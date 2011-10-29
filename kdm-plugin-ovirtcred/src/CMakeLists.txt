@@ -1,0 +1,18 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+PROJECT( KGREET_RHEVCRED )
+
+ADD_DEFINITIONS( -Wall -std=c++98 )
+
+FIND_PACKAGE( KDE4 REQUIRED )
+
+INCLUDE_DIRECTORIES( ./ ../ ${KDE4_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} )
+
+SET( kgreet_rhevcred_PART_SRCS ./kgreet_rhevcred.cpp ./RhevCred.cpp )
+
+KDE4_ADD_PLUGIN( kgreet_rhevcred ${kgreet_rhevcred_PART_SRCS} )
+
+TARGET_LINK_LIBRARIES( kgreet_rhevcred ${KDE4_KDEUI_LIBS} )
+
+INSTALL(TARGETS kgreet_rhevcred DESTINATION ${PLUGIN_INSTALL_DIR} )
+

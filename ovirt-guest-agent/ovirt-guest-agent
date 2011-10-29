@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+# ovirt-guest-agent - Startup script for the oVirt agent daemon
+#
+# chkconfig: 35 85 15
+# description: Startup/shutdown script for the oVirt agent.
+# processname: ovirt-guest-agent
+# config: /etc/ovirt-guest-agent.conf
+# pidfile: /var/run/ovirt-guest-agent/ovirt-guest-agent.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+agentd=/usr/share/ovirt-guest-agent/ovirt-guest-agent.py
+prog=ovirt-guest-agent
+lockfile=/var/lock/subsys/ovirt-guest-agent/${prog}
+pidfile=/var/run/ovirt-guest-agent/${prog}.pid
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting $prog: "
+    # RHEL5 doesn't automatically load the virtio serial module.
+    if [ ! -d /dev/virtio-ports ]; then
+        modprobe virtio_console >/dev/null 2>&1
+        # Give udev some time to create the symbolic links.
+        for retries in `seq 5`; do
+            sleep 1
+            [ -d /dev/virtio-ports ] && break
+        done
+        [ -f /sbin/udevtrigger ] && /sbin/udevtrigger
+    fi
+    daemon --pidfile=${pidfile} --user=rhevagent $agentd $OPTIONS
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    echo
+    return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	killproc -p ${pidfile} -d 10 $agentd
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f $lockfile
+	echo
+}
+
+case "$1" in
+
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    status)
+        status -p ${pidfile} ${prog}
+        RETVAL=$?
+        ;;
+
+    restart)
+        stop
+        start
+        ;;
+
+    condrestart)
+        if [ -f ${pidfile} ] ; then
+            stop
+            start
+        fi
+        ;;
+
+    *)
+        echo $"Usage: $prog {start|stop|restart|condrestart|status}"
+        exit 1
+esac
+
+exit $RETVAL

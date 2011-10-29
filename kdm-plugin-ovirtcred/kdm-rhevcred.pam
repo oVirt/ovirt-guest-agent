@@ -1,0 +1,8 @@
+#%PAM-1.0
+auth        required    pam_rhev_cred.so
+auth        include     password-auth
+account     include     password-auth
+password    include     password-auth
+session     required    pam_selinux.so close
+session     required    pam_selinux.so open
+session     include     password-auth

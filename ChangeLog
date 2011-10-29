@@ -1,0 +1,56 @@
+
+* Thu Oct  6 2011 Gal Hammer <ghammer@redhat.com> - 2.3.16
+- added xorg-x11-drv-qxl to the reported applications.
+- fixed service name in service's status report.
+
+* Thu Sep 27 2011 Gal Hammer <ghammer@redhat.com> - 2.3.15
+- fixed disk usage report when mount point include spaces.
+
+* Thu Sep 22 2011 Gal Hammer <ghammer@redhat.com> - 2.3.14
+- added new 'echo' command.
+
+* Thu Sep 15 2011 Gal Hammer <ghammer@redhat.com> - 2.3.13
+- report new network interaces information (ipv4, ipv6 and
+  mac address)
+- added disks usage report.
+- a new json-based protocol with the vdsm.
+
+* Thu Aug  4 2011 Gal Hammer <ghammer@redhat.com> - 2.3.12
+- mask the user's password in the credentials block
+
+* Thu Jun 16 2011 Gal Hammer <ghammer@redhat.com> - 2.3.9
+- read report rate values from configuration file.
+- replaced executing privilege commands from sudo to
+  consolehelper.
+
+* Tue Jun 14 2011 Gal Hammer <ghammer@redhat.com> - 2.3.8
+- changed to execute the agent with a non-root user.
+- changed the shutdown timeout value to work in minutes.
+
+* Tue May 25 2011 Gal Hammer <ghammer@redhat.com> - 2.3.7
+- stopped removing the domain part from the user name.
+- show only network interfaces that are up and running.
+
+* Mon Apr 4 2011 Gal Hammer <ghammer@redhat.com> - 2.3.6
+- added kdm greeter plug-in.
+
+* Mon Mar 14 2011 Gal Hammer <ghammer@redhat.com> - 2.3.5
+- replaced rhevcredserver execution from blocking main loop to
+  context's iteration (non-blocking).
+
+* Thu Mar 10 2011 Gal Hammer <ghammer@redhat.com> - 2.3.4
+- added some sleep-ing to init script in order to give udev
+  some time to create the symbolic links.
+- changed the kernel version condition.
+
+* Wed Mar 2 2011 Gal Hammer <ghammer@redhat.com> - 2.3.3
+- removed unused file (rhevcredserver) from rhel-5 build.
+
+* Tue Mar 1 2011 Gal Hammer <ghammer@redhat.com> - 2.3.2
+- updated the agent's makefile to work with auto-tools.
+- added sub packages to support the single-sign-on feature.
+- added -h parameter to shutdown command in order to halt the vm
+  after shutdown (bz#680107).
+- converted configuration file to have unix-style line ending.
+- added redhat-rpm-config to build requirements in order to
+  include *.pyc and *.pyo in the rpm file.
