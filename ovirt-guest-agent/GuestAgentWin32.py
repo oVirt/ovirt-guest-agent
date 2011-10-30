@@ -9,9 +9,8 @@ import win32pipe
 import win32security
 import win32process
 import win32con
-import UsbClient
 import subprocess
-from vdsAgentLogic import AgentLogicBase, DataRetriverBase
+from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 from ctypes import *
 from ctypes.util import find_library
 from ctypes.wintypes import *
@@ -340,9 +339,6 @@ class WinVdsAgent(AgentLogicBase):
         logging.debug("WinVdsAgent:: run() entered")
         try:
             self.disable_screen_saver()
-            # TODO: DoUsbAuthorization crash the agent on Windows 2008/R2. Need to fix it!
-            if (self.dr.getOsVersion() != WinOsTypeHandler.WIN2008) and (self.dr.getOsVersion() != WinOsTypeHandler.WIN2008R2):
-                UsbClient.DoUsbAuthorization()
             AgentLogicBase.run(self)
         except:
             logging.exception("WinVdsAgent::run")

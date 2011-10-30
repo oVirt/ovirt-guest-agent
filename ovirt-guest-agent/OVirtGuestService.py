@@ -20,8 +20,8 @@ WTS_SESSION_LOCK = 0x7
 WTS_SESSION_UNLOCK = 0x8
 
 class OVirtGuestService(win32serviceutil.ServiceFramework):
-    _svc_name_ = "OVirt Guest Agent"
-    _svc_display_name_ = "OVirt Guest Agent"
+    _svc_name_ = "OVirtGuestService"
+    _svc_display_name_ = "OVirt Guest Agent Service"
     _svc_description_ = "OVirt Guest Agent Service"
     _svc_deps_ = ["EventLog"]
     def __init__(self, args):

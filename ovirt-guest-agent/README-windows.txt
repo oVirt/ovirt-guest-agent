@@ -32,7 +32,7 @@ Running the service:
 --------------------
 
 > python OVirtGuestService.py -install
-> net OVirtGuestService start
+> net start OVirtGuestService
 
 Building executable file:
 -------------------------
