@@ -1,0 +1,33 @@
+LIBRARY GINASSO
+EXPORTS
+	WlxActivateUserShell
+	WlxDisconnectNotify
+	WlxDisplayLockedNotice
+	WlxDisplaySASNotice
+	WlxDisplayStatusMessage
+	WlxGetConsoleSwitchCredentials
+	WlxGetStatusMessage
+	WlxInitialize
+	WlxIsLockOk
+	WlxIsLogoffOk
+	WlxLoggedOnSAS
+	WlxLoggedOutSAS
+	WlxLogoff
+	WlxNegotiate
+	WlxNetworkProviderLoad
+	WlxReconnectNotify
+	WlxRemoveStatusMessage
+	WlxShutdown
+	WlxWkstaLockedSAS
+	WlxScreenSaverNotify
+	WlxStartApplication
+	
+	
+    
+    
+    
+    
+     
+    
+        
+     

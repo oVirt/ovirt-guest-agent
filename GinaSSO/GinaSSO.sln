@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GinaSSO", "GinaSSO.vcproj", "{87EADA77-9319-446D-9BC3-419B9020B41D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOInstallLogic", "..\SSOInstallLogic\SSOInstallLogic.vcproj", "{E2C275FC-6B2C-4072-8DD6-3EC1DF20839F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87EADA77-9319-446D-9BC3-419B9020B41D} = {87EADA77-9319-446D-9BC3-419B9020B41D}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87EADA77-9319-446D-9BC3-419B9020B41D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{87EADA77-9319-446D-9BC3-419B9020B41D}.Debug|Win32.Build.0 = Debug|Win32
+		{87EADA77-9319-446D-9BC3-419B9020B41D}.Release|Win32.ActiveCfg = Release|Win32
+		{87EADA77-9319-446D-9BC3-419B9020B41D}.Release|Win32.Build.0 = Release|Win32
+		{E2C275FC-6B2C-4072-8DD6-3EC1DF20839F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E2C275FC-6B2C-4072-8DD6-3EC1DF20839F}.Debug|Win32.Build.0 = Debug|Win32
+		{E2C275FC-6B2C-4072-8DD6-3EC1DF20839F}.Release|Win32.ActiveCfg = Release|Win32
+		{E2C275FC-6B2C-4072-8DD6-3EC1DF20839F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
