@@ -1,22 +1,22 @@
 
-PAM_SERVICE_NAME = kdm-rhevcred
+PAM_SERVICE_NAME = kdm-ovirtcred
 
-dist_noinst_DATA =	    	    \
+dist_noinst_DATA =              \
     src/CMakeLists.txt          \
-    src/kgreet_rhevcred.h       \
-    src/kgreet_rhevcred.cpp     \
-    src/RhevCred.h              \
-    src/RhevCred.cpp
+    src/kgreet_ovirtcred.h      \
+    src/kgreet_ovirtcred.cpp    \
+    src/OVirtCred.h             \
+    src/OVirtCred.cpp
 
-kgreet_rhevcreddir = $(KDM_GREETER_PLUGINS_DIR)
-kgreet_rhevcred_DATA = kgreet_rhevcred.so
+kgreet_ovirtcreddir = $(KDM_GREETER_PLUGINS_DIR)
+kgreet_ovirtcred_DATA = kgreet_ovirtcred.so
 
-kgreet_rhevcred.so:
+kgreet_ovirtcred.so:
 	cmake -DCMAKE_INSTALL_PREFIX=/usr src/CMakeLists.txt
 	make -C src
 	(	TMPDIR=`mktemp -d`; \
 		DESTDIR=$$TMPDIR make -C src install; \
-		install -s $$TMPDIR/$(KDM_GREETER_PLUGINS_DIR)/kgreet_rhevcred.so .; \
+		install -s $$TMPDIR/$(KDM_GREETER_PLUGINS_DIR)/kgreet_ovirtcred.so .; \
 		rm -rf $$TMPDIR )
 
 $(PAM_SERVICE_NAME): $(PAM_SERVICE_NAME).pam
@@ -29,5 +29,5 @@ EXTRA_DIST = $(PAM_SERVICE_NAME).pam
 
 CLEANFILES =            \
     *~                  \
-    kgreet_rhevcred.so  \
+    kgreet_ovirtcred.so  \
     $(PAM_SERVICE_NAME)

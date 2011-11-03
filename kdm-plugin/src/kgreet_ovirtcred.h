@@ -1,23 +1,23 @@
 
-#ifndef KGREET_RHEVCRED_H
-#define KGREET_RHEVCRED_H
+#ifndef KGREET_OVIRTCRED_H
+#define KGREET_OVIRTCRED_H
 
 #include <kgreeterplugin.h>
 
 #include <QtCore/QObject>
 
-class RhevCred;
+class OVirtCred;
 
-class KRhevCredGreeter : public QObject, public KGreeterPlugin
+class KOVirtCredGreeter : public QObject, public KGreeterPlugin
 {
     Q_OBJECT
 
 public:
-    KRhevCredGreeter(KGreeterPluginHandler *handler,
+    KOVirtCredGreeter(KGreeterPluginHandler *handler,
         QWidget *parent,
         const QString &fixedEntitiy,
         Function func, Context ctx );
-    virtual ~KRhevCredGreeter();
+    virtual ~KOVirtCredGreeter();
 
         // KGreeterPlugin's methods.
 
@@ -43,9 +43,9 @@ public Q_SLOTS:
     void userAuthenticated(QString token);
 
 private:
-    RhevCred *m_Credentials;
+    OVirtCred *m_Credentials;
     QLabel *m_titleLabel;
     QString m_token;
 };
 
-#endif // KGREET_RHEVCRED_H
+#endif // KGREET_OVIRTCRED_H

@@ -1,6 +1,6 @@
 
-#include "kgreet_rhevcred.h"
-#include "RhevCred.h"
+#include "kgreet_ovirtcred.h"
+#include "OVirtCred.h"
 
 #include <kglobal.h>
 #include <klocale.h>
@@ -8,11 +8,11 @@
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 
-#define KDM_RHEVCRED_SERVER_DBUS_NAME      "com.redhat.rhevm.Credentials"
-#define KDM_RHEVCRED_SERVER_DBUS_PATH      "/com/redhat/rhevm/Credentials"
-#define KDM_RHEVCRED_SERVER_DBUS_INTERFACE KDM_RHEVCRED_SERVER_DBUS_NAME
+#define KDM_OVIRTCRED_SERVER_DBUS_NAME      "org.ovirt.vdsm.Credentials"
+#define KDM_OVIRTCRED_SERVER_DBUS_PATH      "/org/ovirt/vdsm/Credentials"
+#define KDM_OVIRTCRED_SERVER_DBUS_INTERFACE KDM_OVIRTCRED_SERVER_DBUS_NAME
 
-KRhevCredGreeter::KRhevCredGreeter(KGreeterPluginHandler *handler,
+KOVirtCredGreeter::KOVirtCredGreeter(KGreeterPluginHandler *handler,
                                    QWidget *parent,
                                    const QString &fixedEntity,
                                    Function func, Context ctx) :
@@ -29,17 +29,17 @@ KRhevCredGreeter::KRhevCredGreeter(KGreeterPluginHandler *handler,
     widgetList << parent;
 
     QBoxLayout *grid = new QBoxLayout(QBoxLayout::LeftToRight, parent);
-    m_titleLabel = new QLabel(i18n("RHEV-M Automatic Login System"), parent);
+    m_titleLabel = new QLabel(i18n("oVirt Automatic Login System"), parent);
     grid->addWidget(m_titleLabel, 0, Qt::AlignHCenter);    
 
-    m_Credentials = new RhevCred(KDM_RHEVCRED_SERVER_DBUS_NAME, KDM_RHEVCRED_SERVER_DBUS_PATH,
+    m_Credentials = new OVirtCred(KDM_OVIRTCRED_SERVER_DBUS_NAME, KDM_OVIRTCRED_SERVER_DBUS_PATH,
         QDBusConnection::systemBus(), 0);
         
     QObject::connect(m_Credentials, SIGNAL(UserAuthenticated(QString)),
         this, SLOT(userAuthenticated(QString)));
 }
 
-KRhevCredGreeter::~KRhevCredGreeter()
+KOVirtCredGreeter::~KOVirtCredGreeter()
 {
     abort();
     qDeleteAll(widgetList);
@@ -47,35 +47,35 @@ KRhevCredGreeter::~KRhevCredGreeter()
     delete m_Credentials;
 }
 
-void KRhevCredGreeter::loadUsers(const QStringList &users)
+void KOVirtCredGreeter::loadUsers(const QStringList &users)
 {
     // We do no offer a selectable users list.
     Q_UNUSED(users);
 }
 
-void KRhevCredGreeter::presetEntity(const QString &entity, int field)
+void KOVirtCredGreeter::presetEntity(const QString &entity, int field)
 {
     // We do not care about preloaded users either.
     Q_UNUSED(entity);
     Q_UNUSED(field);
 }
 
-QString KRhevCredGreeter::getEntity() const
+QString KOVirtCredGreeter::getEntity() const
 {
     return QString();
 }
 
-void KRhevCredGreeter::setUser(const QString &user)
+void KOVirtCredGreeter::setUser(const QString &user)
 {
     Q_UNUSED(user);
 }
 
-void KRhevCredGreeter::setEnabled(bool on)
+void KOVirtCredGreeter::setEnabled(bool on)
 {
     Q_UNUSED(on);
 }
 
-bool KRhevCredGreeter::textMessage(const char *message, bool error)
+bool KOVirtCredGreeter::textMessage(const char *message, bool error)
 {
     if (error) {
         // Stop authentication.
@@ -87,7 +87,7 @@ bool KRhevCredGreeter::textMessage(const char *message, bool error)
     return true;
 }
 
-void KRhevCredGreeter::textPrompt(const char *prompt, bool echo, bool nonBlocking)
+void KOVirtCredGreeter::textPrompt(const char *prompt, bool echo, bool nonBlocking)
 {
     Q_UNUSED(echo);
     Q_UNUSED(nonBlocking);
@@ -101,59 +101,59 @@ void KRhevCredGreeter::textPrompt(const char *prompt, bool echo, bool nonBlockin
     }
 }
 
-bool KRhevCredGreeter::binaryPrompt(const char *prompt, bool nonBlocking)
+bool KOVirtCredGreeter::binaryPrompt(const char *prompt, bool nonBlocking)
 {
     Q_UNUSED(prompt);
     Q_UNUSED(nonBlocking);
     return true;
 }
 
-void KRhevCredGreeter::start()
+void KOVirtCredGreeter::start()
 {
 
 }
 
-void KRhevCredGreeter::suspend()
+void KOVirtCredGreeter::suspend()
 {
 
 }
 
-void KRhevCredGreeter::resume()
+void KOVirtCredGreeter::resume()
 {
 
 }
 
-void KRhevCredGreeter::next()
+void KOVirtCredGreeter::next()
 {
 
 }
 
-void KRhevCredGreeter::abort()
+void KOVirtCredGreeter::abort()
 {
 
 }
 
-void KRhevCredGreeter::succeeded()
+void KOVirtCredGreeter::succeeded()
 {
 
 }
 
-void KRhevCredGreeter::failed()
+void KOVirtCredGreeter::failed()
 {
 
 }
 
-void KRhevCredGreeter::revive()
+void KOVirtCredGreeter::revive()
 {
 
 }
 
-void KRhevCredGreeter::clear()
+void KOVirtCredGreeter::clear()
 {
 
 }
 
-void KRhevCredGreeter::userAuthenticated(QString token)
+void KOVirtCredGreeter::userAuthenticated(QString token)
 {
     m_token = token;
     
@@ -166,13 +166,13 @@ static bool init(const QString &,
 {
     Q_UNUSED(getConf);
     Q_UNUSED(ctx);
-    KGlobal::locale()->insertCatalog("kgreet_rhevcred");
+    KGlobal::locale()->insertCatalog("kgreet_ovirtcred");
     return true;
 }
 
 static void done()
 {
-    KGlobal::locale()->removeCatalog("kgreet_rhevcred");
+    KGlobal::locale()->removeCatalog("kgreet_ovirtcred");
 }
 
 static KGreeterPlugin* create(KGreeterPluginHandler *handler,
@@ -181,13 +181,13 @@ static KGreeterPlugin* create(KGreeterPluginHandler *handler,
                               KGreeterPlugin::Function func,
                               KGreeterPlugin::Context ctx)
 {
-    return new KRhevCredGreeter(handler, parent, fixedEntity, func, ctx);
+    return new KOVirtCredGreeter(handler, parent, fixedEntity, func, ctx);
 }
 
 KDE_EXPORT KGreeterPluginInfo kgreeterplugin_info = {
-    I18N_NOOP2("@item:inmenu authentication method", "RHEV-M Authentication"), "rhevcred",
+    I18N_NOOP2("@item:inmenu authentication method", "oVirt Authentication"), "ovirtcred",
     KGreeterPluginInfo::Local | KGreeterPluginInfo::Presettable,
     init, done, create
 };
 
-#include "kgreet_rhevcred.moc"
+#include "kgreet_ovirtcred.moc"

@@ -1,7 +1,8 @@
 
-SUBDIRS =                   \
+SUBDIRS =                \
     ovirt-guest-agent    \
-    pam-ovirt-cred
+    pam-ovirt-cred       \
+    kdm-plugin
 
 CLEANFILES = \
     *~

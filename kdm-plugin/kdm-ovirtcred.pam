@@ -1,5 +1,5 @@
 #%PAM-1.0
-auth        required    pam_rhev_cred.so
+auth        required    pam_ovirt_cred.so
 auth        include     password-auth
 account     include     password-auth
 password    include     password-auth

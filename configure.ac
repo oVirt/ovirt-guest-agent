@@ -128,17 +128,17 @@ dnl ---------------------------------------------------------------------------
 dnl - Directory for KDM greeter plugins
 dnl ---------------------------------------------------------------------------
 
-#KDM_GREETER_PLUGINS_DIR=${libdir}/kde4
-#AC_SUBST(KDM_GREETER_PLUGINS_DIR)
+KDM_GREETER_PLUGINS_DIR=${libdir}/kde4
+AC_SUBST(KDM_GREETER_PLUGINS_DIR)
 
 dnl ---------------------------------------------------------------------------
 dnl - Configuration file stuff
 dnl ---------------------------------------------------------------------------
-#AC_ARG_WITH(extensionsdatadir,
-#            AS_HELP_STRING([--with-extensions-datadir],
-#                           [directory where extensions store data, default=DATADIR/gdm/simple-greeter/extensions]),
-#            extensionsdatadir=${withval}, extensionsdatadir=${datadir}/gdm/simple-greeter/extensions)
-#AC_SUBST(extensionsdatadir)
+AC_ARG_WITH(extensionsdatadir,
+            AS_HELP_STRING([--with-extensions-datadir],
+                           [directory where extensions store data, default=DATADIR/gdm/simple-greeter/extensions]),
+            extensionsdatadir=${withval}, extensionsdatadir=${datadir}/gdm/simple-greeter/extensions)
+AC_SUBST(extensionsdatadir)
 
 AC_CONFIG_FILES([
     Makefile
@@ -146,12 +146,13 @@ AC_CONFIG_FILES([
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
     pam-ovirt-cred/Makefile
+    kdm-plugin/Makefile
 ])
 
 #    gdm-plugin-rhevcred/Makefile
 #    gdm-plugin-rhevcred/icons/Makefile
 #    gdm-plugin-rhevcred/icons/16x16/Makefile
 #    gdm-plugin-rhevcred/icons/48x48/Makefile
-#    kdm-plugin-rhevcred/Makefile
 
 AC_OUTPUT
+

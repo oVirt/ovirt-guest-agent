@@ -1,8 +1,8 @@
 
 %define release_version 1
 
-#%define _moduledir /%{_lib}/security
-#%define _kdmrc /etc/kde/kdm/kdmrc
+%define _moduledir /%{_lib}/security
+%define _kdmrc /etc/kde/kdm/kdmrc
 
 #%define libauditver 1.0.6
 #%define pango_version 1.2.0
@@ -44,17 +44,17 @@ Requires: selinux-policy >= 3.7.19-93.el6_1.3
 
 %package pam-module
 Summary: oVirt Guest Agent PAM module
-Requires: pam rhev-agent
+Requires: pam ovirt-guest-agent
 
 #%package gdm-plugin-rhevcred
 #Summary: GDM rhevcred plug-in
 #Requires: gdm rhev-agent
 #Requires: rhev-agent-pam-rhev-cred
 
-#%package kdm-plugin-rhevcred
-#Summary: KDM rhevcred plug-in
-#Requires: kdm rhev-agent
-#Requires: rhev-agent-pam-rhev-cred
+%package kdm-plugin
+Summary: KDM rhevcred plug-in
+Requires: kdm ovirt-guest-agent
+Requires: ovirt-guest-agent-pam-module
 
 # No gdm-devel package is available for plug-in development. So for now
 # we build the gdm package.
@@ -91,8 +91,8 @@ Requires: pam rhev-agent
 #BuildRequires: libxklavier-devel >= 4.0
 #BuildRequires: DeviceKit-power-devel >= 008
 
-# kdm-plugin-rhevcred's requirements.
-#BuildRequires: kdebase-workspace-devel
+# kdm-plugin's requirements.
+BuildRequires: kdebase-workspace-devel
 
 %description
 This is the oVirt managment agent running inside the guest. The agent
@@ -109,9 +109,9 @@ oVirt automatic login system.
 #The GDM rhevcred plug-in provides the functionality necessary to use the
 #RHEV-M automatic login system.
 
-#%description kdm-plugin-rhevcred
-#The KDM rhevcred plug-in provides the functionality necessary to use the
-#RHEV-M automatic login system.
+%description kdm-plugin
+The KDM plug-in provides the functionality necessary to use the
+oVirt automatic login system.
 
 %prep
 %setup -q
@@ -175,11 +175,11 @@ ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-shutdown
 
 /sbin/chkconfig --add %{name}
 
-#%post kdm-plugin-rhevcred
-#if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
-#then
-#    sed -i "s~^#PluginsLogin=winbind~PluginsLogin=rhevcred,classic~" "%{_kdmrc}"
-#fi
+%post kdm-plugin
+if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
+then
+    sed -i "s~^#PluginsLogin=winbind~PluginsLogin=ovirtcred,classic~" "%{_kdmrc}"
+fi
 
 %preun
 if [ "$1" -eq 0 ]
@@ -199,8 +199,8 @@ fi
 rm -f %{_datadir}/%{name}/ovirt-locksession
 rm -f %{_datadir}/%{name}/ovirt-shutdown
 
-#%postun kdm-plugin-rhevcred
-#sed -i "s~PluginsLogin=rhevcred,classic~#PluginsLogin=winbind~" "%{_kdmrc}"
+%postun kdm-plugin
+sed -i "s~PluginsLogin=ovirtcred,classic~#PluginsLogin=winbind~" "%{_kdmrc}"
 
 %files
 %defattr(-,root,root,-)
@@ -237,10 +237,10 @@ rm -f %{_datadir}/%{name}/ovirt-shutdown
 #%{_datadir}/gdm/simple-greeter/extensions/rhevcred/page.ui
 #%{_libdir}/gdm/simple-greeter/plugins/rhevcred.so
 
-#%files kdm-plugin-rhevcred
-#%defattr(-,root,root,-)
-#%config %{_sysconfdir}/pam.d/kdm-rhevcred
-#%{_libdir}/kde4/kgreet_rhevcred.so
+%files kdm-plugin
+%defattr(-,root,root,-)
+%config %{_sysconfdir}/pam.d/kdm-ovirtcred
+%attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
 * Thu Sep 27 2011 Gal Hammer <ghammer@redhat.com> - 2.3.15-1
