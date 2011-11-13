@@ -258,41 +258,35 @@ class WinDataRetriver(DataRetriverBase):
         return total_list
 
     def getActiveUser(self):
-        retval = "None"
+        user = "None"
         try:
-            cur_session = None
-            sessionDict = win32ts.WTSEnumerateSessions(win32ts.WTS_CURRENT_SERVER_HANDLE, 1)
-            for sess in sessionDict:
-                #check if session state is active (=0)
-                if sess['State'] == 0:
-                    cur_session = sess
-                    break
-            if cur_session:
-                sessionId = cur_session['SessionId']
-                userName = win32ts.WTSQuerySessionInformation(win32ts.WTS_CURRENT_SERVER_HANDLE, sessionId, win32ts.WTSUserName)
-                domainName = win32ts.WTSQuerySessionInformation(win32ts.WTS_CURRENT_SERVER_HANDLE, sessionId, win32ts.WTSDomainName)
-                retval = [userName, domainName]
-        except:
-            logging.exception("WinDataRetriver::getActiveUser")
-
-        #handling the fqdn
-        if type(retval) == types.ListType and len(retval) == 2:
-            if retval[1].lower() != self.getMachineName().lower():
+            domain = ""
+            sessionId = win32ts.WTSGetActiveConsoleSessionId()
+            if sessionId != 0xffffffff:
+                user = win32ts.WTSQuerySessionInformation(win32ts.WTS_CURRENT_SERVER_HANDLE,
+                    sessionId, win32ts.WTSUserName)
+                domain = win32ts.WTSQuerySessionInformation(win32ts.WTS_CURRENT_SERVER_HANDLE,
+                    sessionId, win32ts.WTSDomainName)
+            if domain == "":
+                pass
+            elif domain.lower() != self.getMachineName().lower():
+                # Use FQDN as user name if computer is part of a domain.
                 try:
-                    translated = win32security.TranslateName(u"%s\\%s" % (retval[1], retval[0]), win32api.NameSamCompatible, win32api.NameUserPrincipal)
-                    # Check for error because no exception is thrown when running under Windows XP.
+                    user = u"%s\\%s" % (domain, user)
+                    user = win32security.TranslateName(user,
+                        win32api.NameSamCompatible, win32api.NameUserPrincipal)
+                    # Check for error because no exception is raised when running under Windows XP.
                     err = win32api.GetLastError()
                     if err != 0:
-                        raise Exception(err)
-                    retval = translated
-                except Exception, ex:
-                    logging.debug("WinDataRetriver::getActiveUser TranslateName error = '%d'", ex.args[0])
-                    retval = u"%s\\%s" % (retval[1], retval[0])
+                        raise RuntimeError(err, 'TranslateName')
+                except:
+                    logging.exception("Error on user name translation.")
             else:
-                retval = u"%s@%s" % (retval[0], retval[1])
-
-        logging.debug("WinDataRetriver::getActiveUser activeUser = '%s'", retval)
-        return retval.encode('utf8')
+                user = u"%s@%s" % (user, domain)
+        except:
+            logging.exception("Error retrieving active user name.")
+        logging.debug("Activer user: %s", user)
+        return user.encode('utf8')
 
     def getDisksUsage(self):
         usages = list()
