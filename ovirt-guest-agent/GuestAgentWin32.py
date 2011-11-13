@@ -141,8 +141,8 @@ class CommandHandlerWin:
             logging.exception("Error occurred during user login.")
 
     def logoff(self):
-        sessionId = self.WTSGetActiveConsoleSessionId()
-        if sessionId is not None:
+        sessionId = win32ts.WTSGetActiveConsoleSessionId()
+        if sessionId != 0xffffffff:
             logging.debug("Logging off current user (session %d)", sessionId)
             win32ts.WTSLogoffSession(win32ts.WTS_CURRENT_SERVER_HANDLE, sessionId, 0)
         else:
@@ -173,25 +173,12 @@ class CommandHandlerWin:
         if old_value:
             windll.kernel32.Wow64DisableWow64FsRedirection(old_value)
 
-    # WTSGetActiveConsoleSessionId is not implemented. Do the console search yourself.
-    def WTSGetActiveConsoleSessionId(self):
-        sessionId = None
-        try:
-            sessions = win32ts.WTSEnumerateSessions(win32ts.WTS_CURRENT_SERVER_HANDLE, 1)
-            for session in sessions:
-                if session['WinStationName'] == u'Console':
-                    sessionId = session['SessionId']
-                    break
-        except:
-            logging.exception("WTSGetActiveConsoleSessionId exception")
-        return sessionId
-
     # The LockWorkStation function is callable only by processes running on the interactive desktop.
     def LockWorkStation(self):
         try:
             logging.debug("LockWorkStation was called.")
-            sessionId = self.WTSGetActiveConsoleSessionId()
-            if sessionId is not None:
+            sessionId = win32ts.WTSGetActiveConsoleSessionId()
+            if sessionId != 0xffffffff:
                 logging.debug("Locking workstation (session %d)", sessionId)
                 dupToken = None
                 userToken = win32ts.WTSQueryUserToken(sessionId)
