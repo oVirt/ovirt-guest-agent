@@ -6,15 +6,15 @@
 # description: Startup/shutdown script for the oVirt agent.
 # processname: ovirt-guest-agent
 # config: /etc/ovirt-guest-agent.conf
-# pidfile: /var/run/ovirt-guest-agent/ovirt-guest-agent.pid
+# pidfile: /run/ovirt-guest-agent.pid
 
 # Source function library.
 . /etc/rc.d/init.d/functions
 
 agentd=/usr/share/ovirt-guest-agent/ovirt-guest-agent.py
 prog=ovirt-guest-agent
-lockfile=/var/lock/subsys/ovirt-guest-agent/${prog}
-pidfile=/var/run/ovirt-guest-agent/${prog}.pid
+lockfile=/var/lock/subsys/${prog}
+pidfile=/run/${prog}.pid
 
 RETVAL=0
 
@@ -29,6 +29,10 @@ start() {
             [ -d /dev/virtio-ports ] && break
         done
         [ -f /sbin/udevtrigger ] && /sbin/udevtrigger
+    fi
+    if [ ! -f ${pidfile} ]; then
+        /bin/touch ${pidfile}
+        /bin/chown rhevagent:rhevagent ${pidfile}
     fi
     daemon --pidfile=${pidfile} --user=rhevagent $agentd $OPTIONS
     RETVAL=$?

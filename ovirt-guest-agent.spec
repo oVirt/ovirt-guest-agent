@@ -22,7 +22,7 @@ Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
 License: GPLv2+
-URL: http://git.engineering.redhat.com/git/users/bazulay/rhev-agent.git
+URL: http://gerrit.ovirt.org/p/ovirt-guest-agent.git
 Source0: %{name}-%{version}.tar.bz2
 ExclusiveArch: i386 x86_64
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -48,11 +48,11 @@ Requires: pam ovirt-guest-agent
 
 #%package gdm-plugin-rhevcred
 #Summary: GDM rhevcred plug-in
-#Requires: gdm rhev-agent
-#Requires: rhev-agent-pam-rhev-cred
+#Requires: gdm ovirt-guest-agent
+#Requires: ovirt-guest-agent-pam-module
 
 %package kdm-plugin
-Summary: KDM rhevcred plug-in
+Summary: KDM ovirtcred plug-in
 Requires: kdm ovirt-guest-agent
 Requires: ovirt-guest-agent-pam-module
 
@@ -120,8 +120,8 @@ autoreconf -i -f
 
 %build
 %configure \
-	--enable-securedir=%{_moduledir} \
-	--includedir=%{_includedir}/security \
+    --enable-securedir=%{_moduledir} \
+    --includedir=%{_includedir}/security \
     --with-gdm-src-dir=%{_topdir}/BUILD/gdm-2.30.4 \
     --with-pam-prefix=%{_sysconfdir}
     
@@ -162,7 +162,7 @@ getent passwd rhevagent > /dev/null || /usr/sbin/useradd -u 175 -o -r rhevagent 
 
 %post
 
-%define _agent_pid %{_localstatedir}/run/%{name}/%{name}.pid
+%define _agent_pid /run/%{name}.pid
 
 sed -i "s~AGENT_CONFIG\s*=\s*[^\n]*~AGENT_CONFIG = '%{_sysconfdir}/%{name}.conf'~" %{_datadir}/%{name}/%{name}.py
 sed -i "s~AGENT_PIDFILE\s*=\s*[^\n]*~AGENT_PIDFILE = '%{_agent_pid}'~" %{_datadir}/%{name}/%{name}.py
@@ -196,17 +196,21 @@ then
 fi
 
 %postun
-rm -f %{_datadir}/%{name}/ovirt-locksession
-rm -f %{_datadir}/%{name}/ovirt-shutdown
+if [ "$1" -eq 0 ]
+then
+    rm -f %{_datadir}/%{name}/ovirt-locksession
+    rm -f %{_datadir}/%{name}/ovirt-shutdown
+fi
 
 %postun kdm-plugin
-sed -i "s~PluginsLogin=ovirtcred,classic~#PluginsLogin=winbind~" "%{_kdmrc}"
+if [ "$1" -eq 0 ]
+then
+    sed -i "s~PluginsLogin=ovirtcred,classic~#PluginsLogin=winbind~" "%{_kdmrc}"
+fi
 
 %files
 %defattr(-,root,root,-)
 %dir %attr (755,rhevagent,rhevagent) %{_localstatedir}/log/%{name}
-%dir %attr (755,rhevagent,rhevagent) %{_localstatedir}/run/%{name}
-%dir %attr (755,rhevagent,rhevagent) %{_localstatedir}/lock/subsys/%{name}
 %dir %attr (755,root,root) %{_datadir}/%{name}
 %config %{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
