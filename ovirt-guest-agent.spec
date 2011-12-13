@@ -162,12 +162,6 @@ getent passwd rhevagent > /dev/null || /usr/sbin/useradd -u 175 -o -r rhevagent 
 
 %post
 
-%define _agent_pid /run/%{name}.pid
-
-sed -i "s~AGENT_CONFIG\s*=\s*[^\n]*~AGENT_CONFIG = '%{_sysconfdir}/%{name}.conf'~" %{_datadir}/%{name}/%{name}.py
-sed -i "s~AGENT_PIDFILE\s*=\s*[^\n]*~AGENT_PIDFILE = '%{_agent_pid}'~" %{_datadir}/%{name}/%{name}.py
-sed -i "s~^pidfile=[^\n]*~pidfile=%{_agent_pid}~" %{_sysconfdir}/init.d/%{name}
-
 ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-locksession
 ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-shutdown
 
