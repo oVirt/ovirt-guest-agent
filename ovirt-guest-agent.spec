@@ -4,17 +4,14 @@
 %define _moduledir /%{_lib}/security
 %define _kdmrc /etc/kde/kdm/kdmrc
 
-#%define libauditver 1.0.6
-#%define pango_version 1.2.0
-#%define gtk2_version 2.6.0
-#%define libglade2_version 2.0.0
-#%define libgnomeui_version 2.2.0
-#%define scrollkeeper_version 0.3.4
-#%define pam_version 0.99.8.1-11
-#%define desktop_file_utils_version 0.2.90
-#%define gail_version 1.2.0
-#%define nss_version 3.11.1
-#%define fontconfig_version 2.6.0
+%define libauditver 1.0.6
+%define pango_version 1.2.0
+%define gtk3_version 2.99.2
+%define scrollkeeper_version 0.3.4
+%define pam_version 0.99.8.1-11
+%define desktop_file_utils_version 0.2.90
+%define nss_version 3.11.1
+%define fontconfig_version 2.6.0
 
 Name: ovirt-guest-agent
 Version: 1.0.0
@@ -24,7 +21,7 @@ Group: Applications/System
 License: GPLv2+
 URL: http://gerrit.ovirt.org/p/ovirt-guest-agent.git
 Source0: %{name}-%{version}.tar.bz2
-ExclusiveArch: i386 x86_64
+ExclusiveArch: i686 x86_64
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: python
 BuildRequires: redhat-rpm-config
@@ -46,50 +43,50 @@ Requires: selinux-policy >= 3.7.19-93.el6_1.3
 Summary: oVirt Guest Agent PAM module
 Requires: pam ovirt-guest-agent
 
-#%package gdm-plugin-rhevcred
-#Summary: GDM rhevcred plug-in
-#Requires: gdm ovirt-guest-agent
-#Requires: ovirt-guest-agent-pam-module
+%package gdm-plugin
+Summary: GDM oVirt plug-in
+Requires: gdm ovirt-guest-agent
+Requires: ovirt-guest-agent-pam-module
 
 %package kdm-plugin
-Summary: KDM ovirtcred plug-in
+Summary: KDM oVirt plug-in
 Requires: kdm ovirt-guest-agent
 Requires: ovirt-guest-agent-pam-module
 
 # No gdm-devel package is available for plug-in development. So for now
 # we build the gdm package.
-#Source1: gdm-2.30.4-14.el6.src.rpm
+Source1: gdm-3.2.1.1-6.fc16.src.rpm
 
-# The following requirements were copied from the gdm.spec file.
-#BuildRequires: pkgconfig(libcanberra-gtk)
-#BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
-#BuildRequires: pango-devel >= 0:%{pango_version}
-#BuildRequires: gtk2-devel >= 0:%{gtk2_version}
-#BuildRequires: libglade2-devel >= 0:%{libglade2_version}
-#BuildRequires: libgnomeui-devel >= 0:%{libgnomeui_version}
-#BuildRequires: pam-devel >= 0:%{pam_version}
-#BuildRequires: fontconfig >= 0:%{fontconfig_version}
-#BuildRequires: desktop-file-utils >= %{desktop_file_utils_version}
-#BuildRequires: gail-devel >= 0:%{gail_version}
-#BuildRequires: libtool automake autoconf
-#BuildRequires: libattr-devel
-#BuildRequires: gettext
-#BuildRequires: gnome-doc-utils
-#BuildRequires: libdmx-devel
-#BuildRequires: audit-libs-devel >= %{libauditver}
-#BuildRequires: autoconf automake libtool
-#BuildRequires: intltool
-#%ifnarch s390 s390x
-#BuildRequires: xorg-x11-server-Xorg
-#%endif
-#BuildRequires: nss-devel >= %{nss_version}
-#BuildRequires: ConsoleKit
-#BuildRequires: libselinux-devel
-#BuildRequires: check-devel
-#BuildRequires: iso-codes-devel
-#BuildRequires: gnome-panel-devel
-#BuildRequires: libxklavier-devel >= 4.0
-#BuildRequires: DeviceKit-power-devel >= 008
+BuildRequires: pkgconfig(libcanberra-gtk)
+BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
+BuildRequires: pango-devel >= 0:%{pango_version}
+BuildRequires: gtk3-devel >= 0:%{gtk3_version}
+BuildRequires: pam-devel >= 0:%{pam_version}
+BuildRequires: fontconfig >= 0:%{fontconfig_version}
+BuildRequires: desktop-file-utils >= %{desktop_file_utils_version}
+BuildRequires: libtool automake autoconf
+BuildRequires: libattr-devel
+BuildRequires: gettext
+BuildRequires: gnome-doc-utils
+BuildRequires: libdmx-devel
+BuildRequires: audit-libs-devel >= %{libauditver}
+BuildRequires: gobject-introspection-devel
+BuildRequires: autoconf automake libtool
+BuildRequires: intltool
+%ifnarch s390 s390x ppc64
+BuildRequires: xorg-x11-server-Xorg
+%endif
+BuildRequires: nss-devel >= %{nss_version}
+BuildRequires: ConsoleKit
+BuildRequires: libselinux-devel
+BuildRequires: check-devel
+BuildRequires: iso-codes-devel
+BuildRequires: libxklavier-devel >= 4.0
+BuildRequires: upower-devel >= 0.9.7
+BuildRequires: libXdmcp-devel
+BuildRequires: dbus-glib-devel
+BuildRequires: GConf2-devel
+BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 
 # kdm-plugin's requirements.
 BuildRequires: kdebase-workspace-devel
@@ -105,9 +102,9 @@ restart).
 The oVirt PAM module provides the functionality necessary to use the
 oVirt automatic login system.
 
-#%description gdm-plugin-rhevcred
-#The GDM rhevcred plug-in provides the functionality necessary to use the
-#RHEV-M automatic login system.
+%description gdm-plugin
+The GDM plug-in provides the functionality necessary to use the
+oVirt automatic login system.
 
 %description kdm-plugin
 The KDM plug-in provides the functionality necessary to use the
@@ -115,14 +112,14 @@ oVirt automatic login system.
 
 %prep
 %setup -q
-#rpmbuild --define="_topdir %{_topdir}" --recompile %{SOURCE1}
+rpmbuild --define="_topdir %{_topdir}" --recompile %{SOURCE1}
 autoreconf -i -f
 
 %build
 %configure \
     --enable-securedir=%{_moduledir} \
     --includedir=%{_includedir}/security \
-    --with-gdm-src-dir=%{_topdir}/BUILD/gdm-2.30.4 \
+    --with-gdm-src-dir=%{_topdir}/BUILD/gdm-3.2.1.1 \
     --with-pam-prefix=%{_sysconfdir}
     
 make %{?_smp_mflags}
@@ -131,9 +128,9 @@ make %{?_smp_mflags}
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
 # libtool will look for this file when relinking during installation.
-#mkdir -p $RPM_BUILD_ROOT%{_libdir}
-#cp %{_topdir}/BUILDROOT/gdm-2.30.4-14.el6.%{?_arch}%{_libdir}/libgdmsimplegreeter.so \
-#    $RPM_BUILD_ROOT%{_libdir}
+mkdir -p $RPM_BUILD_ROOT%{_libdir}
+cp %{_topdir}/BUILDROOT/gdm-3.2.1.1-6.fc16.%{?_arch}%{_libdir}/libgdmsimplegreeter.so \
+    $RPM_BUILD_ROOT%{_libdir}
 
 make install DESTDIR=$RPM_BUILD_ROOT
 
@@ -142,10 +139,10 @@ make install DESTDIR=$RPM_BUILD_ROOT
 touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/%{name}/*.py
 
 # No longer needed and is provided by the gdm package.
-#rm -f $RPM_BUILD_ROOT%{_libdir}/libgdmsimplegreeter.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/libgdmsimplegreeter.so
 
-#rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/rhevcred.a
-#rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/rhevcred.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
 
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.a
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.la
@@ -228,12 +225,13 @@ fi
 %defattr(-,root,root,-)
 %{_moduledir}/pam_ovirt_cred.so
 
-#%files gdm-plugin-rhevcred
-#%defattr(-,root,root,-)
-#%config %{_sysconfdir}/pam.d/gdm-rhevcred
-#%{_datadir}/icons/hicolor/*/apps/gdm-rhevcred.png
-#%{_datadir}/gdm/simple-greeter/extensions/rhevcred/page.ui
-#%{_libdir}/gdm/simple-greeter/plugins/rhevcred.so
+%files gdm-plugin
+%defattr(-,root,root,-)
+%config %{_sysconfdir}/pam.d/gdm-ovirtcred
+%{_datadir}/icons/hicolor/*/*/*.png
+%dir %{_datadir}/gdm/simple-greeter/extensions/ovirtcred
+%{_datadir}/gdm/simple-greeter/extensions/ovirtcred/page.ui
+%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.so
 
 %files kdm-plugin
 %defattr(-,root,root,-)
