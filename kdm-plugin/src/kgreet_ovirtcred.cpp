@@ -25,7 +25,7 @@ KOVirtCredGreeter::KOVirtCredGreeter(KGreeterPluginHandler *handler,
     Q_UNUSED(ctx);
 
     parent = new QWidget(parent);
-    parent->setObjectName("talker");
+    parent->setObjectName("welcome");
     widgetList << parent;
 
     QBoxLayout *grid = new QBoxLayout(QBoxLayout::LeftToRight, parent);
