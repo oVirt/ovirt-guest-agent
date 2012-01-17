@@ -24,12 +24,9 @@ Source0: %{name}-%{version}.tar.bz2
 ExclusiveArch: i686 x86_64
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: python
-BuildRequires: redhat-rpm-config
-BuildRequires: autoconf >= 2.60
 BuildRequires: automake
 BuildRequires: libtool
 BuildRequires: pam-devel
-Requires: python
 Requires: dbus-python
 Requires: rpm-python
 Requires: SysVinit
