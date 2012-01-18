@@ -173,6 +173,20 @@ class CommandHandlerWin:
         if old_value:
             windll.kernel32.Wow64DisableWow64FsRedirection(old_value)
 
+    def hibernate(self, state):
+        token = win32security.OpenProcessToken(win32api.GetCurrentProcess(),
+            win32security.TOKEN_QUERY | win32security.TOKEN_ADJUST_PRIVILEGES)
+        shutdown_priv = win32security.LookupPrivilegeValue(None,
+            win32security.SE_SHUTDOWN_NAME)
+        privs = win32security.AdjustTokenPrivileges(token, False,
+            [ (shutdown_priv, win32security.SE_PRIVILEGE_ENABLED) ])
+        logging.debug("Privileges before hibernation: %s", privs)
+        if windll.powrprof.SetSuspendState(state=='disk', True, False) != 0:
+            logging.info("System was in hibernation state.")
+        else:
+            logging.error("Error setting system to hibernation state: %d",
+                win32api.GetLastError())
+
     # The LockWorkStation function is callable only by processes running on the interactive desktop.
     def LockWorkStation(self):
         try:

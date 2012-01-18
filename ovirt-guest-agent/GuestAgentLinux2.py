@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2010 Red Hat, Inc. and/or its affiliates.
+# Copyright 2010-2012 Red Hat, Inc. and/or its affiliates.
 #
 # Licensed to you under the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -43,6 +43,11 @@ class CommandHandlerLinux:
         delay = (int(timeout) + 59) / 60
         cmd = [ '/usr/share/ovirt-guest-agent/ovirt-shutdown', '-h', "+%d" % (delay), "\"%s\"" % (msg) ]
         logging.debug("Executing shutdown command: %s", cmd)
+        subprocess.call(cmd)
+
+    def hibernate(self, state):
+        cmd = [ '/usr/share/ovirt-guest-agent/ovirt-hibernate', state ]
+        logging.debug("Executing hibernate command: %s", cmd)
         subprocess.call(cmd)
 
 class LinuxDataRetriver(DataRetriverBase):

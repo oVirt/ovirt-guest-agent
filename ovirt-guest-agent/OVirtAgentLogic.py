@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2010 Red Hat, Inc. and/or its affiliates.
+# Copyright 2010-2012 Red Hat, Inc. and/or its affiliates.
 #
 # Licensed to you under the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -152,6 +152,9 @@ class AgentLogicBase:
         elif command == 'echo':
             logging.debug("Echo: %s", args)
             self.vio.write('echo', args)
+        elif command == 'hibernate':
+            state = args.get('state', 'disk')
+            self.commandHandler.hibernate(state)
         else:
             logging.error("Unknown external command: %s (%s)" % (command, args))
 

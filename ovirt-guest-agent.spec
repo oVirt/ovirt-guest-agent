@@ -1,5 +1,5 @@
 
-%define release_version 1
+%define release_version 2
 
 %define _moduledir /%{_lib}/security
 %define _kdmrc /etc/kde/kdm/kdmrc
@@ -161,6 +161,7 @@ getent passwd rhevagent > /dev/null || /usr/sbin/useradd -u 175 -o -r rhevagent 
 
 ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-locksession
 ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-shutdown
+ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-hibernate
 
 /sbin/udevadm trigger /dev/vport*
 
@@ -191,6 +192,7 @@ if [ "$1" -eq 0 ]
 then
     rm -f %{_datadir}/%{name}/ovirt-locksession
     rm -f %{_datadir}/%{name}/ovirt-shutdown
+    rm -f %{_datadir}/%{name}/ovirt-hibernate
 fi
 
 %postun kdm-plugin
@@ -207,8 +209,10 @@ fi
 %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
 %{_sysconfdir}/security/console.apps/ovirt-locksession
 %{_sysconfdir}/security/console.apps/ovirt-shutdown
+%{_sysconfdir}/security/console.apps/ovirt-hibernate
 %{_sysconfdir}/pam.d/ovirt-locksession
 %{_sysconfdir}/pam.d/ovirt-shutdown
+%{_sysconfdir}/pam.d/ovirt-hibernate
 %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-%{name}.rules
 %attr (755,root,root) %{_sysconfdir}/init.d/%{name}
 %attr (755,root,root) %{_datadir}/%{name}/%{name}.py*
@@ -217,6 +221,7 @@ fi
 %{_datadir}/%{name}/CredServer.py*
 %{_datadir}/%{name}/GuestAgentLinux2.py*
 %attr (755,root,root) %{_datadir}/%{name}/LockActiveSession.py*
+%attr (755,root,root) %{_datadir}/%{name}/hibernate
 %{_datadir}/%{name}/utils.py*
 
 %doc AUTHORS COPYING NEWS README

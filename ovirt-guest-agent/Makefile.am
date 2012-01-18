@@ -11,7 +11,8 @@ agent_DATA= \
     GuestAgentLinux2.py \
     CredServer.py \
     LockActiveSession.py \
-    utils.py
+    utils.py \
+    hibernate
     
 agentconfdir=/etc
 agentconf_DATA=ovirt-guest-agent.conf
