@@ -38,5 +38,4 @@ EXTRA_DIST= \
 
 CLEANFILES = \
 	*~ \
-	$(AGENT_NAME) \
 	55-$(AGENT_NAME).rules
