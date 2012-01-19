@@ -59,7 +59,7 @@ dnl - Directory for GDM source package files
 dnl ---------------------------------------------------------------------------
 
 AC_ARG_WITH(gdm-src-dir,
-            AS_HELP_STRING([--gdm-src-dir=<dir>],
+            AS_HELP_STRING([--with-gdm-src-dir=<dir>],
                            [GDM package source files directory]))
 
 if ! test -z "$with_gdm_src_dir"; then
