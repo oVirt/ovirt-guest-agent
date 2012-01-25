@@ -213,7 +213,7 @@ class CredServer(threading.Thread):
         logging.info('CredServer is running...')
         while not self._quit:
             context.iteration(False)
-            sleep(1)
+            time.sleep(1)
         logging.info('CredServer has stopped.')
 
     def join(self):

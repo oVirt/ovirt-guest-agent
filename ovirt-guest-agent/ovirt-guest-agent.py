@@ -10,11 +10,10 @@
 
 import logging, logging.config, os, time, signal, sys
 import ConfigParser
-import utils
 from GuestAgentLinux2 import LinuxVdsAgent
 
 AGENT_CONFIG = '/etc/ovirt-guest-agent.conf'
-AGENT_PIDFILE = '/var/run/ovirt-guest-agent.pid'
+AGENT_PIDFILE = '/run/ovirt-guest-agent.pid'
 
 class OVirtAgentDaemon:
 
@@ -28,9 +27,9 @@ class OVirtAgentDaemon:
         config.read(AGENT_CONFIG)
 
         self.agent = LinuxVdsAgent(config)
-        
-        utils.createDaemon(True)
-        file(AGENT_PIDFILE, "w").write("%s\n" % (os.getpid()))
+
+        with file(AGENT_PIDFILE, "w") as f:
+            f.write("%s\n" % (os.getpid()))
         os.chmod(AGENT_PIDFILE, 0x1b4) # rw-rw-r-- (664)
         
         self.register_signal_handler()
@@ -57,4 +56,7 @@ if __name__ == '__main__':
             logging.exception("Unhandled exception in oVirt guest agent!")
             sys.exit(1)
     finally:
-        utils.rmFile(AGENT_PIDFILE)
+        try:
+            os.unlink(AGENT_PIDFILE)
+        except:
+            pass

@@ -1,11 +1,11 @@
 
-%define release_version 2
+%define release_version 1
 
 %define _moduledir /%{_lib}/security
 %define _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.0
+Version: 1.0.1
 Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
@@ -159,7 +159,7 @@ ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-hibernate
 
 /sbin/udevadm trigger /dev/vport*
 
-/sbin/chkconfig --add %{name}
+/bin/systemctl daemon-reload
 
 %post kdm-plugin
 if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
@@ -170,8 +170,7 @@ fi
 %preun
 if [ "$1" -eq 0 ]
 then
-    /sbin/service %{name} stop > /dev/null 2>&1
-    /sbin/chkconfig --del %{name}
+    /bin/systemctl stop %{name}.service > /dev/null 2>&1
 
     # Send an "uninstalled" notification to vdsm.
     VIRTIO=`grep "^device" %{_sysconfdir}/%{name}.conf | awk '{ print $3; }'`
@@ -184,6 +183,8 @@ fi
 %postun
 if [ "$1" -eq 0 ]
 then
+    /bin/systemctl daemon-reload
+
     rm -f %{_datadir}/%{name}/ovirt-locksession
     rm -f %{_datadir}/%{name}/ovirt-shutdown
     rm -f %{_datadir}/%{name}/ovirt-hibernate
@@ -208,7 +209,6 @@ fi
 %{_sysconfdir}/pam.d/ovirt-shutdown
 %{_sysconfdir}/pam.d/ovirt-hibernate
 %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-%{name}.rules
-%attr (755,root,root) %{_sysconfdir}/init.d/%{name}
 %attr (755,root,root) %{_datadir}/%{name}/%{name}.py*
 %{_datadir}/%{name}/OVirtAgentLogic.py*
 %{_datadir}/%{name}/VirtIoChannel.py*
@@ -216,7 +216,7 @@ fi
 %{_datadir}/%{name}/GuestAgentLinux2.py*
 %attr (755,root,root) %{_datadir}/%{name}/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/%{name}/hibernate
-%{_datadir}/%{name}/utils.py*
+/lib/systemd/system/ovirt-guest-agent.service
 
 %doc AUTHORS COPYING NEWS README
 

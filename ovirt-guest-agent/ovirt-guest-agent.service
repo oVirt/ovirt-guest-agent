@@ -1,0 +1,15 @@
+[Unit]
+Description=oVirt Guest Agent
+
+[Service]
+Type=simple
+PIDFile=/run/ovirt-guest-agent.pid
+EnvironmentFile=-/etc/sysconfig/ovirt-guest-agent
+User=rhevagent
+PermissionsStartOnly=true
+ExecStartPre=/bin/touch /run/ovirt-guest-agent.pid
+ExecStartPre=/bin/chown rhevagent:rhevagent /run/ovirt-guest-agent.pid
+ExecStart=/usr/bin/python /usr/share/ovirt-guest-agent/ovirt-guest-agent.py
+
+[Install]
+WantedBy=multi-user.target
