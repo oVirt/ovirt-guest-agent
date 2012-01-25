@@ -4,15 +4,6 @@
 %define _moduledir /%{_lib}/security
 %define _kdmrc /etc/kde/kdm/kdmrc
 
-%define libauditver 1.0.6
-%define pango_version 1.2.0
-%define gtk3_version 2.99.2
-%define scrollkeeper_version 0.3.4
-%define pam_version 0.99.8.1-11
-%define desktop_file_utils_version 0.2.90
-%define nss_version 3.11.1
-%define fontconfig_version 2.6.0
-
 Name: ovirt-guest-agent
 Version: 1.0.0
 Release: %{release_version}%{?dist}
@@ -20,7 +11,7 @@ Summary: oVirt Guest Agent
 Group: Applications/System
 License: GPLv2+
 URL: http://gerrit.ovirt.org/p/ovirt-guest-agent.git
-Source0: %{name}-%{version}.tar.bz2
+Source0: http://ghammer.fedorapeople.org/%{name}-%{version}.tar.bz2
 ExclusiveArch: i686 x86_64
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: python
@@ -54,6 +45,15 @@ Requires: ovirt-guest-agent-pam-module
 # we build the gdm package.
 Source1: gdm-3.2.1.1-6.fc16.src.rpm
 
+%define libauditver 1.0.6
+%define pango_version 1.2.0
+%define gtk3_version 2.99.2
+%define scrollkeeper_version 0.3.4
+%define pam_version 0.99.8.1-11
+%define desktop_file_utils_version 0.2.90
+%define nss_version 3.11.1
+%define fontconfig_version 2.6.0
+
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
 BuildRequires: pango-devel >= 0:%{pango_version}
@@ -70,9 +70,6 @@ BuildRequires: audit-libs-devel >= %{libauditver}
 BuildRequires: gobject-introspection-devel
 BuildRequires: autoconf automake libtool
 BuildRequires: intltool
-%ifnarch s390 s390x ppc64
-BuildRequires: xorg-x11-server-Xorg
-%endif
 BuildRequires: nss-devel >= %{nss_version}
 BuildRequires: ConsoleKit
 BuildRequires: libselinux-devel
@@ -89,9 +86,9 @@ BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 BuildRequires: kdebase-workspace-devel
 
 %description
-This is the oVirt managment agent running inside the guest. The agent
+This is the oVirt management agent running inside the guest. The agent
 interfaces with the oVirt manager, supplying heart-beat info as well as
-runtime data from within the guest itself. The agent also accepts
+run-time data from within the guest itself. The agent also accepts
 control commands to be run executed within the OS (like: shutdown and
 restart).
 
@@ -175,7 +172,7 @@ if [ "$1" -eq 0 ]
 then
     /sbin/service %{name} stop > /dev/null 2>&1
     /sbin/chkconfig --del %{name}
-	
+
     # Send an "uninstalled" notification to vdsm.
     VIRTIO=`grep "^device" %{_sysconfdir}/%{name}.conf | awk '{ print $3; }'`
     if [ -w $VIRTIO ]
