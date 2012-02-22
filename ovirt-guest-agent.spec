@@ -24,7 +24,15 @@ Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
-Requires: selinux-policy >= 3.7.19-93.el6_1.3
+%if 0%{?rhel}
+Conflicts: selinux-policy < 3.7.19-131
+%endif
+%if 0%{?fc16}
+Conflicts: selinux-policy < 3.10.0-77
+%endif
+%if 0%{?fedora} >= 17
+Conflicts: selinux-policy < 3.10.0-89
+%endif
 
 %package pam-module
 Summary: oVirt Guest Agent PAM module
@@ -309,6 +317,12 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Wed Feb 22 2012 Gal Hammer <ghammer@redhat.com> - 1.0.1-2
+- updated required selinux-policy version (related to rhbz#791113).
+- added a support to hibernate (s4) command.
+- renamed user name to ovirtguest.
+- reset version numbering after changing the package name.
+
 * Thu Sep 27 2011 Gal Hammer <ghammer@redhat.com> - 2.3.15-1
 - fixed disk usage report when mount point include spaces.
 - added a minimum version for python-ethtool.
