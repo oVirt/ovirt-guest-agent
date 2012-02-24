@@ -8,7 +8,7 @@
 # LICENSE_GPL_v2 which accompany this distribution.
 #
 
-import os, rpm, socket, subprocess, string, threading, logging
+import os, rpm, socket, subprocess, string, threading, logging, time
 import ethtool
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 
@@ -55,6 +55,8 @@ class LinuxDataRetriver(DataRetriverBase):
     def __init__(self):
         self.app_list = ""
         self.ignored_fs = ""
+        self._init_vmstat()
+        DataRetriverBase.__init__(self)
 
     def getMachineName(self):
         return socket.getfqdn()
@@ -136,6 +138,60 @@ class LinuxDataRetriver(DataRetriverBase):
             logging.exception("Error retrieving disks usages.")
         return usages
 
+    def getMemoryStats(self):
+        try:
+            self._get_meminfo()
+            self._get_vmstat()
+        except:
+            logging.exception("Error retrieving memory stats.")
+        return self.memStats
+
+    def _init_vmstat(self):
+        self.vmstat = {}
+        self.vmstat['timestamp_prev'] = time.time()
+        fields = ['swap_in', 'swap_out', 'pageflt', 'majflt']
+        for field in fields:
+            self.vmstat[field + '_prev'] = None
+            self.vmstat[field + '_cur'] = None
+
+    def _get_meminfo(self):
+        fields = {'MemTotal:' : 0, 'MemFree:' : 0, 'Buffers:' : 0, \
+                  'Cached:' : 0}
+        free = 0
+        for line in open('/proc/meminfo'):
+            (key, value) = line.strip().split()[0:2]
+            if key in fields.keys():
+                fields[key] = int(value)
+            if key in ('MemFree:', 'Buffers:', 'Cached:'):
+                free += int(value)
+        self.memStats['mem_total'] = fields['MemTotal:']
+        self.memStats['mem_unused'] = fields['MemFree:']
+        self.memStats['mem_free'] = free
+
+    def _get_vmstat(self):
+        """
+        /proc/vmstat reports cumulative statistics so we must subtract the
+        previous values to get the difference since the last collection.
+        """
+        fields = {'pswpin' : 'swap_in', 'pswpout' : 'swap_out',
+                        'pgfault' : 'pageflt', 'pgmajfault' : 'majflt'}
+
+        self.vmstat['timestamp_cur'] = time.time()
+        interval = self.vmstat['timestamp_cur'] - self.vmstat['timestamp_prev']
+        self.vmstat['timestamp_prev'] = self.vmstat['timestamp_cur']
+
+        for line in open('/proc/vmstat'):
+            (key, value) = line.strip().split()[0:2]
+            if key in fields.keys():
+                name = fields[key]
+                self.vmstat[name + '_prev'] = self.vmstat[name + '_cur']
+                self.vmstat[name + '_cur'] = int(value)
+                if self.vmstat[name + '_prev'] == None:
+                    self.vmstat[name + '_prev'] = self.vmstat[name + '_cur']
+                self.memStats[name] = int((self.vmstat[name + '_cur'] - \
+                                self.vmstat[name + '_prev'])/interval)
+
+
 class LinuxVdsAgent(AgentLogicBase):
 
     def __init__(self, config):
@@ -168,6 +224,7 @@ def test():
     print "Logged in Users:", dr.getUsers()
     print "Active User:", dr.getActiveUser()
     print "Disks Usage:", dr.getDisksUsage()
+    print "Memory Stats:", dr.getMemoryStats()
 
 if __name__ == '__main__':
     test()

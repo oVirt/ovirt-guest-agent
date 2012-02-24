@@ -21,6 +21,9 @@ def safe_creds_repr(creds):
     return repr(creds[:cut] + ('*' * 8)+ creds[cut + pass_len:])
 
 class DataRetriverBase:
+    def __init__(self):
+        self.memStats = {'mem_total' : 0, 'mem_free': 0, 'mem_unused' : 0,
+               'swap_in' : 0, 'swap_out' : 0, 'pageflt' : 0, 'majflt' : 0}
     def getMachineName(self):
         pass
     def getOsVersion(self):
@@ -36,6 +39,8 @@ class DataRetriverBase:
     def getActiveUser(self):
         pass
     def getDisksUsage(self):
+        pass
+    def getMemoryStats(self):
         pass
 
 class AgentLogicBase:
@@ -85,7 +90,9 @@ class AgentLogicBase:
                 counter +=1
                 hbsecs -= 1
                 if hbsecs <= 0:
-                    self.vio.write('heartbeat',  { 'free-ram' : self.dr.getAvailableRAM() })
+                    self.vio.write('heartbeat',
+                                   {'free-ram' : self.dr.getAvailableRAM(),
+                                    'memory-stat' : self.dr.getMemoryStats()})
                     hbsecs = self.heartBitRate
                 usersecs -=1
                 if usersecs <=0:
@@ -175,6 +182,9 @@ class AgentLogicBase:
 
     def sendDisksUsages(self):
         self.vio.write('disks-usage', { 'disks' : self.dr.getDisksUsage() })
+
+    def sendMemoryStats(self):
+        self.vio.write('memory-stats', { 'memory' : self.dr.getMemoryStats() })
 
     def sessionLogon(self):
         logging.debug("AgentLogicBase::sessionLogon: user logs on the system.")

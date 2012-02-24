@@ -9,6 +9,8 @@ import win32pipe
 import win32security
 import win32process
 import win32con
+import win32com.client
+import pythoncom
 import subprocess
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 from ctypes import *
@@ -35,34 +37,29 @@ def QueryStringValue(hkey, name):
         return unicode()
     return key_value.value
 
-## Returns the available physical memory (including the system cache).
-def MemPerformanceMonitor():
-    class PERFORMANCE_INFORMATION(Structure):
-        _fields_ = [
-            ('cb', DWORD),
-            ('CommitTotal', DWORD),
-            ('CommitLimit', DWORD),
-            ('CommitPeak', DWORD),
-            ('PhysicalTotal', DWORD),
-            ('PhysicalAvailable', DWORD),
-            ('SystemCache', DWORD),
-            ('KernelTotal', DWORD),
-            ('KernelPaged', DWORD),
-            ('KernelNonpaged', DWORD),
-            ('PageSize', DWORD),
-            ('HandleCount', DWORD),
-            ('ProcessCount', DWORD),
-            ('ThreadCount', DWORD)
-        ]
+class PERFORMANCE_INFORMATION(Structure):
+    _fields_ = [
+        ('cb', DWORD),
+        ('CommitTotal', DWORD),
+        ('CommitLimit', DWORD),
+        ('CommitPeak', DWORD),
+        ('PhysicalTotal', DWORD),
+        ('PhysicalAvailable', DWORD),
+        ('SystemCache', DWORD),
+        ('KernelTotal', DWORD),
+        ('KernelPaged', DWORD),
+        ('KernelNonpaged', DWORD),
+        ('PageSize', DWORD),
+        ('HandleCount', DWORD),
+        ('ProcessCount', DWORD),
+        ('ThreadCount', DWORD)
+    ]
 
-    def get_perf_info():
-        pi = PERFORMANCE_INFORMATION()
-        pi.cb = sizeof(pi)
-        windll.psapi.GetPerformanceInfo(byref(pi), pi.cb)
-        return pi
-
-    pi = get_perf_info()
-    return str(int((pi.PhysicalAvailable * pi.PageSize) / (1024**2)))
+def get_perf_info():
+    pi = PERFORMANCE_INFORMATION()
+    pi.cb = sizeof(pi)
+    windll.psapi.GetPerformanceInfo(byref(pi), pi.cb)
+    return pi
 
 class IncomingMessageTypes:
         Credentials = 11
@@ -216,6 +213,7 @@ class CommandHandlerWin:
 class WinDataRetriver(DataRetriverBase):
     def __init__(self):
         self.os = WinOsTypeHandler().getWinOsType()
+        DataRetriverBase.__init__(self)
 
     def getMachineName(self):
         return os.environ.get('COMPUTERNAME', '')
@@ -250,7 +248,9 @@ class WinDataRetriver(DataRetriverBase):
         return retval
 
     def getAvailableRAM(self):
-        return MemPerformanceMonitor()
+        ## Returns the available physical memory (including the system cache).
+        pi = get_perf_info()
+        return str(int((pi.PhysicalAvailable * pi.PageSize) / (1024**2)))
 
     def getUsers(self):
         total_list=[]
@@ -323,6 +323,28 @@ class WinDataRetriver(DataRetriverBase):
             logging.exception("Error retrieving disks usages.")
         return usages
 
+    def getMemoryStats(self):
+        pi = get_perf_info()
+        # keep the unit consistent with Linux guests
+        self.memStats['mem_total'] = str(int((pi.PhysicalTotal * pi.PageSize) / 1024))
+        self.memStats['mem_free'] = str(int((pi.PhysicalAvailable * pi.PageSize) / 1024))
+        self.memStats['mem_unused'] = self.memStats['mem_free']
+        try:
+            strComputer = "."
+            objWMIService = win32com.client.Dispatch("WbemScripting.SWbemLocator")
+            objSWbemServices = objWMIService.ConnectServer(strComputer, "root\cimv2")
+            colItems = objSWbemServices.ExecQuery("SELECT * FROM Win32_PerfFormattedData_PerfOS_Memory")
+            for objItem in colItems:
+                # Please see the definition of Win32_PerfFormattedData_PerfOS_Memory class in MSDN manual
+                # for the explanations of the following fields.
+                self.memStats['swap_in'] = objItem.PagesInputPersec
+                self.memStats['swap_out'] = objItem.PagesOutputPersec
+                self.memStats['pageflt'] = objItem.PageFaultsPersec
+                self.memStats['majflt'] = objItem.PageReadsPersec
+        except:
+            logging.exception("Error retrieving detailed memory stats")
+        return self.memStats
+
 class WinVdsAgent(AgentLogicBase):
 
     def __init__(self, config):
@@ -337,6 +359,11 @@ class WinVdsAgent(AgentLogicBase):
             AgentLogicBase.run(self)
         except:
             logging.exception("WinVdsAgent::run")
+ 
+    def doWork(self):
+        # CoInitialize() should be called in multi-threading program according to msdn document.
+        pythoncom.CoInitialize()
+        AgentLogicBase.doWork(self)
 
     def disable_screen_saver(self):
         keyHandle = win32api.RegOpenKeyEx(win32con.HKEY_USERS, ".DEFAULT\Control Panel\Desktop", 0, win32con.KEY_WRITE)
@@ -353,6 +380,7 @@ def test():
     print "Logged in Users:", dr.getUsers()
     print "Active User:", dr.getActiveUser()
     print "Disks Usage:", dr.getDisksUsage()
+    print "Memory Stats:", dr.getMemoryStats()
 
 if __name__ == '__main__':
     test()
