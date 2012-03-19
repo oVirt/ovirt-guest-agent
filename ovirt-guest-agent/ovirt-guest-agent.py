@@ -9,6 +9,7 @@
 #
 
 import logging, logging.config, os, time, signal, sys
+import getopt
 import ConfigParser
 from GuestAgentLinux2 import LinuxVdsAgent
 
@@ -20,7 +21,7 @@ class OVirtAgentDaemon:
     def __init__(self):
         logging.config.fileConfig(AGENT_CONFIG)
 
-    def run(self):
+    def run(self, daemon, pidfile):
         logging.info("Starting oVirt guest agent")
 
         config = ConfigParser.ConfigParser()
@@ -28,14 +29,35 @@ class OVirtAgentDaemon:
 
         self.agent = LinuxVdsAgent(config)
 
-        with file(AGENT_PIDFILE, "w") as f:
+        if daemon:
+            self._daemonize()
+
+        with file(pidfile, "w") as f:
             f.write("%s\n" % (os.getpid()))
-        os.chmod(AGENT_PIDFILE, 0x1b4) # rw-rw-r-- (664)
+        os.chmod(pidfile, 0x1b4) # rw-rw-r-- (664)
         
         self.register_signal_handler()
         self.agent.run()
 
         logging.info("oVirt guest agent is down.")
+
+    def _daemonize(self):
+        if os.getppid() == 1:
+            raise RuntimeError, "already a daemon"
+        pid = os.fork();
+        if pid == 0:
+            os.umask(0)
+            os.setsid()
+            os.chdir("/")
+            self._reopen_file_as_null(sys.stdin)
+            self._reopen_file_as_null(sys.stdout)
+            self._reopen_file_as_null(sys.stderr)
+        else:
+            os._exit(0)
+
+    def _reopen_file_as_null(self, oldfile):
+        with file("/dev/null", "rw") as nullfile:
+            os.dup2(nullfile.fileno(), oldfile.fileno())
 
     def register_signal_handler(self):
         
@@ -47,11 +69,34 @@ class OVirtAgentDaemon:
  
         signal.signal(signal.SIGTERM, sigterm_handler)
 
+def usage():
+    print "Usage: %s [OPTION]..." % (sys.argv[0])
+    print ""
+    print "  -p, --pidfile\t\tset pid file name (default: %s)" % (AGENT_PIDFILE)
+    print "  -d\t\t\trun program as a daemon."
+    print "  -h, --help\t\tdisplay this help and exit."
+    print ""
+
 if __name__ == '__main__':
     try:
         try:
+            opts, args = getopt.getopt(sys.argv[1:], "?hp:d", ["help", "pidfile="])
+            pidfile = AGENT_PIDFILE
+            daemon = False
+            for opt, value in opts:
+                if opt in ("-h", "-?", "--help"):
+                    usage()
+                    os._exit(2)
+                elif opt in ("-p", "--pidfile"):
+                    pidfile = value
+                elif opt in ("-d"):
+                    daemon = True
             agent = OVirtAgentDaemon()
-            agent.run()
+            agent.run(daemon, pidfile)
+        except getopt.GetoptError, err:
+            print str(err)
+            print "Try `%s --help' for more information." % (sys.argv[0])
+            os._exit(2)
         except:
             logging.exception("Unhandled exception in oVirt guest agent!")
             sys.exit(1)
