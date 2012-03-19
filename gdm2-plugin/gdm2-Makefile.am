@@ -1,0 +1,44 @@
+
+SUBDIRS = icons
+
+PAM_SERVICE_NAME = gdm-ovirtcred
+
+extensiondir = $(extensionsdatadir)/ovirtcred
+extension_DATA = page.ui
+
+AM_CPPFLAGS =                                               \
+	-I$(GDM_SRC_DIR)/common                                 \
+	-I$(GDM_SRC_DIR)/gui/simple-greeter/libgdmsimplegreeter \
+	-DPLUGINDATADIR=\""$(extensiondir)"\"                   \
+	-DPAMSERVICENAME=\""$(PAM_SERVICE_NAME)"\"              \
+    $(DISABLE_DEPRECATED_CFLAGS)			                \
+	$(GDM_PLUGIN_CFLAGS)			                        \
+	$(NULL)
+
+plugindir = $(GDM_SIMPLE_GREETER_PLUGINS_DIR)
+plugin_LTLIBRARIES = ovirtcred.la
+
+ovirtcred_la_CFLAGS =    \
+	$(GDM_PLUGIN_CFLAGS)    \
+	$(NULL)
+
+ovirtcred_la_LDFLAGS = -module -avoid-version -export-dynamic
+ovirtcred_la_LIBADD  = $(GDM_SRC_DIR)/gui/simple-greeter/libgdmsimplegreeter/libgdmsimplegreeter.la
+ovirtcred_la_SOURCES =					\
+			gdm-ovirtcred-extension.h	\
+			gdm-ovirtcred-extension.c	\
+			plugin.c
+
+$(PAM_SERVICE_NAME): $(PAM_SERVICE_NAME).pam
+	cp $(PAM_SERVICE_NAME).pam $(PAM_SERVICE_NAME)
+
+pamdir = $(PAM_PREFIX)/pam.d
+pam_DATA = $(PAM_SERVICE_NAME)
+
+EXTRA_DIST = $(extension_DATA) $(PAM_SERVICE_NAME).pam
+CLEANFILES = $(PAM_SERVICE_NAME)
+
+MAINTAINERCLEANFILES =                  \
+        *~                              \
+        $(PAM_SERVICE_NAME)             \
+        Makefile.in

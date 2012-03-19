@@ -2,7 +2,7 @@
 AC_PREREQ([2.63])
 
 AC_INIT([ovirt-guest-agent],
-	[1.0.1],
+	[1.0.2],
 	[http://bugzilla.redhat.com])
 
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2 -Wall])
@@ -149,6 +149,7 @@ AC_CONFIG_FILES([
     gdm-plugin/icons/Makefile
     gdm-plugin/icons/16x16/Makefile
     gdm-plugin/icons/48x48/Makefile
+    gdm2-plugin/Makefile
     kdm-plugin/Makefile
 ])
 

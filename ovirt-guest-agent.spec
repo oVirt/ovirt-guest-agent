@@ -5,7 +5,7 @@
 %define _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.1
+Version: 1.0.2
 Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
@@ -43,7 +43,59 @@ Requires: ovirt-guest-agent-pam-module
 
 # No gdm-devel package is available for plug-in development. So for now
 # we build the gdm package.
+%if 0%{?rhel}
+Source1: gdm-2.30.4-14.el6.src.rpm
+
+%define gdm_version gdm-2.30.4
+%define gdm_release %{gdm_version}-14.el6
+
+%define libauditver 1.0.6
+%define pango_version 1.2.0
+%define gtk2_version 2.6.0
+%define libglade2_version 2.0.0
+%define libgnomeui_version 2.2.0
+%define scrollkeeper_version 0.3.4
+%define pam_version 0.99.8.1-11
+%define desktop_file_utils_version 0.2.90
+%define gail_version 1.2.0
+%define nss_version 3.11.1
+%define fontconfig_version 2.6.0
+
+# The following requirements were copied from the gdm.spec file.
+BuildRequires: pkgconfig(libcanberra-gtk)
+BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
+BuildRequires: pango-devel >= 0:%{pango_version}
+BuildRequires: gtk2-devel >= 0:%{gtk2_version}
+BuildRequires: libglade2-devel >= 0:%{libglade2_version}
+BuildRequires: libgnomeui-devel >= 0:%{libgnomeui_version}
+BuildRequires: pam-devel >= 0:%{pam_version}
+BuildRequires: fontconfig >= 0:%{fontconfig_version}
+BuildRequires: desktop-file-utils >= %{desktop_file_utils_version}
+BuildRequires: gail-devel >= 0:%{gail_version}
+BuildRequires: libtool automake autoconf
+BuildRequires: libattr-devel
+BuildRequires: gettext
+BuildRequires: gnome-doc-utils
+BuildRequires: libdmx-devel
+BuildRequires: audit-libs-devel >= %{libauditver}
+BuildRequires: autoconf automake libtool
+BuildRequires: intltool
+%ifnarch s390 s390x
+BuildRequires: xorg-x11-server-Xorg
+%endif
+BuildRequires: nss-devel >= %{nss_version}
+BuildRequires: ConsoleKit
+BuildRequires: libselinux-devel
+BuildRequires: check-devel
+BuildRequires: iso-codes-devel
+BuildRequires: gnome-panel-devel
+BuildRequires: libxklavier-devel >= 4.0
+BuildRequires: DeviceKit-power-devel >= 008
+%else
 Source1: gdm-3.2.1.1-6.fc16.src.rpm
+
+%define gdm_version gdm-3.2.1.1
+%define gdm_release %{gdm_version}-6.fc16
 
 %define libauditver 1.0.6
 %define pango_version 1.2.0
@@ -54,6 +106,7 @@ Source1: gdm-3.2.1.1-6.fc16.src.rpm
 %define nss_version 3.11.1
 %define fontconfig_version 2.6.0
 
+# The following requirements were copied from the gdm.spec file.
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
 BuildRequires: pango-devel >= 0:%{pango_version}
@@ -81,6 +134,7 @@ BuildRequires: libXdmcp-devel
 BuildRequires: dbus-glib-devel
 BuildRequires: GConf2-devel
 BuildRequires: pkgconfig(accountsservice) >= 0.6.3
+%endif
 
 # kdm-plugin's requirements.
 BuildRequires: kdebase-workspace-devel
@@ -106,6 +160,12 @@ oVirt automatic login system.
 
 %prep
 %setup -q
+%if 0%{?rhel}
+    cp -f gdm2-plugin/gdm2-Makefile.am gdm-plugin/Makefile.am
+    cp -f gdm2-plugin/gdm-ovirtcred-extension.c gdm-plugin/
+    cp -f gdm2-plugin/gdm-ovirtcred-extension.h gdm-plugin/
+    cp -f gdm2-plugin/plugin.c gdm-plugin/
+%endif
 rpmbuild --define="_topdir %{_topdir}" --recompile %{SOURCE1}
 autoreconf -i -f
 
@@ -113,7 +173,10 @@ autoreconf -i -f
 %configure \
     --enable-securedir=%{_moduledir} \
     --includedir=%{_includedir}/security \
-    --with-gdm-src-dir=%{_topdir}/BUILD/gdm-3.2.1.1 \
+    --with-gdm-src-dir=%{_topdir}/BUILD/%{gdm_version} \
+%if 0%{?rhel}
+    --with-simple-greeter-plugins-dir=%{_libdir}/gdm/simple-greeter/plugins \
+%endif
     --with-pam-prefix=%{_sysconfdir}
     
 make %{?_smp_mflags}
@@ -123,8 +186,12 @@ make %{?_smp_mflags}
 
 # libtool will look for this file when relinking during installation.
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
-cp %{_topdir}/BUILDROOT/gdm-3.2.1.1-6.fc16.%{?_arch}%{_libdir}/libgdmsimplegreeter.so \
+cp %{_topdir}/BUILDROOT/%{gdm_release}.%{?_arch}%{_libdir}/libgdmsimplegreeter.so \
     $RPM_BUILD_ROOT%{_libdir}
+
+%if 0%{?rhel}
+    sed -i "s~parent->setObjectName(\"welcome\");~parent->setObjectName(\"talker\");~" kdm-plugin/src/kgreet_ovirtcred.cpp
+%endif
 
 make install DESTDIR=$RPM_BUILD_ROOT
 
@@ -143,8 +210,13 @@ touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/%{name}/*.py
 # No longer needed and is provided by the gdm package.
 rm -f $RPM_BUILD_ROOT%{_libdir}/libgdmsimplegreeter.so
 
+%if 0%{?rhel}
+rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.la
+%else
 rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
+%endif
 
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.a
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.la
@@ -259,7 +331,11 @@ fi
 %{_datadir}/icons/hicolor/*/*/*.png
 %dir %{_datadir}/gdm/simple-greeter/extensions/ovirtcred
 %{_datadir}/gdm/simple-greeter/extensions/ovirtcred/page.ui
+%if 0%{?rhel}
+%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.so
+%else
 %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.so
+%endif
 
 %files kdm-plugin
 %defattr(-,root,root,-)
