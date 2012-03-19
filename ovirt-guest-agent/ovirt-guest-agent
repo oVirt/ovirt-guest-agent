@@ -6,7 +6,7 @@
 # description: Startup/shutdown script for the oVirt agent.
 # processname: ovirt-guest-agent
 # config: /etc/ovirt-guest-agent.conf
-# pidfile: /run/ovirt-guest-agent.pid
+# pidfile: /var/run/ovirt-guest-agent.pid
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -14,7 +14,7 @@
 agentd=/usr/share/ovirt-guest-agent/ovirt-guest-agent.py
 prog=ovirt-guest-agent
 lockfile=/var/lock/subsys/${prog}
-pidfile=/run/${prog}.pid
+pidfile=/var/run/${prog}.pid
 
 RETVAL=0
 
@@ -30,11 +30,12 @@ start() {
         done
         [ -f /sbin/udevtrigger ] && /sbin/udevtrigger
     fi
+    # Create as root an empty pidfile for the agent.
     if [ ! -f ${pidfile} ]; then
         /bin/touch ${pidfile}
-        /bin/chown rhevagent:rhevagent ${pidfile}
+        /bin/chown ovirtagent:ovirtagent ${pidfile}
     fi
-    daemon --pidfile=${pidfile} --user=rhevagent $agentd $OPTIONS
+    daemon --pidfile=${pidfile} --user=ovirtagent $agentd -p ${pidfile} -d $OPTIONS
     RETVAL=$?
     [ $RETVAL -eq 0 ] && touch $lockfile
     echo

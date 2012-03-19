@@ -149,7 +149,7 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lock/subsys/%{name}
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
 %pre
-getent passwd rhevagent > /dev/null || /usr/sbin/useradd -u 175 -o -r rhevagent -c "oVirt Guest Agent" -d / -s /sbin/nologin
+getent passwd ovirtagent > /dev/null || /usr/sbin/useradd -u 175 -o -r ovirtagent -c "oVirt Guest Agent" -d / -s /sbin/nologin
 
 %post
 
@@ -198,7 +198,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%dir %attr (755,rhevagent,rhevagent) %{_localstatedir}/log/%{name}
+%dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/%{name}
 %dir %attr (755,root,root) %{_datadir}/%{name}
 %config %{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf

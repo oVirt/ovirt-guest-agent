@@ -7,5 +7,5 @@
 # LICENSE_GPL_v2 which accompany this distribution.
 #
 
-SYMLINK=="virtio-ports/com.redhat.rhevm.vdsm", OWNER="rhevagent", GROUP="rhevagent"
+SYMLINK=="virtio-ports/com.redhat.rhevm.vdsm", OWNER="ovirtagent", GROUP="ovirtagent"
 
