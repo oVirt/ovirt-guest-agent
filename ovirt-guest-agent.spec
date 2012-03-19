@@ -128,6 +128,14 @@ cp %{_topdir}/BUILDROOT/gdm-3.2.1.1-6.fc16.%{?_arch}%{_libdir}/libgdmsimplegreet
 
 make install DESTDIR=$RPM_BUILD_ROOT
 
+%if 0%{?rhel}
+# Install SystemV init script.
+install -Dm 0755 %{name}/%{name} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+%else
+# Install systemd script.
+install -Dm 0644 %{name}/%{name}.service $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
+%endif
+
 # Update timestamps on Python files in order to avoid differences between
 # .pyc/.pyo files.
 touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/%{name}/*.py
@@ -159,7 +167,11 @@ ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-hibernate
 
 /sbin/udevadm trigger /dev/vport*
 
+%if 0%{?rhel}
+    /sbin/chkconfig --add %{name}
+%else
 /bin/systemctl daemon-reload
+%endif
 
 %post kdm-plugin
 if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
@@ -170,7 +182,12 @@ fi
 %preun
 if [ "$1" -eq 0 ]
 then
+%if 0%{?rhel}
+    /sbin/service %{name} stop > /dev/null 2>&1
+    /sbin/chkconfig --del %{name}
+%else
     /bin/systemctl stop %{name}.service > /dev/null 2>&1
+%endif
 
     # Send an "uninstalled" notification to vdsm.
     VIRTIO=`grep "^device" %{_sysconfdir}/%{name}.conf | awk '{ print $3; }'`
@@ -188,6 +205,14 @@ then
     rm -f %{_datadir}/%{name}/ovirt-locksession
     rm -f %{_datadir}/%{name}/ovirt-shutdown
     rm -f %{_datadir}/%{name}/ovirt-hibernate
+fi
+
+if [ "$1" -ge 1 ]; then
+%if 0%{?rhel}
+    /sbin/service %{name} condrestart > /dev/null 2>&1
+%else
+    /bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+%endif
 fi
 
 %postun kdm-plugin
@@ -216,7 +241,11 @@ fi
 %{_datadir}/%{name}/GuestAgentLinux2.py*
 %attr (755,root,root) %{_datadir}/%{name}/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/%{name}/hibernate
-/lib/systemd/system/ovirt-guest-agent.service
+%if 0%{?rhel}
+%attr (755,root,root) %{_initrddir}/%{name}
+%else
+/lib/systemd/system/%{name}.service
+%endif
 
 %doc AUTHORS COPYING NEWS README
 

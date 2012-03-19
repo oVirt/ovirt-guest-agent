@@ -16,9 +16,6 @@ agent_DATA= \
 agentconfdir=/etc
 agentconf_DATA=ovirt-guest-agent.conf
 
-daemondir=/lib/systemd/system
-daemon_DATA=ovirt-guest-agent.service
-
 dbusconfdir=/etc/dbus-1/system.d
 dbusconf_DATA=org.ovirt.vdsm.Credentials.conf
 
@@ -33,7 +30,9 @@ EXTRA_DIST= \
 	$(agentconf_DATA) \
 	$(daemon_DATA) \
 	$(dbusconf_DATA) \
-	$(AGENT_NAME).rules
+	$(AGENT_NAME).rules \
+	ovirt-guest-agent \
+	ovirt-guest-agent.service
 
 CLEANFILES = \
 	*~ \
