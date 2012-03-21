@@ -9,8 +9,6 @@ extensiondir = $(extensionsdatadir)/ovirtcred
 extension_DATA = page.ui
 
 AM_CPPFLAGS = \
-	-I$(GDM_SRC_DIR)/common \
-	-I$(GDM_SRC_DIR)/gui/simple-greeter/libgdmsimplegreeter \
 	-DPLUGINDATADIR=\""$(extensiondir)"\" \
 	-DGDM_OVIRTCRED_EXTENSION_SERVICE_NAME=\""$(PAM_SERVICE_NAME)"\" \
 	$(DISABLE_DEPRECATED_CFLAGS) \
@@ -19,16 +17,12 @@ AM_CPPFLAGS = \
 	$(POLKIT_GNOME_CFLAGS) \
 	$(NULL)
 
-
 plugindir = $(GDM_SIMPLE_GREETER_PLUGINS_DIR)
 plugin_LTLIBRARIES = libovirtcred.la
 
-libovirtcred_la_CFLAGS = \
-	$(SIMPLE_GREETER_CFLAGS) \
-	$(NULL)
-
+libovirtcred_la_CFLAGS = $(SIMPLE_GREETER_CFLAGS)
 libovirtcred_la_LDFLAGS = -module -avoid-version -export-dynamic
-libovirtcred_la_LIBADD = $(GDM_SRC_DIR)/gui/simple-greeter/libgdmsimplegreeter/libgdmsimplegreeter.la
+libovirtcred_la_LIBADD = $(GDM_PLUGIN_LIBS)
 libovirtcred_la_SOURCES = \
 	gdm-ovirtcred-extension.h \
 	gdm-ovirtcred-extension.c

@@ -20,7 +20,6 @@ BuildRequires: libtool
 BuildRequires: pam-devel
 Requires: dbus-python
 Requires: rpm-python
-Requires: SysVinit
 Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
@@ -91,50 +90,14 @@ BuildRequires: iso-codes-devel
 BuildRequires: gnome-panel-devel
 BuildRequires: libxklavier-devel >= 4.0
 BuildRequires: DeviceKit-power-devel >= 008
-%else
-Source1: gdm-3.2.1.1-6.fc16.src.rpm
-
-%define gdm_version gdm-3.2.1.1
-%define gdm_release %{gdm_version}-6.fc16
-
-%define libauditver 1.0.6
-%define pango_version 1.2.0
-%define gtk3_version 2.99.2
-%define scrollkeeper_version 0.3.4
-%define pam_version 0.99.8.1-11
-%define desktop_file_utils_version 0.2.90
-%define nss_version 3.11.1
-%define fontconfig_version 2.6.0
-
-# The following requirements were copied from the gdm.spec file.
-BuildRequires: pkgconfig(libcanberra-gtk)
-BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
-BuildRequires: pango-devel >= 0:%{pango_version}
-BuildRequires: gtk3-devel >= 0:%{gtk3_version}
-BuildRequires: pam-devel >= 0:%{pam_version}
-BuildRequires: fontconfig >= 0:%{fontconfig_version}
-BuildRequires: desktop-file-utils >= %{desktop_file_utils_version}
-BuildRequires: libtool automake autoconf
-BuildRequires: libattr-devel
-BuildRequires: gettext
-BuildRequires: gnome-doc-utils
-BuildRequires: libdmx-devel
-BuildRequires: audit-libs-devel >= %{libauditver}
-BuildRequires: gobject-introspection-devel
-BuildRequires: autoconf automake libtool
-BuildRequires: intltool
-BuildRequires: nss-devel >= %{nss_version}
-BuildRequires: ConsoleKit
-BuildRequires: libselinux-devel
-BuildRequires: check-devel
-BuildRequires: iso-codes-devel
-BuildRequires: libxklavier-devel >= 4.0
-BuildRequires: upower-devel >= 0.9.7
-BuildRequires: libXdmcp-devel
-BuildRequires: dbus-glib-devel
-BuildRequires: GConf2-devel
-BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 %endif
+
+# gdm-plugin's requirements.
+BuildRequires: dbus-glib-devel
+BuildRequires: gdm
+BuildRequires: gdm-devel
+BuildRequires: gobject-introspection-devel
+BuildRequires: gtk2-devel
 
 # kdm-plugin's requirements.
 BuildRequires: kdebase-workspace-devel
@@ -165,16 +128,17 @@ oVirt automatic login system.
     cp -f gdm2-plugin/gdm-ovirtcred-extension.c gdm-plugin/
     cp -f gdm2-plugin/gdm-ovirtcred-extension.h gdm-plugin/
     cp -f gdm2-plugin/plugin.c gdm-plugin/
+
+    rpmbuild --define="_topdir %{_topdir}" --recompile %{SOURCE1}
 %endif
-rpmbuild --define="_topdir %{_topdir}" --recompile %{SOURCE1}
 autoreconf -i -f
 
 %build
 %configure \
     --enable-securedir=%{_moduledir} \
     --includedir=%{_includedir}/security \
-    --with-gdm-src-dir=%{_topdir}/BUILD/%{gdm_version} \
 %if 0%{?rhel}
+    --with-gdm-src-dir=%{_topdir}/BUILD/%{gdm_version} \
     --with-simple-greeter-plugins-dir=%{_libdir}/gdm/simple-greeter/plugins \
 %endif
     --with-pam-prefix=%{_sysconfdir}
@@ -184,10 +148,12 @@ make %{?_smp_mflags}
 %install
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
-# libtool will look for this file when relinking during installation.
-mkdir -p $RPM_BUILD_ROOT%{_libdir}
-cp %{_topdir}/BUILDROOT/%{gdm_release}.%{?_arch}%{_libdir}/libgdmsimplegreeter.so \
-    $RPM_BUILD_ROOT%{_libdir}
+%if 0%{?rhel}
+    # libtool will look for this file when relinking during installation.
+    mkdir -p $RPM_BUILD_ROOT%{_libdir}
+    cp %{_topdir}/BUILDROOT/%{gdm_release}.%{?_arch}%{_libdir}/libgdmsimplegreeter.so \
+        $RPM_BUILD_ROOT%{_libdir}
+%endif
 
 %if 0%{?rhel}
     sed -i "s~parent->setObjectName(\"welcome\");~parent->setObjectName(\"talker\");~" kdm-plugin/src/kgreet_ovirtcred.cpp
@@ -196,26 +162,26 @@ cp %{_topdir}/BUILDROOT/%{gdm_release}.%{?_arch}%{_libdir}/libgdmsimplegreeter.s
 make install DESTDIR=$RPM_BUILD_ROOT
 
 %if 0%{?rhel}
-# Install SystemV init script.
-install -Dm 0755 %{name}/%{name} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+    # Install SystemV init script.
+    install -Dm 0755 %{name}/%{name} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 %else
-# Install systemd script.
-install -Dm 0644 %{name}/%{name}.service $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
+    # Install systemd script.
+    install -Dm 0644 %{name}/%{name}.service $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
 %endif
 
 # Update timestamps on Python files in order to avoid differences between
 # .pyc/.pyo files.
 touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/%{name}/*.py
 
-# No longer needed and is provided by the gdm package.
-rm -f $RPM_BUILD_ROOT%{_libdir}/libgdmsimplegreeter.so
-
 %if 0%{?rhel}
-rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.la
+    # No longer needed and is provided by the gdm package.
+    rm -f $RPM_BUILD_ROOT%{_libdir}/libgdmsimplegreeter.so
+
+    rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.a
+    rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/plugins/ovirtcred.la
 %else
-rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
+    rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
+    rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
 %endif
 
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.a

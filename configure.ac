@@ -31,11 +31,13 @@ dnl - Dependencies
 dnl ---------------------------------------------------------------------------
 
 DBUS_GLIB_REQUIRED_VERSION=0.74
+GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
 GLIB_REQUIRED_VERSION=2.22.0
 GTK_REQUIRED_VERSION=2.18.0
 
 PKG_CHECK_MODULES(GDM_PLUGIN,
         dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
+        gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION
         gobject-2.0 >= $GLIB_REQUIRED_VERSION
         gtk+-2.0 >= $GTK_REQUIRED_VERSION
 )

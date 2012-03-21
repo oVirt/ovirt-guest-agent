@@ -243,10 +243,8 @@ gdm_ovirtcred_extension_ask_question (GdmLoginExtension *login_extension,
         if (g_strcmp0 ("Token?", message) != 0) {
                 return;
         }
-        
-        if (extension->priv->token) {
-                gdm_ovirtcred_extension_request_answer (login_extension);
-        }
+
+        _gdm_login_extension_emit_answer (login_extension, extension->priv->token);
 }
 
 static void
