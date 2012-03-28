@@ -317,6 +317,11 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Wed Mar 28 2012 Gal Hammer <ghammer@redhat.com> - 1.0.2-1
+- included a gpl-v2 copying file.
+- build the gdm-plugin using the gdm-devel package.
+- added a support for RHEL distribution.
+
 * Wed Feb 22 2012 Gal Hammer <ghammer@redhat.com> - 1.0.1-2
 - updated required selinux-policy version (related to rhbz#791113).
 - added a support to hibernate (s4) command.
