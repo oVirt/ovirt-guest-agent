@@ -4,14 +4,18 @@
 %define _moduledir /%{_lib}/security
 %define _kdmrc /etc/kde/kdm/kdmrc
 
+%if 0%{?rhel}
+Name: rhevm-guest-agent
+%else
 Name: ovirt-guest-agent
-Version: 1.0.2
+%endif
+Version: 1.0.3
 Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
 License: GPLv2+
 URL: http://gerrit.ovirt.org/p/ovirt-guest-agent.git
-Source0: http://ghammer.fedorapeople.org/%{name}-%{version}.tar.bz2
+Source0: http://ghammer.fedorapeople.org/ovirt-guest-agent-%{version}.tar.bz2
 ExclusiveArch: i686 x86_64
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: python
@@ -36,18 +40,11 @@ Conflicts: selinux-policy < 3.10.0-89
 
 %package pam-module
 Summary: oVirt Guest Agent PAM module
-Requires: pam ovirt-guest-agent
+Requires: %{name}
+Requires: pam
 
 %package gdm-plugin
 Summary: GDM oVirt plug-in
-Requires: gdm ovirt-guest-agent
-Requires: ovirt-guest-agent-pam-module
-
-%package kdm-plugin
-Summary: KDM oVirt plug-in
-Requires: kdm ovirt-guest-agent
-Requires: ovirt-guest-agent-pam-module
-
 # No gdm-devel package is available for plug-in development. So for now
 # we build the gdm package.
 %if 0%{?rhel}
@@ -98,17 +95,22 @@ BuildRequires: iso-codes-devel
 BuildRequires: gnome-panel-devel
 BuildRequires: libxklavier-devel >= 4.0
 BuildRequires: DeviceKit-power-devel >= 008
-%endif
-
-# gdm-plugin's requirements.
+%else
 BuildRequires: dbus-glib-devel
-BuildRequires: gdm
 BuildRequires: gdm-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: gtk2-devel
+%endif
+Requires: %{name}
+Requires: gdm
+Requires: %{name}-pam-module
 
-# kdm-plugin's requirements.
+%package kdm-plugin
+Summary: KDM oVirt plug-in
 BuildRequires: kdebase-workspace-devel
+Requires: %{name}
+Requires: kdm
+Requires: %{name}-pam-module
 
 %description
 This is the oVirt management agent running inside the guest. The agent
@@ -130,7 +132,7 @@ The KDM plug-in provides the functionality necessary to use the
 oVirt automatic login system.
 
 %prep
-%setup -q
+%setup -q -n ovirt-guest-agent-%{version}
 %if 0%{?rhel}
     cp -f gdm2-plugin/gdm2-Makefile.am gdm-plugin/Makefile.am
     cp -f gdm2-plugin/gdm-ovirtcred-extension.c gdm-plugin/
@@ -171,15 +173,15 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 %if 0%{?rhel}
     # Install SystemV init script.
-    install -Dm 0755 %{name}/%{name} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+    install -Dm 0755 ovirt-guest-agent/ovirt-guest-agent $RPM_BUILD_ROOT%{_initrddir}/ovirt-guest-agent
 %else
     # Install systemd script.
-    install -Dm 0644 %{name}/%{name}.service $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
+    install -Dm 0644 ovirt-guest-agent/ovirt-guest-agent.service $RPM_BUILD_ROOT%{_unitdir}/ovirt-guest-agent.service
 %endif
 
 # Update timestamps on Python files in order to avoid differences between
 # .pyc/.pyo files.
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/%{name}/*.py
+touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/*.py
 
 %if 0%{?rhel}
     # No longer needed and is provided by the gdm package.
@@ -195,28 +197,29 @@ touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/%{name}/*.py
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.a
 rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.la
 
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/%{name}
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lock/subsys/%{name}
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/ovirt-guest-agent
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/ovirt-guest-agent
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lock/subsys/ovirt-guest-agent
 
 %clean
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
 %pre
-getent passwd ovirtagent > /dev/null || /usr/sbin/useradd -u 175 -o -r ovirtagent -c "oVirt Guest Agent" -d / -s /sbin/nologin
+getent passwd ovirtagent > /dev/null || \
+    /usr/sbin/useradd -u 175 -g 175 -o -r ovirtagent -c "oVirt Guest Agent" -d / -s /sbin/nologin
 
 %post
 
-ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-locksession
-ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-shutdown
-ln -s /usr/bin/consolehelper %{_datadir}/%{name}/ovirt-hibernate
+ln -s /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-locksession
+ln -s /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-shutdown
+ln -s /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 
 /sbin/udevadm trigger /dev/vport*
 
 %if 0%{?rhel}
-    /sbin/chkconfig --add %{name}
+    /sbin/chkconfig --add ovirt-guest-agent
 %else
-/bin/systemctl daemon-reload
+    /bin/systemctl daemon-reload
 %endif
 
 %post kdm-plugin
@@ -229,14 +232,14 @@ fi
 if [ "$1" -eq 0 ]
 then
 %if 0%{?rhel}
-    /sbin/service %{name} stop > /dev/null 2>&1
-    /sbin/chkconfig --del %{name}
+    /sbin/service ovirt-guest-agent stop > /dev/null 2>&1
+    /sbin/chkconfig --del ovirt-guest-agent
 %else
-    /bin/systemctl stop %{name}.service > /dev/null 2>&1
+    /bin/systemctl stop ovirt-guest-agent.service > /dev/null 2>&1
 %endif
 
     # Send an "uninstalled" notification to vdsm.
-    VIRTIO=`grep "^device" %{_sysconfdir}/%{name}.conf | awk '{ print $3; }'`
+    VIRTIO=`grep "^device" %{_sysconfdir}/ovirt-guest-agent.conf | awk '{ print $3; }'`
     if [ -w $VIRTIO ]
     then
         echo '{ "__name__" : "uninstalled" }' >> $VIRTIO
@@ -248,16 +251,16 @@ if [ "$1" -eq 0 ]
 then
     /bin/systemctl daemon-reload
 
-    rm -f %{_datadir}/%{name}/ovirt-locksession
-    rm -f %{_datadir}/%{name}/ovirt-shutdown
-    rm -f %{_datadir}/%{name}/ovirt-hibernate
+    rm -f %{_datadir}/ovirt-guest-agent/ovirt-locksession
+    rm -f %{_datadir}/ovirt-guest-agent/ovirt-shutdown
+    rm -f %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 fi
 
 if [ "$1" -ge 1 ]; then
 %if 0%{?rhel}
-    /sbin/service %{name} condrestart > /dev/null 2>&1
+    /sbin/service ovirt-guest-agent condrestart > /dev/null 2>&1
 %else
-    /bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+    /bin/systemctl try-restart ovirt-guest-agent.service >/dev/null 2>&1 || :
 %endif
 fi
 
@@ -269,9 +272,9 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/%{name}
-%dir %attr (755,root,root) %{_datadir}/%{name}
-%config %{_sysconfdir}/%{name}.conf
+%dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/ovirt-guest-agent
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent
+%config %{_sysconfdir}/ovirt-guest-agent.conf
 %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
 %{_sysconfdir}/security/console.apps/ovirt-locksession
 %{_sysconfdir}/security/console.apps/ovirt-shutdown
@@ -279,18 +282,18 @@ fi
 %{_sysconfdir}/pam.d/ovirt-locksession
 %{_sysconfdir}/pam.d/ovirt-shutdown
 %{_sysconfdir}/pam.d/ovirt-hibernate
-%attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-%{name}.rules
-%attr (755,root,root) %{_datadir}/%{name}/%{name}.py*
-%{_datadir}/%{name}/OVirtAgentLogic.py*
-%{_datadir}/%{name}/VirtIoChannel.py*
-%{_datadir}/%{name}/CredServer.py*
-%{_datadir}/%{name}/GuestAgentLinux2.py*
-%attr (755,root,root) %{_datadir}/%{name}/LockActiveSession.py*
-%attr (755,root,root) %{_datadir}/%{name}/hibernate
+%attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/ovirt-guest-agent.py*
+%{_datadir}/ovirt-guest-agent/OVirtAgentLogic.py*
+%{_datadir}/ovirt-guest-agent/VirtIoChannel.py*
+%{_datadir}/ovirt-guest-agent/CredServer.py*
+%{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
 %if 0%{?rhel}
-%attr (755,root,root) %{_initrddir}/%{name}
+%attr (755,root,root) %{_initrddir}/ovirt-guest-agent
 %else
-/lib/systemd/system/%{name}.service
+/lib/systemd/system/ovirt-guest-agent.service
 %endif
 
 %doc AUTHORS COPYING NEWS README
@@ -317,6 +320,11 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Tue Apr 10 2012 Gal Hammer <ghammer@redhat.com> - 1.0.3-1
+- package was renamed to rhevm-guest-agent in RHEL distribution.
+- fixed gdm-plugin build requires.
+Resolves: BZ#803503
+
 * Wed Mar 28 2012 Gal Hammer <ghammer@redhat.com> - 1.0.2-1
 - included a gpl-v2 copying file.
 - build the gdm-plugin using the gdm-devel package.

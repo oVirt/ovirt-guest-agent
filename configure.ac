@@ -2,7 +2,7 @@
 AC_PREREQ([2.63])
 
 AC_INIT([ovirt-guest-agent],
-	[1.0.2],
+	[1.0.3],
 	[http://bugzilla.redhat.com])
 
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2 -Wall])
@@ -35,9 +35,16 @@ GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
 GLIB_REQUIRED_VERSION=2.22.0
 GTK_REQUIRED_VERSION=2.18.0
 
+# A hack to ignore gdm-devel package when building gdm-2.
+if ! test -z "$with_gdm_src_dir"; then
+   GDM_SIMPLE_GREETER_REQUIRED=""
+else
+   GDM_SIMPLE_GREETER_REQUIRED="gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION"
+fi
+
 PKG_CHECK_MODULES(GDM_PLUGIN,
         dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
-        gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION
+        $GDM_SIMPLE_GREETER_REQUIRED
         gobject-2.0 >= $GLIB_REQUIRED_VERSION
         gtk+-2.0 >= $GTK_REQUIRED_VERSION
 )
