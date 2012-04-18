@@ -12,11 +12,11 @@ import win32con
 import win32com.client
 import pythoncom
 import subprocess
+import socket
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 from ctypes import *
 from ctypes.util import find_library
 from ctypes.wintypes import *
-from IPHelper import GetNetworkInterfaces
 import _winreg
 
 # Both _winreg.QueryValueEx and win32api.RegQueryValueEx doesn't support reading
@@ -36,6 +36,32 @@ def QueryStringValue(hkey, name):
     if windll.advapi32.RegQueryValueExW(hkey.handle, name, None, None, byref(key_value), byref(key_len)) != 0:
         return unicode()
     return key_value.value
+
+def GetNetworkInterfaces():
+    interfaces = list()
+    try:
+        objWMIService = win32com.client.Dispatch("WbemScripting.SWbemLocator")
+        objSWbemServices = objWMIService.ConnectServer(".", "root\cimv2")
+        adapters = objSWbemServices.ExecQuery(
+            "SELECT * FROM Win32_NetworkAdapterConfiguration")
+        for adapter in adapters:
+            if adapter.IPEnabled:
+                inet = []
+                inet6 = []
+                if adapter.IPAddress:
+                    for ip in adapter.IPAddress:
+                        try:
+                            socket.inet_aton(ip)
+                            inet.append(ip)
+                        except socket.error:
+                            # Assume IPv6 if parsing as IPv4 was failed.
+                            inet6.append(ip)
+                interfaces.append({ 'name' : adapter.Description,
+                    'inet' : inet, 'inet6' : inet6,
+                    'hw' : adapter.MacAddress.lower() })
+    except:
+        logging.exception("Error retrieving network interfaces.")
+    return interfaces
 
 class PERFORMANCE_INFORMATION(Structure):
     _fields_ = [
@@ -359,7 +385,7 @@ class WinVdsAgent(AgentLogicBase):
             AgentLogicBase.run(self)
         except:
             logging.exception("WinVdsAgent::run")
- 
+
     def doWork(self):
         # CoInitialize() should be called in multi-threading program according to msdn document.
         pythoncom.CoInitialize()
