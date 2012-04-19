@@ -1,11 +1,11 @@
 
-%define release_version 2
+%define release_version 1
 
 %define _moduledir /%{_lib}/security
 %define _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.3
+Version: 1.0.4
 Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
@@ -105,16 +105,16 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/ovirt-guest-agent
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lock/subsys/ovirt-guest-agent
 
 %pre
-getent group ovirtagent >/dev/null || groupadd -r ovirtagent
+getent group ovirtagent >/dev/null || groupadd -r -g 175 ovirtagent
 getent passwd ovirtagent > /dev/null || \
     /usr/sbin/useradd -u 175 -g 175 -o -r ovirtagent \
     -c "oVirt Guest Agent" -d / -s /sbin/nologin
 exit 0
  
 %post
-ln -s /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-locksession
-ln -s /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-shutdown
-ln -s /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-hibernate
+ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-locksession
+ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-shutdown
+ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 
 /sbin/udevadm trigger /dev/vport*
 
@@ -201,6 +201,11 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Web Apr 18 2012 Gal Hammer <ghammer@redhat.com> - 1.0.4-1
+- replaced "with" usage with a python 2.4 compatible way.
+- added files to support RHEL-5 distribution.
+- added more detailed memory statistics.
+
 * Sun Apr 15 2012 Gal Hammer <ghammer@redhat.com> - 1.0.3-2
 - removed the RHEL distribution support for the review process.
 - removed BuildRoot header and %clean section.

@@ -8,7 +8,7 @@
 # LICENSE_GPL_v2 which accompany this distribution.
 #
 
-import logging, logging.config, os, time, signal, sys
+import logging, logging.config, os, signal, sys
 import getopt
 import ConfigParser
 from GuestAgentLinux2 import LinuxVdsAgent
@@ -32,8 +32,9 @@ class OVirtAgentDaemon:
         if daemon:
             self._daemonize()
 
-        with file(pidfile, "w") as f:
-            f.write("%s\n" % (os.getpid()))
+        f = file(pidfile, "w")
+        f.write("%s\n" % (os.getpid()))
+        f.close()
         os.chmod(pidfile, 0x1b4) # rw-rw-r-- (664)
         
         self.register_signal_handler()
@@ -44,7 +45,7 @@ class OVirtAgentDaemon:
     def _daemonize(self):
         if os.getppid() == 1:
             raise RuntimeError, "already a daemon"
-        pid = os.fork();
+        pid = os.fork()
         if pid == 0:
             os.umask(0)
             os.setsid()
@@ -56,8 +57,9 @@ class OVirtAgentDaemon:
             os._exit(0)
 
     def _reopen_file_as_null(self, oldfile):
-        with file("/dev/null", "rw") as nullfile:
-            os.dup2(nullfile.fileno(), oldfile.fileno())
+        nullfile = file("/dev/null", "rw")
+        os.dup2(nullfile.fileno(), oldfile.fileno())
+        nullfile.close()
 
     def register_signal_handler(self):
         

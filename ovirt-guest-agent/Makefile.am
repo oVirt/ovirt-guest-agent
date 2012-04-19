@@ -32,7 +32,9 @@ EXTRA_DIST= \
 	$(dbusconf_DATA) \
 	$(AGENT_NAME).rules \
 	ovirt-guest-agent \
-	ovirt-guest-agent.service
+	ovirt-guest-agent.service \
+	ovirt-guest-agent.el5.rules \
+	Makefile.el5
 
 CLEANFILES = \
 	*~ \
