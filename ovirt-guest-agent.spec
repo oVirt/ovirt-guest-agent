@@ -179,7 +179,7 @@ fi
 %{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
-/lib/systemd/system/ovirt-guest-agent.service
+%{_unitdir}/ovirt-guest-agent.service
 
 %doc AUTHORS COPYING NEWS README
 
