@@ -201,10 +201,11 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
-* Web Apr 18 2012 Gal Hammer <ghammer@redhat.com> - 1.0.4-1
+* Tue May 15 2012 Gal Hammer <ghammer@redhat.com> - 1.0.4-1
 - replaced "with" usage with a python 2.4 compatible way.
 - added files to support RHEL-5 distribution.
 - added more detailed memory statistics.
+- fixed build on fc-17 (use the %{_unitdir} macro).
 
 * Sun Apr 15 2012 Gal Hammer <ghammer@redhat.com> - 1.0.3-2
 - removed the RHEL distribution support for the review process.
