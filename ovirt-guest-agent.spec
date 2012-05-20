@@ -116,7 +116,8 @@ ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-locksession
 ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-shutdown
 ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 
-/sbin/udevadm trigger /dev/vport*
+/sbin/udevadm trigger --subsystem-match="virtio-ports" \
+    --attr-match="name=com.redhat.rhevm.vdsm"
 
 /bin/systemctl daemon-reload
 
