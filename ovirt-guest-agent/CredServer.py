@@ -1,4 +1,11 @@
-#!/usr/bin/python
+#
+# Copyright 2010-2012 Red Hat, Inc. and/or its affiliates.
+#
+# Licensed to you under the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.  See the files README and
+# LICENSE_GPL_v2 which accompany this distribution.
+#
 
 import array, dbus, dbus.service, errno, gobject, pwd
 import logging, socket, time, threading, random, struct

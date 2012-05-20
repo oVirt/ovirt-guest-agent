@@ -5,7 +5,7 @@
 %define _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.4
+Version: 1.0.5
 Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
@@ -61,15 +61,15 @@ restart).
 
 %description pam-module
 The oVirt PAM module provides the functionality necessary to use the
-oVirt automatic login system.
+oVirt automatic log-in system.
 
 %description gdm-plugin
 The GDM plug-in provides the functionality necessary to use the
-oVirt automatic login system.
+oVirt automatic log-in system.
 
 %description kdm-plugin
 The KDM plug-in provides the functionality necessary to use the
-oVirt automatic login system.
+oVirt automatic log-in system.
 
 %prep
 %setup -q -n ovirt-guest-agent-%{version}
@@ -164,7 +164,7 @@ fi
 %defattr(-,root,root,-)
 %dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/ovirt-guest-agent
 %dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent
-%config %{_sysconfdir}/ovirt-guest-agent.conf
+%config(noreplace) %{_sysconfdir}/ovirt-guest-agent.conf
 %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
 %{_sysconfdir}/security/console.apps/ovirt-locksession
 %{_sysconfdir}/security/console.apps/ovirt-shutdown
@@ -190,7 +190,7 @@ fi
 
 %files gdm-plugin
 %defattr(-,root,root,-)
-%config %{_sysconfdir}/pam.d/gdm-ovirtcred
+%{_sysconfdir}/pam.d/gdm-ovirtcred
 %{_datadir}/icons/hicolor/*/*/*.png
 %dir %{_datadir}/gdm/simple-greeter/extensions/ovirtcred
 %{_datadir}/gdm/simple-greeter/extensions/ovirtcred/page.ui
@@ -198,19 +198,23 @@ fi
 
 %files kdm-plugin
 %defattr(-,root,root,-)
-%config %{_sysconfdir}/pam.d/kdm-ovirtcred
+%{_sysconfdir}/pam.d/kdm-ovirtcred
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Sun May 20 2012 Gal Hammer <ghammer@redhat.com> - 1.0.5-1
+- fixed 'udevadm trigger' command line (bz#819945).
+- fixed various rpmlint errors and warnings.
+
 * Tue May 15 2012 Gal Hammer <ghammer@redhat.com> - 1.0.4-1
 - replaced "with" usage with a python 2.4 compatible way.
 - added files to support RHEL-5 distribution.
 - added more detailed memory statistics.
-- fixed build on fc-17 (use the %{_unitdir} macro).
+- fixed build on fc-17 (use the _unitdir macro).
 
 * Sun Apr 15 2012 Gal Hammer <ghammer@redhat.com> - 1.0.3-2
 - removed the RHEL distribution support for the review process.
-- removed BuildRoot header and %clean section.
+- removed BuildRoot header and clean section.
 - fixed user creation.
 
 * Tue Apr 10 2012 Gal Hammer <ghammer@redhat.com> - 1.0.3-1
