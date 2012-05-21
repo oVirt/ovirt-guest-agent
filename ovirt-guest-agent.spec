@@ -91,6 +91,11 @@ make install DESTDIR=$RPM_BUILD_ROOT
 # Install systemd script.
 install -Dm 0644 ovirt-guest-agent/ovirt-guest-agent.service $RPM_BUILD_ROOT%{_unitdir}/ovirt-guest-agent.service
 
+# Create symbolic links to commands that requires root privileges.
+ln -sf /usr/bin/consolehelper $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/ovirt-locksession
+ln -sf /usr/bin/consolehelper $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/ovirt-shutdown
+ln -sf /usr/bin/consolehelper $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/ovirt-hibernate
+
 # Update timestamps on Python files in order to avoid differences between
 # .pyc/.pyo files.
 touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/*.py
@@ -112,10 +117,6 @@ getent passwd ovirtagent > /dev/null || \
 exit 0
  
 %post
-ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-locksession
-ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-shutdown
-ln -sf /usr/bin/consolehelper %{_datadir}/ovirt-guest-agent/ovirt-hibernate
-
 /sbin/udevadm trigger --subsystem-match="virtio-ports" \
     --attr-match="name=com.redhat.rhevm.vdsm"
 
@@ -144,10 +145,6 @@ fi
 if [ "$1" -eq 0 ]
 then
     /bin/systemctl daemon-reload
-
-    rm -f %{_datadir}/ovirt-guest-agent/ovirt-locksession
-    rm -f %{_datadir}/ovirt-guest-agent/ovirt-shutdown
-    rm -f %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 fi
 
 if [ "$1" -ge 1 ]; then
@@ -178,6 +175,9 @@ fi
 %{_datadir}/ovirt-guest-agent/VirtIoChannel.py*
 %{_datadir}/ovirt-guest-agent/CredServer.py*
 %{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
+%{_datadir}/ovirt-guest-agent/ovirt-locksession
+%{_datadir}/ovirt-guest-agent/ovirt-shutdown
+%{_datadir}/ovirt-guest-agent/ovirt-hibernate
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
 %{_unitdir}/ovirt-guest-agent.service
