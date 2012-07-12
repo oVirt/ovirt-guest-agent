@@ -39,6 +39,32 @@ class PkgMgr(object):
         else:
             raise NotImplementedError
 
+class NicMgr(object):
+
+    def ethtool_list_nics(self):
+        interfaces = list()
+        try:
+            for dev in self.ethtool.get_active_devices():
+                flags = self.ethtool.get_flags(dev)
+                if not(flags & self.ethtool.IFF_LOOPBACK):
+                    devinfo = self.ethtool.get_interfaces_info(dev)[0]
+                    interfaces.append({ 'name' : dev,
+                        'inet' : [ self.ethtool.get_ipaddr(dev) ],
+                        'inet6' : map(lambda ip: ip.address,
+                            devinfo.get_ipv6_addresses()),
+                        'hw' : self.ethtool.get_hwaddr(dev) })
+        except:
+            logging.exception("Error retrieving network interfaces.")
+        return interfaces
+
+    def __init__(self):
+        try:
+            import ethtool
+        except ImportError:
+            raise NotImplementedError
+        self.ethtool = ethtool
+        self.list_nics = self.ethtool_list_nics
+
 class CommandHandlerLinux:
 
     def __init__(self, agent):
@@ -77,6 +103,12 @@ class LinuxDataRetriver(DataRetriverBase):
              self.list_pkgs = lambda app_list: []
         else:
              self.list_pkgs = pkgmgr.list_pkgs
+        try:
+             nicmgr = NicMgr()
+        except NotImplementedError:
+             self.list_nics = lambda: []
+        else:
+             self.list_nics = nicmgr.list_nics
         self.app_list = ""
         self.ignored_fs = ""
         self._init_vmstat()
@@ -89,19 +121,7 @@ class LinuxDataRetriver(DataRetriverBase):
         return os.uname()[2]
 
     def getAllNetworkInterfaces(self):
-        interfaces = list()
-        try:
-            for dev in ethtool.get_active_devices():
-                flags = ethtool.get_flags(dev)
-                if not(flags & ethtool.IFF_LOOPBACK):
-                    devinfo = ethtool.get_interfaces_info(dev)[0]
-                    interfaces.append({ 'name' : dev,
-                        'inet' : [ ethtool.get_ipaddr(dev) ],
-                        'inet6' : map(lambda ip: ip.address, devinfo.get_ipv6_addresses()),
-                        'hw' : ethtool.get_hwaddr(dev) })
-        except:
-            logging.exception("Error retrieving network interfaces.")
-        return interfaces
+        return self.list_nics()
 
     def getApplications(self):
         return self.list_pkgs(self.app_list)
