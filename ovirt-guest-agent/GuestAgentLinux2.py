@@ -7,7 +7,7 @@
 # LICENSE_GPL_v2 which accompany this distribution.
 #
 
-import os, rpm, socket, subprocess, string, threading, logging, time
+import os, socket, subprocess, string, threading, logging, time
 import ethtool
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 
@@ -19,6 +19,25 @@ except ImportError:
     class CredServer(threading.Thread):
         def user_authenticated(self, credentials):
             pass
+
+class PkgMgr(object):
+
+    def rpm_list_packages(self, app_list):
+        apps = []
+        for name in app_list.split():
+            ts = self.rpm.TransactionSet()
+            for app in ts.dbMatch('name', name):
+                apps.append("%s-%s-%s" %
+                    (app['name'], app['version'], app['release']))
+        return apps
+
+    def __init__(self):
+        if os.path.exists('/etc/redhat-release'):
+            import rpm
+            self.rpm = rpm
+            self.list_pkgs = self.rpm_list_packages
+        else:
+            raise NotImplementedError
 
 class CommandHandlerLinux:
 
@@ -52,6 +71,12 @@ class CommandHandlerLinux:
 class LinuxDataRetriver(DataRetriverBase):
 
     def __init__(self):
+        try:
+             pkgmgr = PkgMgr()
+        except NotImplementedError:
+             self.list_pkgs = lambda app_list: []
+        else:
+             self.list_pkgs = pkgmgr.list_pkgs
         self.app_list = ""
         self.ignored_fs = ""
         self._init_vmstat()
@@ -79,20 +104,7 @@ class LinuxDataRetriver(DataRetriverBase):
         return interfaces
 
     def getApplications(self):
-        apps = []
-        try:
-            for name in self.app_list.split():
-                ts = rpm.TransactionSet()
-                mi = ts.dbMatch('name', name)
-                try:
-                    while mi:
-                        app = mi.next()
-                        apps.append("%s-%s-%s" % (app['name'], app['version'], app['release']))
-                except StopIteration:
-                    pass
-        except:
-            logging.exception("Error retrieving installed applications.")
-        return apps
+        return self.list_pkgs(self.app_list)
 
     def getAvailableRAM(self):
         free = 0
