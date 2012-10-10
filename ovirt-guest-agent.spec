@@ -9,7 +9,7 @@ Version: 1.0.5
 Release: %{release_version}%{?dist}
 Summary: oVirt Guest Agent
 Group: Applications/System
-License: GPLv2+
+License: ASL 2.0
 URL: http://gerrit.ovirt.org/p/ovirt-guest-agent.git
 Source0: http://ghammer.fedorapeople.org/ovirt-guest-agent-%{version}.tar.bz2
 ExclusiveArch: i686 x86_64
