@@ -32,21 +32,66 @@ except ImportError:
 class PkgMgr(object):
 
     def rpm_list_packages(self, app_list):
-        apps = []
+        """ Implementes the package retrieval for rpm based environments """
+        apps = set()
         for name in app_list.split():
             ts = self.rpm.TransactionSet()
             for app in ts.dbMatch('name', name):
-                apps.append("%s-%s-%s" %
+                apps.add("%s-%s-%s" %
                     (app['name'], app['version'], app['release']))
         return apps
 
+    def apt_list_packages(self, app_list):
+        """ Implementes the package retrieval for apt based environments """
+        INSTALLED_STATE = self.apt_pkg.CURSTATE_INSTALLED
+        apps = set()
+        cache = self.apt_pkg.Cache()
+        for app in app_list.split():
+            if app in cache:
+                pkg = cache[app]
+                # Normal package
+                if pkg.current_state == INSTALLED_STATE:
+                    detail = (app, pkg.current_ver.ver_str)
+                    apps.add("%s-%s" % (detail))
+                # virtual package
+                elif len(pkg.provides_list) > 0:
+                    for _, _, pkg in pkg.provides_list:
+                        if pkg.parent_pkg.current_state == INSTALLED_STATE:
+                            detail = (app, pkg.parent_pkg.current_ver.ver_str)
+                            apps.add("%s-%s" % (detail))
+        return apps
+
+    def list_pkgs(self, app_list):
+        """ Implements the package retrieval for apt and rpm if present and
+            returns a joined list of packages installed on the system. """
+        apps = set()
+        if self.rpm:
+            apps.update(self.rpm_list_packages(app_list))
+        if self.apt_pkg:
+            apps.update(self.apt_list_packages(app_list))
+        apps = list(apps)
+        logging.debug("PkgMgr: list_pkgs returns [%s]" % (str(apps)))
+        return apps
+
     def __init__(self):
-        if os.path.exists('/etc/redhat-release'):
+        self.rpm = None
+        self.apt_pkg = None
+        try:
             import rpm
             self.rpm = rpm
-            self.list_pkgs = self.rpm_list_packages
-        else:
-            raise NotImplementedError
+        except ImportError:
+            pass
+
+        try:
+            from apt import apt_pkg
+            apt_pkg.init()
+            self.apt_pkg = apt_pkg
+        except ImportError:
+            pass
+
+        if not self.rpm and not self.apt_pkg:
+            logging.info("Unknown package management. " \
+                         "Application list report is disabled.")
 
 class NicMgr(object):
 
