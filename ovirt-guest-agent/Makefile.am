@@ -4,14 +4,15 @@ SUBDIRS = pam consoleapps
 AGENT_NAME = ovirt-guest-agent
 
 agentdir=/usr/share/ovirt-guest-agent
-agent_DATA= \
+agent_PYTHON= \
     ovirt-guest-agent.py \
     OVirtAgentLogic.py \
     VirtIoChannel.py \
     GuestAgentLinux2.py \
     CredServer.py \
-    LockActiveSession.py \
-    hibernate
+    LockActiveSession.py
+
+agent_DATA=hibernate
 
 agentconfdir=/etc
 agentconf_DATA=ovirt-guest-agent.conf
@@ -24,6 +25,11 @@ rules_DATA = 55-$(AGENT_NAME).rules
 
 55-$(AGENT_NAME).rules: $(AGENT_NAME).rules
 	cp $(AGENT_NAME).rules 55-$(AGENT_NAME).rules
+
+# Conditionally install the systemd service
+if HAVE_SYSTEMD
+systemdsystemunit_DATA = ovirt-guest-agent.service
+endif
 
 EXTRA_DIST= \
 	$(agent_DATA) \

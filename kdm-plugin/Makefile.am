@@ -8,16 +8,15 @@ dist_noinst_DATA =              \
     src/OVirtCred.h             \
     src/OVirtCred.cpp
 
-kgreet_ovirtcreddir = $(KDM_GREETER_PLUGINS_DIR)
-kgreet_ovirtcred_DATA = kgreet_ovirtcred.so
-
-kgreet_ovirtcred.so:
+all-local:
 	cmake -DCMAKE_INSTALL_PREFIX=/usr src/CMakeLists.txt
 	make -C src
-	(	TMPDIR=`mktemp -d`; \
-		DESTDIR=$$TMPDIR make -C src install; \
-		install -s $$TMPDIR/$(KDM_GREETER_PLUGINS_DIR)/kgreet_ovirtcred.so .; \
-		rm -rf $$TMPDIR )
+
+clean-local:
+	make -C src clean
+
+install-exec-hook:
+	make -C src install DESTDIR=$(DESTDIR)
 
 $(PAM_SERVICE_NAME): $(PAM_SERVICE_NAME).pam
 	cp $(PAM_SERVICE_NAME).pam $(PAM_SERVICE_NAME)
@@ -29,5 +28,4 @@ EXTRA_DIST = $(PAM_SERVICE_NAME).pam
 
 CLEANFILES =            \
     *~                  \
-    kgreet_ovirtcred.so  \
     $(PAM_SERVICE_NAME)

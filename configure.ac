@@ -2,7 +2,7 @@
 AC_PREREQ([2.63])
 
 AC_INIT([ovirt-guest-agent],
-	[1.0.5],
+	[1.0.6],
 	[http://bugzilla.redhat.com])
 
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2 -Wall])
@@ -15,6 +15,13 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
+AC_PROG_MKDIR_P
+AC_PROG_LN_S
+AM_PATH_PYTHON
+dnl ---------------------------------------------------------------------------
+dnl needed for systemd detection
+dnl ---------------------------------------------------------------------------
+PKG_PROG_PKG_CONFIG
 
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h stdlib.h string.h sys/socket.h unistd.h])
 AC_CHECK_HEADERS([security/pam_ext.h security/pam_modules.h])
@@ -25,6 +32,21 @@ AC_CHECK_LIB([pam], [pam_get_user])
 
 AC_TYPE_SIZE_T
 AC_TYPE_PID_T
+
+# Fix libdir on demand
+test "$libdir" = '${exec_prefix}/lib' && libdir='${exec_prefix}/lib64'
+
+dnl ---------------------------------------------------------------------------
+dnl Check if we have systemd so we know if we have to install the systemd
+dnl service
+dnl ---------------------------------------------------------------------------
+AC_ARG_WITH([systemdsystemunitdir],
+    AS_HELP_STRING([--with-systemdsystemunitdir=DIR],[Directory for systemd service files]),
+    [], [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
+if test "x$with_systemdsystemunitdir" != xno; then
+    AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
+fi
+AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_systemdsystemunitdir" != xno ])
 
 dnl ---------------------------------------------------------------------------
 dnl - Dependencies
@@ -102,19 +124,16 @@ dnl ---------------------------------------------------------------------------
 dnl - Directory for PAM modules files
 dnl ---------------------------------------------------------------------------
 
-if test ${libdir} = '${exec_prefix}/lib'
-then
-    case "`uname -m`" in
-        x86_64)
-        libdir="/lib64" ;;
-        *)
-        libdir="/lib" ;;
-    esac
-fi
+case "`uname -m`" in
+    x86_64)
+    system_libdir="/lib64";;
+    *)
+    system_libdir="/lib" ;;
+esac
 
 AC_ARG_ENABLE(securedir,
-	AS_HELP_STRING([--enable-securedir=DIR],[path to location of PAMs @<:@default=$libdir/security@:>@]),
-	SECUREDIR=$enableval, SECUREDIR=$libdir/security)
+	AS_HELP_STRING([--enable-securedir=DIR],[path to location of PAMs @<:@default=$system_libdir/security@:>@]),
+	SECUREDIR=$enableval, SECUREDIR=$system_libdir/security)
 AC_SUBST(SECUREDIR)
 
 dnl ---------------------------------------------------------------------------
@@ -127,16 +146,15 @@ AC_ARG_WITH(simple-greeter-plugins-dir,
 if ! test -z "$with_simple_greeter_plugins_dir"; then
    GDM_SIMPLE_GREETER_PLUGINS_DIR=$with_simple_greeter_plugins_dir
 else
-   GDM_SIMPLE_GREETER_PLUGINS_DIR=${libdir}/gdm/simple-greeter/extensions
+   GDM_SIMPLE_GREETER_PLUGINS_DIR=$libdir/gdm/simple-greeter/extensions
 fi
-
 AC_SUBST(GDM_SIMPLE_GREETER_PLUGINS_DIR)
 
 dnl ---------------------------------------------------------------------------
 dnl - Directory for KDM greeter plugins
 dnl ---------------------------------------------------------------------------
 
-KDM_GREETER_PLUGINS_DIR=${libdir}/kde4
+KDM_GREETER_PLUGINS_DIR=$libdir/kde4
 AC_SUBST(KDM_GREETER_PLUGINS_DIR)
 
 dnl ---------------------------------------------------------------------------

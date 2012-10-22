@@ -20,7 +20,7 @@ AM_CPPFLAGS = \
 plugindir = $(GDM_SIMPLE_GREETER_PLUGINS_DIR)
 plugin_LTLIBRARIES = libovirtcred.la
 
-libovirtcred_la_CFLAGS = $(SIMPLE_GREETER_CFLAGS)
+libovirtcred_la_CFLAGS = $(SIMPLE_GREETER_CFLAGS) -fPIC
 libovirtcred_la_LDFLAGS = -module -avoid-version -export-dynamic
 libovirtcred_la_LIBADD = $(GDM_PLUGIN_LIBS)
 libovirtcred_la_SOURCES = \

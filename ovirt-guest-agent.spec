@@ -1,28 +1,38 @@
 
-%define release_version 1
+%global release_version 1
 
-%define _moduledir /%{_lib}/security
-%define _kdmrc /etc/kde/kdm/kdmrc
+%global _moduledir /%{_lib}/security
+%global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.5
+Version: 1.0.6
 Release: %{release_version}%{?dist}
-Summary: oVirt Guest Agent
+Summary: The oVirt Guest Agent
 Group: Applications/System
 License: ASL 2.0
-URL: http://gerrit.ovirt.org/p/ovirt-guest-agent.git
-Source0: http://ghammer.fedorapeople.org/ovirt-guest-agent-%{version}.tar.bz2
-ExclusiveArch: i686 x86_64
-BuildRequires: python
-BuildRequires: automake
+URL: http://wiki.ovirt.org/wiki/Category:Ovirt_guest_agent
+Source0: http://ovirt.org/releases/stable/src/%{name}-%{version}.tar.bz2
 BuildRequires: libtool
 BuildRequires: pam-devel
+BuildRequires: python2-devel
+%if 0%{?fedora} >= 18
+BuildRequires: systemd
+%else
+BuildRequires: systemd-units
+%endif
+Requires: %{name}-common = %{version}-%{release}
+
+%package common
+Summary: Commonly used files of the oVirt Guest Agent
+BuildArch: noarch
 Requires: dbus-python
 Requires: rpm-python
 Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
+Provides: %{name} = %{version}-%{release}
+
 %if 0%{?fc16}
 Conflicts: selinux-policy < 3.10.0-77
 %endif
@@ -31,28 +41,35 @@ Conflicts: selinux-policy < 3.10.0-89
 %endif
 
 %package pam-module
-Summary: oVirt Guest Agent PAM module
-Requires: %{name}
+Summary: PAM module for the oVirt Guest Agent
+Requires: %{name} = %{version}-%{release}
 Requires: pam
 
 %package gdm-plugin
-Summary: GDM oVirt plug-in
+Summary: GDM plug-in for the oVirt Guest Agent
 BuildRequires: dbus-glib-devel
 BuildRequires: gdm-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: gtk2-devel
-Requires: %{name}
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-pam-module = %{version}-%{release}
 Requires: gdm
-Requires: %{name}-pam-module
 
 %package kdm-plugin
-Summary: KDM oVirt plug-in
+Summary: KDM plug-in for the oVirt Guest Agent
 BuildRequires: kdebase-workspace-devel
-Requires: %{name}
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-pam-module = %{version}-%{release}
 Requires: kdm
-Requires: %{name}-pam-module
 
 %description
+This is the oVirt management agent running inside the guest. The agent
+interfaces with the oVirt manager, supplying heart-beat info as well as
+run-time data from within the guest itself. The agent also accepts
+control commands to be run executed within the OS (like: shutdown and
+restart).
+
+%description common
 This is the oVirt management agent running inside the guest. The agent
 interfaces with the oVirt manager, supplying heart-beat info as well as
 run-time data from within the guest itself. The agent also accepts
@@ -73,50 +90,26 @@ oVirt automatic log-in system.
 
 %prep
 %setup -q -n ovirt-guest-agent-%{version}
-autoreconf -i -f
 
 %build
 %configure \
     --enable-securedir=%{_moduledir} \
     --includedir=%{_includedir}/security \
     --with-pam-prefix=%{_sysconfdir}
-    
+
 make %{?_smp_mflags}
 
 %install
-[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
-make install DESTDIR=$RPM_BUILD_ROOT
-
-# Install systemd script.
-install -Dm 0644 ovirt-guest-agent/ovirt-guest-agent.service $RPM_BUILD_ROOT%{_unitdir}/ovirt-guest-agent.service
-
-# Create symbolic links to commands that requires root privileges.
-ln -sf /usr/bin/consolehelper $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/ovirt-locksession
-ln -sf /usr/bin/consolehelper $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/ovirt-shutdown
-ln -sf /usr/bin/consolehelper $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/ovirt-hibernate
-
-# Update timestamps on Python files in order to avoid differences between
-# .pyc/.pyo files.
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_datadir}/ovirt-guest-agent/*.py
-
-rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
-
-rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.a
-rm -f $RPM_BUILD_ROOT%{_moduledir}/pam_ovirt_cred.la
-
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/ovirt-guest-agent
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lock/subsys/ovirt-guest-agent
-
-%pre
+%pre common
 getent group ovirtagent >/dev/null || groupadd -r -g 175 ovirtagent
 getent passwd ovirtagent > /dev/null || \
     /usr/sbin/useradd -u 175 -g 175 -o -r ovirtagent \
     -c "oVirt Guest Agent" -d / -s /sbin/nologin
 exit 0
- 
-%post
+
+%post common
 /sbin/udevadm trigger --subsystem-match="virtio-ports" \
     --attr-match="name=com.redhat.rhevm.vdsm"
 
@@ -128,7 +121,7 @@ then
     sed -i "s~^#PluginsLogin=winbind~PluginsLogin=ovirtcred,classic~" "%{_kdmrc}"
 fi
 
-%preun
+%preun common
 if [ "$1" -eq 0 ]
 then
     /bin/systemctl stop ovirt-guest-agent.service > /dev/null 2>&1
@@ -141,7 +134,7 @@ then
     fi
 fi
 
-%postun
+%postun common
 if [ "$1" -eq 0 ]
 then
     /bin/systemctl daemon-reload
@@ -157,20 +150,27 @@ then
     sed -i "s~PluginsLogin=ovirtcred,classic~#PluginsLogin=winbind~" "%{_kdmrc}"
 fi
 
-%files
-%defattr(-,root,root,-)
+%files common
 %dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/ovirt-guest-agent
 %dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent
+
 %config(noreplace) %{_sysconfdir}/ovirt-guest-agent.conf
-%{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
-%{_sysconfdir}/security/console.apps/ovirt-locksession
-%{_sysconfdir}/security/console.apps/ovirt-shutdown
-%{_sysconfdir}/security/console.apps/ovirt-hibernate
-%{_sysconfdir}/pam.d/ovirt-locksession
-%{_sysconfdir}/pam.d/ovirt-shutdown
-%{_sysconfdir}/pam.d/ovirt-hibernate
-%attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
+
+%doc AUTHORS COPYING NEWS README
+
+# These are intentionally NOT 'noreplace' If this is modified by an user,
+# this actually might break it.
+%config %{_sysconfdir}/pam.d/ovirt-locksession
+%config %{_sysconfdir}/pam.d/ovirt-shutdown
+%config %{_sysconfdir}/pam.d/ovirt-hibernate
+%config %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
+%config %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
+%config %{_sysconfdir}/security/console.apps/ovirt-locksession
+%config %{_sysconfdir}/security/console.apps/ovirt-shutdown
+%config %{_sysconfdir}/security/console.apps/ovirt-hibernate
+
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/ovirt-guest-agent.py*
+
 %{_datadir}/ovirt-guest-agent/OVirtAgentLogic.py*
 %{_datadir}/ovirt-guest-agent/VirtIoChannel.py*
 %{_datadir}/ovirt-guest-agent/CredServer.py*
@@ -178,30 +178,57 @@ fi
 %{_datadir}/ovirt-guest-agent/ovirt-locksession
 %{_datadir}/ovirt-guest-agent/ovirt-shutdown
 %{_datadir}/ovirt-guest-agent/ovirt-hibernate
+
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
+
 %{_unitdir}/ovirt-guest-agent.service
 
-%doc AUTHORS COPYING NEWS README
 
 %files pam-module
-%defattr(-,root,root,-)
 %{_moduledir}/pam_ovirt_cred.so
+%exclude %{_moduledir}/pam_ovirt_cred.a
+%exclude %{_moduledir}/pam_ovirt_cred.la
+
 
 %files gdm-plugin
-%defattr(-,root,root,-)
-%{_sysconfdir}/pam.d/gdm-ovirtcred
+# This is intentionally NOT 'noreplace' If this is modified by an user,
+# this actually might break it.
+%config %{_sysconfdir}/pam.d/gdm-ovirtcred
 %{_datadir}/icons/hicolor/*/*/*.png
 %dir %{_datadir}/gdm/simple-greeter/extensions/ovirtcred
 %{_datadir}/gdm/simple-greeter/extensions/ovirtcred/page.ui
 %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.so
+# Unwanted files
+%exclude %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
+%exclude %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
 
 %files kdm-plugin
-%defattr(-,root,root,-)
-%{_sysconfdir}/pam.d/kdm-ovirtcred
+# This is intentionally NOT 'noreplace' If this is modified by an user,
+# this actually might break it.
+%config %{_sysconfdir}/pam.d/kdm-ovirtcred
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Wed Dec 05 2012 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.6-1
+- New upstream version 1.0.6
+- Upstream build system is now taking care of folder creation
+- Upstream build system is now taking care of systemd units installation
+
+* Wed Nov 28 2012 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.5-3
+- License has been changed to Apache Software License 2.0
+
+* Fri Oct 19 2012 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.5-2
+- introduced ovirt-guest-agent-common noarch package which provides
+  ovirt-guest-agent and avoids duplication of the same package content
+- fixed various rpmlint errors and warnings
+- added required build requires
+- removed unnecessary build requires
+- removed unnecessary call to autoreconf in setup section
+- marked config files as such
+- excluded unwanted files instead of deleting them
+- removed consolehelper based symlinks - now in upstream make install
+
 * Sun May 20 2012 Gal Hammer <ghammer@redhat.com> - 1.0.5-1
 - fixed 'udevadm trigger' command line (bz#819945).
 - fixed various rpmlint errors and warnings.
@@ -251,7 +278,7 @@ Resolves: BZ#729252 BZ#736426
 
 * Mon Aug  8 2011 Gal Hammer <ghammer@redhat.com> - 2.3.12-1
 - replaced password masking with a fixed-length string.
-Resolves: BZ#727506 
+Resolves: BZ#727506
 
 * Thu Aug  4 2011 Gal Hammer <ghammer@redhat.com> - 2.3.11-1
 - send an 'uninstalled' notification to vdsm
@@ -344,11 +371,11 @@ Resolves: BZ#660343 BZ#660231
 
 * Wed Dec 05 2010 Barak Azulay <bazulay@redhat.com> - 2.3-2
 - initial build for RHEL-6
-- works over vioserial 
+- works over vioserial
 - Agent reports only heartbeats, IPs, app list
-- performs: shutdown & lock (the lock works only on gnome - when 
+- performs: shutdown & lock (the lock works only on gnome - when
   ConsoleKit & gnome-screensaver is installed)
 Resolves: BZ#613059
-  
+
 * Thu Aug 27 2010 Gal Hammer <ghammer@redhat.com> - 2.3-1
 - Initial build.
