@@ -98,7 +98,9 @@ class WinOsTypeHandler:
     WIN2003    = 'Win 2003'
     WIN2008    = 'Win 2008'
     WIN2008R2  = 'Win 2008 R2'
+    WIN2012    = 'Win 2012'
     WIN7       = 'Win 7'
+    WIN8       = 'Win 8'
     WINCE3_1_0 = 'Win CE 1.0'
     WINCE3_2_0 = 'Win CE 2.0'
     WINCE3_2_1 = 'Win CE 2.1'
@@ -113,24 +115,28 @@ class WinOsTypeHandler:
         '2.5.2'  : WIN2003,
         '2.6.0'  : WIN2008,
         '2.6.1'  : WIN2008R2, # Window Server 2008 R2
+        '2.6.2'  : WIN2012,
         '3.1.0'  : WINCE3_1_0,
         '3.2.0'  : WINCE3_2_0,
         '3.2.1'  : WINCE3_2_1 ,
         '3.3.0'  : WINCE3_3_0}
     def getWinOsType(self):
-
         retval = self.UNKNOWN
         try:
             versionTupple = win32api.GetVersionEx(1)
-            key = "%d.%d.%d"%(versionTupple[3], versionTupple[0], versionTupple[1])
+            key = "%d.%d.%d" % (
+                versionTupple[3], versionTupple[0], versionTupple[1])
             if self.winVersionMatrix.has_key(key):
                 retval = self.winVersionMatrix[key]
             # Window 7 and Window Server 2008 R2 share the same version.
             # Need to fix it using the wProductType field.
-            if retval == WinOsTypeHandler.WIN2008R2:
                 VER_NT_WORKSTATION = 1
-                if versionTupple[8] == VER_NT_WORKSTATION:
+            if (retval == WinOsTypeHandler.WIN2008R2 and
+                versionTupple[8] == VER_NT_WORKSTATION):
                     retval = WinOsTypeHandler.WIN7
+            elif (retval == WinOsTypeHandler.WIN2012 and
+                  versionTupple[8] == VER_NT_WORKSTATION):
+                retval = WinOsTypeHandler.WIN8
             logging.debug("WinOsTypeHandler::getWinOsType osType = '%s'", retval)
         except:
             logging.exception("getWinOsType - failed")
