@@ -1,0 +1,10 @@
+*.c eol=lf
+*.cpp eol=lf
+*.py eol=lf
+*.h eol=lf
+*.rc eol=lf
+*.txt eol=lf
+*.bat eol=crlf
+*.vc*proj* eol=crlf
+*.ini eol=crlf
+*.sln eol=crlf
