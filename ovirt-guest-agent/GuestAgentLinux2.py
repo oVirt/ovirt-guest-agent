@@ -109,18 +109,24 @@ class NicMgr(object):
         self.ethtool = ethtool
         self.list_nics = self.ethtool_list_nics
 
+    def _get_ipv4_addresses(self, dev):
+        return [dev.ipv4_address] if dev.ipv4_address is not None else []
+
+    def _get_ipv6_addresses(self, dev):
+        return [ip.address for ip in dev.get_ipv6_addresses()]
+
     def ethtool_list_nics(self):
         interfaces = list()
         try:
-            for dev in self.ethtool.get_active_devices():
+            for dev in self.ethtool.get_devices():
                 flags = self.ethtool.get_flags(dev)
-                if not(flags & self.ethtool.IFF_LOOPBACK):
+                if flags & self.ethtool.IFF_UP and \
+                        not(flags & self.ethtool.IFF_LOOPBACK):
                     devinfo = self.ethtool.get_interfaces_info(dev)[0]
                     interfaces.append(
                         {'name': dev,
-                         'inet': [self.ethtool.get_ipaddr(dev)],
-                         'inet6': map(lambda ip: ip.address,
-                                      devinfo.get_ipv6_addresses()),
+                         'inet': self._get_ipv4_addresses(devinfo),
+                         'inet6': self._get_ipv6_addresses(devinfo),
                          'hw': self.ethtool.get_hwaddr(dev)})
         except:
             logging.exception("Error retrieving network interfaces.")
