@@ -16,8 +16,12 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import os, socket, subprocess, string, threading, logging, time
-import ethtool
+import logging
+import os
+import socket
+import subprocess
+import threading
+import time
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 
 try:
@@ -29,6 +33,7 @@ except ImportError:
         def user_authenticated(self, credentials):
             pass
 
+
 class PkgMgr(object):
 
     def rpm_list_packages(self, app_list):
@@ -38,7 +43,7 @@ class PkgMgr(object):
             ts = self.rpm.TransactionSet()
             for app in ts.dbMatch('name', name):
                 apps.add("%s-%s-%s" %
-                    (app['name'], app['version'], app['release']))
+                         (app['name'], app['version'], app['release']))
         return apps
 
     def apt_list_packages(self, app_list):
@@ -90,26 +95,11 @@ class PkgMgr(object):
             pass
 
         if not self.rpm and not self.apt_pkg:
-            logging.info("Unknown package management. " \
-                         "Application list report is disabled.")
+            logging.info("Unknown package management. Application list "
+                         "report is disabled.")
+
 
 class NicMgr(object):
-
-    def ethtool_list_nics(self):
-        interfaces = list()
-        try:
-            for dev in self.ethtool.get_active_devices():
-                flags = self.ethtool.get_flags(dev)
-                if not(flags & self.ethtool.IFF_LOOPBACK):
-                    devinfo = self.ethtool.get_interfaces_info(dev)[0]
-                    interfaces.append({ 'name' : dev,
-                        'inet' : [ self.ethtool.get_ipaddr(dev) ],
-                        'inet6' : map(lambda ip: ip.address,
-                            devinfo.get_ipv6_addresses()),
-                        'hw' : self.ethtool.get_hwaddr(dev) })
-        except:
-            logging.exception("Error retrieving network interfaces.")
-        return interfaces
 
     def __init__(self):
         try:
@@ -119,13 +109,31 @@ class NicMgr(object):
         self.ethtool = ethtool
         self.list_nics = self.ethtool_list_nics
 
+    def ethtool_list_nics(self):
+        interfaces = list()
+        try:
+            for dev in self.ethtool.get_active_devices():
+                flags = self.ethtool.get_flags(dev)
+                if not(flags & self.ethtool.IFF_LOOPBACK):
+                    devinfo = self.ethtool.get_interfaces_info(dev)[0]
+                    interfaces.append(
+                        {'name': dev,
+                         'inet': [self.ethtool.get_ipaddr(dev)],
+                         'inet6': map(lambda ip: ip.address,
+                                      devinfo.get_ipv6_addresses()),
+                         'hw': self.ethtool.get_hwaddr(dev)})
+        except:
+            logging.exception("Error retrieving network interfaces.")
+        return interfaces
+
+
 class CommandHandlerLinux:
 
     def __init__(self, agent):
         self.agent = agent
 
     def lock_screen(self):
-        cmd = [ '/usr/share/ovirt-guest-agent/ovirt-locksession' ]
+        cmd = ['/usr/share/ovirt-guest-agent/ovirt-locksession']
         logging.debug("Executing lock session command: '%s'", cmd)
         subprocess.call(cmd)
 
@@ -139,30 +147,32 @@ class CommandHandlerLinux:
         # The shutdown command works with minutes while vdsm send value in
         # seconds, so we round up the value to minutes.
         delay = (int(timeout) + 59) / 60
-        cmd = [ '/usr/share/ovirt-guest-agent/ovirt-shutdown', '-h', "+%d" % (delay), "\"%s\"" % (msg) ]
+        cmd = ['/usr/share/ovirt-guest-agent/ovirt-shutdown', '-h',
+               "+%d" % (delay), "\"%s\"" % (msg)]
         logging.debug("Executing shutdown command: %s", cmd)
         subprocess.call(cmd)
 
     def hibernate(self, state):
-        cmd = [ '/usr/share/ovirt-guest-agent/ovirt-hibernate', state ]
+        cmd = ['/usr/share/ovirt-guest-agent/ovirt-hibernate', state]
         logging.debug("Executing hibernate command: %s", cmd)
         subprocess.call(cmd)
+
 
 class LinuxDataRetriver(DataRetriverBase):
 
     def __init__(self):
         try:
-             pkgmgr = PkgMgr()
+            pkgmgr = PkgMgr()
         except NotImplementedError:
-             self.list_pkgs = lambda app_list: []
+            self.list_pkgs = lambda app_list: []
         else:
-             self.list_pkgs = pkgmgr.list_pkgs
+            self.list_pkgs = pkgmgr.list_pkgs
         try:
-             nicmgr = NicMgr()
+            nicmgr = NicMgr()
         except NotImplementedError:
-             self.list_nics = lambda: []
+            self.list_nics = lambda: []
         else:
-             self.list_nics = nicmgr.list_nics
+            self.list_nics = nicmgr.list_nics
         self.app_list = ""
         self.ignored_fs = ""
         self._init_vmstat()
@@ -192,13 +202,13 @@ class LinuxDataRetriver(DataRetriverBase):
         users = ''
         try:
             cmdline = '/usr/bin/users | /usr/bin/tr " " "\n" | /usr/bin/uniq'
-            users = string.join(string.join(os.popen(cmdline).readlines()).split())
+            users = ' '.join(os.popen(cmdline).read().split())
         except:
             logging.exception("Error retrieving logged in users.")
         return users
 
     def getActiveUser(self):
-        users = string.join(os.popen('/usr/bin/users').readlines()).split()
+        users = os.popen('/usr/bin/users').read().split()
         try:
             user = users[0]
         except:
@@ -217,7 +227,8 @@ class LinuxDataRetriver(DataRetriverBase):
                     statvfs = os.statvfs(path)
                     total = statvfs.f_bsize * statvfs.f_blocks
                     used = total - statvfs.f_bsize * statvfs.f_bfree
-                    usages.append({ 'path' : path, 'fs' : fs, 'total' : total, 'used' : used })
+                    usages.append({'path': path, 'fs': fs, 'total': total,
+                                   'used': used})
             mounts.close()
         except:
             logging.exception("Error retrieving disks usages.")
@@ -258,8 +269,8 @@ class LinuxDataRetriver(DataRetriverBase):
         /proc/vmstat reports cumulative statistics so we must subtract the
         previous values to get the difference since the last collection.
         """
-        fields = {'pswpin' : 'swap_in', 'pswpout' : 'swap_out',
-                        'pgfault' : 'pageflt', 'pgmajfault' : 'majflt'}
+        fields = {'pswpin': 'swap_in', 'pswpout': 'swap_out',
+                  'pgfault': 'pageflt', 'pgmajfault': 'majflt'}
 
         self.vmstat['timestamp_cur'] = time.time()
         interval = self.vmstat['timestamp_cur'] - self.vmstat['timestamp_prev']
@@ -271,10 +282,11 @@ class LinuxDataRetriver(DataRetriverBase):
                 name = fields[key]
                 self.vmstat[name + '_prev'] = self.vmstat[name + '_cur']
                 self.vmstat[name + '_cur'] = int(value)
-                if self.vmstat[name + '_prev'] == None:
+                if self.vmstat[name + '_prev'] is None:
                     self.vmstat[name + '_prev'] = self.vmstat[name + '_cur']
-                self.memStats[name] = int((self.vmstat[name + '_cur'] - \
-                                self.vmstat[name + '_prev'])/interval)
+                self.memStats[name] = int((self.vmstat[name + '_cur'] -
+                                           self.vmstat[name + '_prev']) /
+                                          interval)
 
 
 class LinuxVdsAgent(AgentLogicBase):
@@ -295,12 +307,13 @@ class LinuxVdsAgent(AgentLogicBase):
         self.cred_server.join()
         AgentLogicBase.stop(self)
 
+
 def test():
     dr = LinuxDataRetriver()
     dr.app_list = "kernel kernel-headers aspell"
-    dr.ignored_fs = set("rootfs tmpfs autofs cgroup selinuxfs udev mqueue nfsd " \
-        "proc sysfs devtmpfs hugetlbfs rpc_pipefs devpts securityfs debugfs " \
-        "binfmt_misc".split())
+    dr.ignored_fs = set("rootfs tmpfs autofs cgroup selinuxfs udev mqueue "
+                        "nfsd proc sysfs devtmpfs hugetlbfs rpc_pipefs devpts "
+                        "securityfs debugfs binfmt_misc".split())
     print "Machine Name:", dr.getMachineName()
     print "OS Version:", dr.getOsVersion()
     print "Network Interfaces:", dr.getAllNetworkInterfaces()
