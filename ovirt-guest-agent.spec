@@ -138,6 +138,9 @@ fi
 if [ "$1" -eq 0 ]
 then
     /bin/systemctl daemon-reload
+    # Let udev clear access rights
+    /sbin/udevadm trigger --subsystem-match="virtio-ports" \
+        --attr-match="name=com.redhat.rhevm.vdsm"
 fi
 
 if [ "$1" -ge 1 ]; then
