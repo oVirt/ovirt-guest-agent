@@ -5,7 +5,7 @@
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.6
+Version: 1.0.7
 Release: %{release_version}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -213,6 +213,12 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Tue Dec 25 2012 Gal Hammer <ghammer@redhat.com> - 1.0.7-1
+- reset user rights on virtio-channel during package removal.
+- unification of line endings to unix.
+- fixed support for reporting devices with only ipv6.
+- fixed pep8 errors in the linux guest agent.
+
 * Wed Dec 05 2012 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.6-1
 - New upstream version 1.0.6
 - Upstream build system is now taking care of folder creation
