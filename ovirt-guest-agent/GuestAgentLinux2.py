@@ -110,10 +110,16 @@ class NicMgr(object):
         self.list_nics = self.ethtool_list_nics
 
     def _get_ipv4_addresses(self, dev):
-        return [dev.ipv4_address] if dev.ipv4_address is not None else []
+        if dev.ipv4_address is not None:
+            return [dev.ipv4_address]
+        else:
+            return []
 
     def _get_ipv6_addresses(self, dev):
-        return [ip.address for ip in dev.get_ipv6_addresses()]
+        ipv6_addrs = []
+        for ip in dev.get_ipv6_addresses():
+            ipv6_addrs.append(ip.address)
+        return ipv6_addrs
 
     def ethtool_list_nics(self):
         interfaces = list()
