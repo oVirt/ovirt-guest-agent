@@ -24,14 +24,17 @@ import threading
 import time
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 
+CredServer = None
 try:
-    from CredServer import CredServer
+    from CredServer import CredServer as CredServerImported
+    CredServer = CredServerImported
 except ImportError:
     # The CredServer doesn't exist in RHEL-5. So we provide a
     # fake server that do nothing.
-    class CredServer(threading.Thread):
+    class CredServerFake(threading.Thread):
         def user_authenticated(self, credentials):
             pass
+    CredServer = CredServerFake
 
 
 class PkgMgr(object):
@@ -268,8 +271,8 @@ class LinuxDataRetriver(DataRetriverBase):
             self.vmstat[field + '_cur'] = None
 
     def _get_meminfo(self):
-        fields = {'MemTotal:' : 0, 'MemFree:' : 0, 'Buffers:' : 0, \
-                  'Cached:' : 0}
+        fields = {'MemTotal:': 0, 'MemFree:': 0, 'Buffers:': 0,
+                  'Cached:': 0}
         free = 0
         for line in open('/proc/meminfo'):
             (key, value) = line.strip().split()[0:2]

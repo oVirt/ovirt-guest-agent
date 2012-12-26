@@ -16,17 +16,27 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import os, platform, time
+import os
+import platform
+import time
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
+
+# avoid pep8 warnings
+def import_json():
+    try:
+        import json
+        return json
+    except ImportError:
+        import simplejson
+        return simplejson
+json = import_json()
+
 
 class VirtIoChannel:
 
-    # Python on Windows 7 return 'Microsoft' rather than 'Windows' as documented.
-    is_windows = (platform.system() == 'Windows') or (platform.system() == 'Microsoft')
+    # Python on Windows 7 returns 'Microsoft' rather than 'Windows' as
+    # documented.
+    is_windows = platform.system() in ['Windows', 'Microsoft']
 
     def __init__(self, vport_name):
         if self.is_windows:
@@ -75,7 +85,7 @@ class VirtIoChannel:
     def read(self):
         return self._parseLine(self._readline())
 
-    def write(self, name, args = {}):
+    def write(self, name, args={}):
         if not isinstance(name, str):
             raise TypeError("1nd arg must be a str.")
         if not isinstance(args, dict):
@@ -89,6 +99,7 @@ class VirtIoChannel:
                 written = os.write(self._vport, message)
             message = message[written:]
 
+
 def _create_vio():
     if (platform.system() == 'Windows') or (platform.system() == 'Microsoft'):
         vport_name = '\\\\.\\Global\\com.redhat.rhevm.vdsm'
@@ -96,11 +107,18 @@ def _create_vio():
         vport_name = '/dev/virtio-ports/com.redhat.rhevm.vdsm'
     return VirtIoChannel(vport_name)
 
+
 def _test_write():
     vio = _create_vio()
-    vio.write('network-interfaces', { 'interfaces' :
-        [{ 'name': 'eth0', 'inet': [ '10.0.0.2' ], 'inet6': [ 'fe80::213:20ff:fef5:f9d6' ], 'hw': '00:1a:4a:23:10:00' }] })
-    vio.write('applications', { 'applications' : [ 'kernel-2.6.32-131.4.1.el6', 'rhev-agent-2.3.11-1.el6'] })
+    vio.write('network-interfaces',
+              {'interfaces': [{
+                  'name': 'eth0',
+                  'inet': ['10.0.0.2'],
+                  'inet6': ['fe80::213:20ff:fef5:f9d6'],
+                  'hw': '00:1a:4a:23:10:00'}]})
+    vio.write('applications', {'applications': ['kernel-2.6.32-131.4.1.el6',
+                                                'rhev-agent-2.3.11-1.el6']})
+
 
 def _test_read():
     vio = _create_vio()

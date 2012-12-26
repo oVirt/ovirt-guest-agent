@@ -23,14 +23,15 @@ import win32event
 import win32con
 import pywintypes
 
+
 # Using Python's os.read() to do a blocking-read doesn't allow
 # to use os.write() on a different thread. This class overrides
 # this problem by using Windows's API.
-
 class WinFile(object):
 
     def __init__(self, filename):
-        self._hfile = win32file.CreateFile(filename,
+        self._hfile = win32file.CreateFile(
+            filename,
             win32con.GENERIC_READ | win32con.GENERIC_WRITE,
             win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE,
             win32security.SECURITY_ATTRIBUTES(),
@@ -38,19 +39,28 @@ class WinFile(object):
             win32con.FILE_FLAG_OVERLAPPED,
             0)
         self._read_ovrlpd = pywintypes.OVERLAPPED()
-        self._read_ovrlpd.hEvent = win32event.CreateEvent(None, True, False, None)
+        self._read_ovrlpd.hEvent = win32event.CreateEvent(None, True, False,
+                                                          None)
         self._write_ovrlpd = pywintypes.OVERLAPPED()
-        self._write_ovrlpd.hEvent = win32event.CreateEvent(None, True, False, None)
+        self._write_ovrlpd.hEvent = win32event.CreateEvent(None, True, False,
+                                                           None)
 
     def read(self, n):
         (nr, buf) = (0, ())
         try:
-            (hr, buf) = win32file.ReadFile(self._hfile, win32file.AllocateReadBuffer(n), self._read_ovrlpd)
-            nr = win32file.GetOverlappedResult(self._hfile, self._read_ovrlpd, True)
+            (hr, buf) = win32file.ReadFile(
+                self._hfile,
+                win32file.AllocateReadBuffer(n),
+                self._read_ovrlpd)
+            nr = win32file.GetOverlappedResult(self._hfile,
+                                               self._read_ovrlpd,
+                                               True)
         except:
             pass
         return buf[:nr]
 
     def write(self, s):
         win32file.WriteFile(self._hfile, s, self._write_ovrlpd)
-        return win32file.GetOverlappedResult(self._hfile, self._write_ovrlpd, True)
+        return win32file.GetOverlappedResult(self._hfile,
+                                             self._write_ovrlpd,
+                                             True)

@@ -8,7 +8,7 @@ This module provides DSA software versioning information for
 python based components
 """
 version_name = "Ice Coffee"
-build_name   = "trunk"
+build_name = "trunk"
 software_version = "4.7"
 # software_revision should be replaced by build system to the real revision
 software_revision = "1"

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
-import time, os, logging, types
+import time
+import os
+import logging
 import win32netcon
 import win32net
 import win32ts
@@ -14,12 +16,14 @@ import pythoncom
 import subprocess
 import socket
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
-from ctypes import *
+from ctypes import c_ulong, byref, windll, create_unicode_buffer,\
+    Structure, sizeof, c_void_p
 from ctypes.util import find_library
-from ctypes.wintypes import *
+from ctypes.wintypes import DWORD
 import _winreg
 
-# Both _winreg.QueryValueEx and win32api.RegQueryValueEx doesn't support reading
+
+# _winreg.QueryValueEx and win32api.RegQueryValueEx don't support reading
 # Unicode strings from the registry (at least on Python 2.5.1).
 def QueryStringValue(hkey, name):
     #if type(hkey) != type(PyHKEY):
@@ -28,14 +32,20 @@ def QueryStringValue(hkey, name):
         raise TypeError("2nd arg must be a unicode.")
     key_type = c_ulong(0)
     key_len = c_ulong(0)
-    if windll.advapi32.RegQueryValueExW(hkey.handle, name, None, byref(key_type), None, byref(key_len)) != 0:
+    res = windll.advapi32.RegQueryValueExW(hkey.handle, name, None,
+                                           byref(key_type), None,
+                                           byref(key_len))
+    if res != 0:
         return unicode()
     if (key_type.value != win32con.REG_SZ):
         return unicode()
     key_value = create_unicode_buffer(key_len.value)
-    if windll.advapi32.RegQueryValueExW(hkey.handle, name, None, None, byref(key_value), byref(key_len)) != 0:
+    res = windll.advapi32.RegQueryValueExW(hkey.handle, name, None, None,
+                                           byref(key_value), byref(key_len))
+    if res != 0:
         return unicode()
     return key_value.value
+
 
 def GetNetworkInterfaces():
     interfaces = list()
@@ -56,12 +66,15 @@ def GetNetworkInterfaces():
                         except socket.error:
                             # Assume IPv6 if parsing as IPv4 was failed.
                             inet6.append(ip)
-                interfaces.append({ 'name' : adapter.Description,
-                    'inet' : inet, 'inet6' : inet6,
-                    'hw' : adapter.MacAddress.lower().replace('-', ':') })
+                interfaces.append({
+                    'name': adapter.Description,
+                    'inet': inet,
+                    'inet6': inet6,
+                    'hw': adapter.MacAddress.lower().replace('-', ':')})
     except:
         logging.exception("Error retrieving network interfaces.")
     return interfaces
+
 
 class PERFORMANCE_INFORMATION(Structure):
     _fields_ = [
@@ -81,66 +94,73 @@ class PERFORMANCE_INFORMATION(Structure):
         ('ThreadCount', DWORD)
     ]
 
+
 def get_perf_info():
     pi = PERFORMANCE_INFORMATION()
     pi.cb = sizeof(pi)
     windll.psapi.GetPerformanceInfo(byref(pi), pi.cb)
     return pi
 
+
 class IncomingMessageTypes:
         Credentials = 11
 
+
 class WinOsTypeHandler:
-    WINNT3_51  = 'Win NT 3.51'
-    WINNT4     = 'Win NT 4'
-    WIN2K      = 'Win 2000'
-    WINXP      = 'Win XP'
-    WIN2003    = 'Win 2003'
-    WIN2008    = 'Win 2008'
-    WIN2008R2  = 'Win 2008 R2'
-    WIN2012    = 'Win 2012'
-    WIN7       = 'Win 7'
-    WIN8       = 'Win 8'
+    WINNT3_51 = 'Win NT 3.51'
+    WINNT4 = 'Win NT 4'
+    WIN2K = 'Win 2000'
+    WINXP = 'Win XP'
+    WIN2003 = 'Win 2003'
+    WIN2008 = 'Win 2008'
+    WIN2008R2 = 'Win 2008 R2'
+    WIN2012 = 'Win 2012'
+    WIN7 = 'Win 7'
+    WIN8 = 'Win 8'
     WINCE3_1_0 = 'Win CE 1.0'
     WINCE3_2_0 = 'Win CE 2.0'
     WINCE3_2_1 = 'Win CE 2.1'
     WINCE3_3_0 = 'Win CE 3.0'
-    UNKNOWN    = 'Unknown'
-    #winVersionMatrix is constructed from 3 fields <platformId>.<MajorVersion>.<MinorVersion>
+    UNKNOWN = 'Unknown'
+    # winVersionMatrix is constructed from 3 fields
+    # <platformId>.<MajorVersion>.<MinorVersion>
     winVersionMatrix = {
-        '2.3.51' : WINNT3_51,
-        '2.4.0'  : WINNT4,
-        '2.5.0'  : WIN2K,
-        '2.5.1'  : WINXP,
-        '2.5.2'  : WIN2003,
-        '2.6.0'  : WIN2008,
-        '2.6.1'  : WIN2008R2, # Window Server 2008 R2
-        '2.6.2'  : WIN2012,
-        '3.1.0'  : WINCE3_1_0,
-        '3.2.0'  : WINCE3_2_0,
-        '3.2.1'  : WINCE3_2_1 ,
-        '3.3.0'  : WINCE3_3_0}
+        '2.3.51': WINNT3_51,
+        '2.4.0': WINNT4,
+        '2.5.0': WIN2K,
+        '2.5.1': WINXP,
+        '2.5.2': WIN2003,
+        '2.6.0': WIN2008,
+        '2.6.1': WIN2008R2,  # Window Server 2008 R2
+        '2.6.2': WIN2012,
+        '3.1.0': WINCE3_1_0,
+        '3.2.0': WINCE3_2_0,
+        '3.2.1': WINCE3_2_1,
+        '3.3.0': WINCE3_3_0}
+
     def getWinOsType(self):
         retval = self.UNKNOWN
         try:
             versionTupple = win32api.GetVersionEx(1)
             key = "%d.%d.%d" % (
                 versionTupple[3], versionTupple[0], versionTupple[1])
-            if self.winVersionMatrix.has_key(key):
+            if key in self.winVersionMatrix:
                 retval = self.winVersionMatrix[key]
             # Window 7 and Window Server 2008 R2 share the same version.
             # Need to fix it using the wProductType field.
                 VER_NT_WORKSTATION = 1
             if (retval == WinOsTypeHandler.WIN2008R2 and
-                versionTupple[8] == VER_NT_WORKSTATION):
-                    retval = WinOsTypeHandler.WIN7
+                    versionTupple[8] == VER_NT_WORKSTATION):
+                retval = WinOsTypeHandler.WIN7
             elif (retval == WinOsTypeHandler.WIN2012 and
-                  versionTupple[8] == VER_NT_WORKSTATION):
+                    versionTupple[8] == VER_NT_WORKSTATION):
                 retval = WinOsTypeHandler.WIN8
-            logging.debug("WinOsTypeHandler::getWinOsType osType = '%s'", retval)
+            logging.debug("WinOsTypeHandler::getWinOsType osType = '%s'",
+                          retval)
         except:
             logging.exception("getWinOsType - failed")
         return retval
+
 
 class CommandHandlerWin:
 
@@ -159,12 +179,14 @@ class CommandHandlerWin:
             while retries <= RETIRES:
                 try:
                     time.sleep(1)
-                    win32pipe.CallNamedPipe(PIPE_NAME, credentials, BUFSIZE, win32pipe.NMPWAIT_WAIT_FOREVER)
+                    win32pipe.CallNamedPipe(PIPE_NAME, credentials, BUFSIZE,
+                                            win32pipe.NMPWAIT_WAIT_FOREVER)
                     logging.debug("Credentials were written to pipe.")
                     break
                 except:
                     error = windll.kernel32.GetLastError()
-                    logging.error("Error writing credentials to pipe [%d/%d] (error = %d)", retries, RETIRES, error)
+                    logging.error("Error writing credentials to pipe [%d/%d] "
+                                  "(error = %d)", retries, RETIRES, error)
                     retries += 1
         except:
             logging.exception("Error occurred during user login.")
@@ -173,12 +195,14 @@ class CommandHandlerWin:
         sessionId = win32ts.WTSGetActiveConsoleSessionId()
         if sessionId != 0xffffffff:
             logging.debug("Logging off current user (session %d)", sessionId)
-            win32ts.WTSLogoffSession(win32ts.WTS_CURRENT_SERVER_HANDLE, sessionId, 0)
+            win32ts.WTSLogoffSession(win32ts.WTS_CURRENT_SERVER_HANDLE,
+                                     sessionId, 0)
         else:
             logging.debug("No active session. Ignoring log off command.")
 
     def shutdown(self, timeout, msg):
-        cmd = "%s\\system32\\shutdown.exe -s -t %d -f -c \"%s\"" % (os.environ['WINDIR'], timeout, msg)
+        cmd = "%s\\system32\\shutdown.exe -s -t %d -f -c \"%s\"" \
+            % (os.environ['WINDIR'], timeout, msg)
         logging.debug("Executing shutdown command: '%s'", cmd)
 
         # Since we're a 32-bit application that sometimes is executed on
@@ -203,20 +227,26 @@ class CommandHandlerWin:
             windll.kernel32.Wow64DisableWow64FsRedirection(old_value)
 
     def hibernate(self, state):
-        token = win32security.OpenProcessToken(win32api.GetCurrentProcess(),
+        token = win32security.OpenProcessToken(
+            win32api.GetCurrentProcess(),
             win32security.TOKEN_QUERY | win32security.TOKEN_ADJUST_PRIVILEGES)
-        shutdown_priv = win32security.LookupPrivilegeValue(None,
+        shutdown_priv = win32security.LookupPrivilegeValue(
+            None,
             win32security.SE_SHUTDOWN_NAME)
-        privs = win32security.AdjustTokenPrivileges(token, False,
-            [ (shutdown_priv, win32security.SE_PRIVILEGE_ENABLED) ])
+        privs = win32security.AdjustTokenPrivileges(
+            token,
+            False,
+            [(shutdown_priv, win32security.SE_PRIVILEGE_ENABLED)])
         logging.debug("Privileges before hibernation: %s", privs)
-        if windll.powrprof.SetSuspendState(state=='disk', True, False) != 0:
+        if windll.powrprof.SetSuspendState(state == 'disk', True, False) != 0:
             logging.info("System was in hibernation state.")
         else:
-            logging.error("Error setting system to hibernation state: %d",
+            logging.error(
+                "Error setting system to hibernation state: %d",
                 win32api.GetLastError())
 
-    # The LockWorkStation function is callable only by processes running on the interactive desktop.
+    # The LockWorkStation function is callable only by processes running on the
+    # interactive desktop.
     def LockWorkStation(self):
         try:
             logging.debug("LockWorkStation was called.")
@@ -227,20 +257,35 @@ class CommandHandlerWin:
                 userToken = win32ts.WTSQueryUserToken(sessionId)
                 if userToken is not None:
                     logging.debug("Got the active user token.")
-                    # The following access rights are required for CreateProcessAsUser.
-                    access = win32security.TOKEN_QUERY|win32security.TOKEN_DUPLICATE|win32security.TOKEN_ASSIGN_PRIMARY
-                    dupToken = win32security.DuplicateTokenEx(userToken, win32security.SecurityImpersonation, access, win32security.TokenPrimary, None)
+                    # The following access rights are required for
+                    # CreateProcessAsUser.
+                    access = win32security.TOKEN_QUERY
+                    access |= win32security.TOKEN_DUPLICATE
+                    access |= win32security.TOKEN_ASSIGN_PRIMARY
+                    dupToken = win32security.DuplicateTokenEx(
+                        userToken,
+                        win32security.SecurityImpersonation,
+                        access,
+                        win32security.TokenPrimary,
+                        None)
                     userToken.Close()
                 if dupToken is not None:
                     logging.debug("Duplicated the active user token.")
-                    lockCmd = "%s\\system32\\rundll32.exe user32.dll,LockWorkStation" % (os.environ['WINDIR'])
+                    lockCmd = os.path.join(os.environ['WINDIR'],
+                                           "system32\\rundll32.exe")
+                    lockCmd += " user32.dll,LockWorkStation"
                     logging.debug("Executing \"%s\".", lockCmd)
-                    win32process.CreateProcessAsUser(dupToken, None, lockCmd, None, None, 0, 0, None, None, win32process.STARTUPINFO())
+                    win32process.CreateProcessAsUser(
+                        dupToken, None, lockCmd,
+                        None, None, 0, 0, None,
+                        None, win32process.STARTUPINFO())
                     dupToken.Close()
             else:
-                logging.debug("No active session. Ignoring lock workstation command.")
+                logging.debug("No active session. Ignoring lock workstation "
+                              "command.")
         except:
             logging.exception("LockWorkStation exception")
+
 
 class WinDataRetriver(DataRetriverBase):
     def __init__(self):
@@ -282,22 +327,23 @@ class WinDataRetriver(DataRetriverBase):
     def getAvailableRAM(self):
         ## Returns the available physical memory (including the system cache).
         pi = get_perf_info()
-        return str(int((pi.PhysicalAvailable * pi.PageSize) / (1024**2)))
+        return str(int((pi.PhysicalAvailable * pi.PageSize) / (1024 ** 2)))
 
     def getUsers(self):
-        total_list=[]
+        total_list = []
         try:
             server = self.getMachineName()
             res = 1  # initially set it to true
             pref = win32netcon.MAX_PREFERRED_LENGTH
-            level = 1 # setting it to 1 will provide more detailed info
-            while res: # loop until res2
-                (user_list,total,res2)=win32net.NetWkstaUserEnum(server,level,res,pref)
+            level = 1  # setting it to 1 will provide more detailed info
+            while res:  # loop until res2
+                (user_list, total, res2) = \
+                    win32net.NetWkstaUserEnum(server, level, res, pref)
                 logging.debug("getUsers: user_list = '%s'", user_list)
                 for i in user_list:
                     if not i['username'].startswith(server):
-                        total_list.append([i['username'],i['logon_domain']])
-                res=res2
+                        total_list.append([i['username'], i['logon_domain']])
+                res = res2
         except win32net.error:
             logging.exception("WinDataRetriver::getUsers")
         logging.debug("WinDataRetriver::getUsers retval = '%s'", total_list)
@@ -309,19 +355,26 @@ class WinDataRetriver(DataRetriverBase):
             domain = ""
             sessionId = win32ts.WTSGetActiveConsoleSessionId()
             if sessionId != 0xffffffff:
-                user = win32ts.WTSQuerySessionInformation(win32ts.WTS_CURRENT_SERVER_HANDLE,
-                    sessionId, win32ts.WTSUserName)
-                domain = win32ts.WTSQuerySessionInformation(win32ts.WTS_CURRENT_SERVER_HANDLE,
-                    sessionId, win32ts.WTSDomainName)
+                user = win32ts.WTSQuerySessionInformation(
+                    win32ts.WTS_CURRENT_SERVER_HANDLE,
+                    sessionId,
+                    win32ts.WTSUserName)
+                domain = win32ts.WTSQuerySessionInformation(
+                    win32ts.WTS_CURRENT_SERVER_HANDLE,
+                    sessionId,
+                    win32ts.WTSDomainName)
             if domain == "":
                 pass
             elif domain.lower() != self.getMachineName().lower():
                 # Use FQDN as user name if computer is part of a domain.
                 try:
                     user = u"%s\\%s" % (domain, user)
-                    user = win32security.TranslateName(user,
-                        win32api.NameSamCompatible, win32api.NameUserPrincipal)
-                    # Check for error because no exception is raised when running under Windows XP.
+                    user = win32security.TranslateName(
+                        user,
+                        win32api.NameSamCompatible,
+                        win32api.NameUserPrincipal)
+                    # Check for error because no exception is raised when
+                    # running under Windows XP.
                     err = win32api.GetLastError()
                     if err != 0:
                         raise RuntimeError(err, 'TranslateName')
@@ -343,10 +396,15 @@ class WinDataRetriver(DataRetriverBase):
                 path_name = path + ':\\'
                 if (drives_mask & 1):
                     try:
-                        (free, total) = win32api.GetDiskFreeSpaceEx(path_name)[:2]
+                        res = win32api.GetDiskFreeSpaceEx(path_name)
+                        (free, total) = res[:2]
                         fs = win32api.GetVolumeInformation(path_name)[4]
                         used = total - free
-                        usages.append({ 'path' : path_name, 'fs' : fs, 'total' : total, 'used' : used })
+                        usages.append({
+                            'path': path_name,
+                            'fs': fs,
+                            'total': total,
+                            'used': used})
                     except:
                         pass
                 drives_mask >>= 1
@@ -358,16 +416,23 @@ class WinDataRetriver(DataRetriverBase):
     def getMemoryStats(self):
         pi = get_perf_info()
         # keep the unit consistent with Linux guests
-        self.memStats['mem_total'] = str(int((pi.PhysicalTotal * pi.PageSize) / 1024))
-        self.memStats['mem_free'] = str(int((pi.PhysicalAvailable * pi.PageSize) / 1024))
+        self.memStats['mem_total'] = \
+            str(int((pi.PhysicalTotal * pi.PageSize) / 1024))
+        self.memStats['mem_free'] = \
+            str(int((pi.PhysicalAvailable * pi.PageSize) / 1024))
         self.memStats['mem_unused'] = self.memStats['mem_free']
         try:
             strComputer = "."
-            objWMIService = win32com.client.Dispatch("WbemScripting.SWbemLocator")
-            objSWbemServices = objWMIService.ConnectServer(strComputer, "root\cimv2")
-            colItems = objSWbemServices.ExecQuery("SELECT * FROM Win32_PerfFormattedData_PerfOS_Memory")
+            objWMIService = \
+                win32com.client.Dispatch("WbemScripting.SWbemLocator")
+            objSWbemServices = \
+                objWMIService.ConnectServer(strComputer, "root\cimv2")
+            colItems = \
+                objSWbemServices.ExecQuery(
+                    "SELECT * FROM Win32_PerfFormattedData_PerfOS_Memory")
             for objItem in colItems:
-                # Please see the definition of Win32_PerfFormattedData_PerfOS_Memory class in MSDN manual
+                # Please see the definition of
+                # Win32_PerfFormattedData_PerfOS_Memory class in the MSDN
                 # for the explanations of the following fields.
                 self.memStats['swap_in'] = objItem.PagesInputPersec
                 self.memStats['swap_out'] = objItem.PagesOutputPersec
@@ -376,6 +441,7 @@ class WinDataRetriver(DataRetriverBase):
         except:
             logging.exception("Error retrieving detailed memory stats")
         return self.memStats
+
 
 class WinVdsAgent(AgentLogicBase):
 
@@ -393,14 +459,21 @@ class WinVdsAgent(AgentLogicBase):
             logging.exception("WinVdsAgent::run")
 
     def doWork(self):
-        # CoInitialize() should be called in multi-threading program according to msdn document.
+        # CoInitialize() should be called in multi-threading program according
+        # to msdn document.
         pythoncom.CoInitialize()
         AgentLogicBase.doWork(self)
 
     def disable_screen_saver(self):
-        keyHandle = win32api.RegOpenKeyEx(win32con.HKEY_USERS, ".DEFAULT\Control Panel\Desktop", 0, win32con.KEY_WRITE)
-        win32api.RegSetValueEx(keyHandle, "ScreenSaveActive", 0, win32con.REG_SZ, "0")
+        keyHandle = win32api.RegOpenKeyEx(
+            win32con.HKEY_USERS,
+            ".DEFAULT\Control Panel\Desktop",
+            0,
+            win32con.KEY_WRITE)
+        win32api.RegSetValueEx(keyHandle, "ScreenSaveActive", 0,
+                               win32con.REG_SZ, "0")
         keyHandle.Close()
+
 
 def test():
     dr = WinDataRetriver()

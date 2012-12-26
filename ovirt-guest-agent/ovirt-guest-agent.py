@@ -15,13 +15,18 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import logging, logging.config, os, signal, sys
+import logging
+import logging.config
+import os
+import signal
+import sys
 import getopt
 import ConfigParser
 from GuestAgentLinux2 import LinuxVdsAgent
 
 AGENT_CONFIG = '/etc/ovirt-guest-agent.conf'
 AGENT_PIDFILE = '/run/ovirt-guest-agent.pid'
+
 
 class OVirtAgentDaemon:
 
@@ -42,8 +47,8 @@ class OVirtAgentDaemon:
         f = file(pidfile, "w")
         f.write("%s\n" % (os.getpid()))
         f.close()
-        os.chmod(pidfile, 0x1b4) # rw-rw-r-- (664)
-        
+        os.chmod(pidfile, 0644)   # rw-rw-r-- (664)
+
         self.register_signal_handler()
         self.agent.run()
 
@@ -51,7 +56,7 @@ class OVirtAgentDaemon:
 
     def _daemonize(self):
         if os.getppid() == 1:
-            raise RuntimeError, "already a daemon"
+            raise RuntimeError("already a daemon")
         pid = os.fork()
         if pid == 0:
             os.umask(0)
@@ -69,19 +74,20 @@ class OVirtAgentDaemon:
         nullfile.close()
 
     def register_signal_handler(self):
-        
+
         def sigterm_handler(signum, frame):
             logging.debug("Handling signal %d" % (signum))
             if signum == signal.SIGTERM:
                 logging.info("Stopping oVirt guest agent")
                 self.agent.stop()
- 
+
         signal.signal(signal.SIGTERM, sigterm_handler)
+
 
 def usage():
     print "Usage: %s [OPTION]..." % (sys.argv[0])
     print ""
-    print "  -p, --pidfile\t\tset pid file name (default: %s)" % (AGENT_PIDFILE)
+    print "  -p, --pidfile\t\tset pid file name (default: %s)" % AGENT_PIDFILE
     print "  -d\t\t\trun program as a daemon."
     print "  -h, --help\t\tdisplay this help and exit."
     print ""
@@ -89,7 +95,8 @@ def usage():
 if __name__ == '__main__':
     try:
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "?hp:d", ["help", "pidfile="])
+            opts, args = getopt.getopt(sys.argv[1:],
+                                       "?hp:d", ["help", "pidfile="])
             pidfile = AGENT_PIDFILE
             daemon = False
             for opt, value in opts:

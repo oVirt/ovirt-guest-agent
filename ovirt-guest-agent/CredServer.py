@@ -16,17 +16,28 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import array, dbus, dbus.service, errno, gobject, pwd
-import logging, socket, time, threading, random, struct
+import array
+import dbus
+import dbus.service
+import errno
+import gobject
+import pwd
+import logging
+import socket
+import time
+import threading
+import random
+import struct
 
-from ctypes import *
+from ctypes import Structure, POINTER, CDLL, c_ubyte, c_uint, c_void_p, \
+    c_size_t, c_int, sizeof, cast, pointer, c_short, byref, get_errno
 from ctypes.util import find_library
 
 # Initializes the use of Python threading in the gobject module.
 gobject.threads_init()
 
 from dbus.mainloop.glib import DBusGMainLoop
-DBusGMainLoop(set_as_default = True)
+DBusGMainLoop(set_as_default=True)
 
 libc = CDLL(find_library('c'), use_errno=True)
 
@@ -34,11 +45,13 @@ libc = CDLL(find_library('c'), use_errno=True)
 
 SCM_CREDENTIALS = 2
 
+
 class iovec(Structure):
     _fields_ = [
         ('iov_base', POINTER(c_ubyte)),
         ('iov_len',  c_uint)
     ]
+
 
 class msghdr(Structure):
     _fields_ = [
@@ -51,6 +64,7 @@ class msghdr(Structure):
         ('msg_flags', c_int)
     ]
 
+
 class cmsghdr(Structure):
     _fields_ = [
         ('cmsg_len', c_size_t),
@@ -59,6 +73,7 @@ class cmsghdr(Structure):
         ('cmsg_data', POINTER(c_ubyte))
     ]
 
+
 class ucred(Structure):
     _fields_ = [
         ('pid', c_int),
@@ -66,27 +81,31 @@ class ucred(Structure):
         ('gid', c_int)
     ]
 
+
 def CMSG_FIRSTHDR(mhdr):
     if mhdr.msg_controllen >= sizeof(cmsghdr):
         return cast(mhdr.msg_control, POINTER(cmsghdr)).contents
     else:
         return None
 
+
 def CMSG_NXTHDR(mhdr, cmsg):
     return None
+
 
 def CMSG_ALIGN(x):
     return ((x + sizeof(c_uint) - 1) & ~(sizeof(c_uint) - 1))
 
+
 def CMSG_SPACE(x):
     return (CMSG_ALIGN(x) + CMSG_ALIGN(sizeof(cmsghdr)))
+
 
 #
 # The socket credential code is based on knowlage learned from the "Linux
 # Socket Programming by Example (Warren Gay)" book.
 #
-
-def packcreds(user, password, domain = ''):
+def packcreds(user, password, domain=''):
     if domain != '':
         username = user + '@' + domain
     else:
@@ -94,12 +113,12 @@ def packcreds(user, password, domain = ''):
     username = username.encode('utf-8')
     password = password.encode('utf-8')
     s = struct.pack('>6sI%ds%ds' % (len(username), len(password) + 1),
-                'login', len(username), username, password)
+                    'login', len(username), username, password)
     return s
 
-class CredDBusObject(dbus.service.Object):
 
-    DBUS_PATH      = '/org/ovirt/vdsm/Credentials'
+class CredDBusObject(dbus.service.Object):
+    DBUS_PATH = '/org/ovirt/vdsm/Credentials'
     DBUS_INTERFACE = 'org.ovirt.vdsm.Credentials'
 
     def __init__(self):
@@ -107,9 +126,11 @@ class CredDBusObject(dbus.service.Object):
         dbus.service.Object.__init__(self, bus, '/org/ovirt/vdsm/Credentials')
         self._name = dbus.service.BusName('org.ovirt.vdsm.Credentials', bus)
 
-    @dbus.service.signal(dbus_interface='org.ovirt.vdsm.Credentials', signature='s')
+    @dbus.service.signal(dbus_interface='org.ovirt.vdsm.Credentials',
+                         signature='s')
     def UserAuthenticated(self, token):
         logging.info("Emitting user authenticated signal (%s)." % (token))
+
 
 class CredChannel(threading.Thread):
 
@@ -134,14 +155,15 @@ class CredChannel(threading.Thread):
 
         # Initialize a message control structure.
         msgh = msghdr()
-        msgh.msg_iov= pointer(iov)
+        msgh.msg_iov = pointer(iov)
         msgh.msg_iovlen = 1
         msgh.msg_control = ctrl.buffer_info()[0]
         msgh.msg_controllen = ctrl.buffer_info()[1]
 
         while True:
             ret = libc.recvmsg(conn.fileno(), byref(msgh), socket.MSG_PEEK)
-            logging.debug("Receiving user's credential ret = %d errno = %d" % (ret, get_errno()))
+            logging.debug("Receiving user's credential ret = %d errno = %d",
+                          ret, get_errno())
             if (ret >= 0) or (get_errno() != errno.EINTR):
                 break
 
@@ -151,10 +173,13 @@ class CredChannel(threading.Thread):
             cmsgp = CMSG_FIRSTHDR(msgh)
             while cmsgp is not None:
                 logging.debug("cmsgp: len=%d level=%d type=%d",
-                    cmsgp.cmsg_len, cmsgp.cmsg_level, cmsgp.cmsg_type)
-                if (cmsgp.cmsg_level == socket.SOL_SOCKET) and (cmsgp.cmsg_type == SCM_CREDENTIALS):
-                    result = cast(pointer(cmsgp.cmsg_data), POINTER(ucred)).contents
-                    break
+                              cmsgp.cmsg_len, cmsgp.cmsg_level,
+                              cmsgp.cmsg_type)
+                if cmsgp.cmsg_level == socket.SOL_SOCKET:
+                    if cmsgp.cmsg_type == SCM_CREDENTIALS:
+                        data = cast(pointer(cmsgp.cmsg_data), POINTER(ucred))
+                        result = data.contents
+                        break
                 # This doesn't really work, but I got only one record during
                 # development.
                 cmsgp = CMSG_NXTHDR(msgh, cmsgp)
@@ -178,7 +203,8 @@ class CredChannel(threading.Thread):
                     self._allowed.append(pwd.getpwnam(user)[2])
                 except KeyError, err:
                     logging.error(str(err)[1:-1])
-        logging.info("The following users are allowed to connect: %s", self._allowed)
+        logging.info("The following users are allowed to connect: %s",
+                     self._allowed)
 
     def run(self):
         self._channel = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -193,10 +219,10 @@ class CredChannel(threading.Thread):
                 logging.error("Error receiving user's credential from socket.")
                 return
             if cred.uid not in self._allowed:
-                logging.error("User %d is not allowed to connect!" % (cred.uid))
+                logging.error("User %d is not allowed to connect!", cred.uid)
                 return
-            logging.info("Incomming connection from user: %d process: %d" %
-                (cred.uid, cred.pid))
+            logging.info("Incomming connection from user: %d process: %d",
+                         cred.uid, cred.pid)
 
             token = conn.recv(1024)
             if not token:
@@ -206,13 +232,15 @@ class CredChannel(threading.Thread):
                 logging.info("Sending user's credential (token: %s)", token)
                 conn.send(self._credentials[1])
             else:
-                logging.warning("Unexpect token was received (token: %s)", token)
+                logging.warning("Unexpect token was received (token: %s)",
+                                token)
 
             conn.close()
 
         except socket.timeout:
             logging.info("Credentials channel timed out.")
             self._channel.close()
+
 
 class CredServer(threading.Thread):
 
@@ -239,7 +267,7 @@ class CredServer(threading.Thread):
     def user_authenticated(self, credentials):
         if self._cred_channel is None:
             self._cred_channel = CredChannel()
-            self._cred_channel.set_allowed([ 0 ])
+            self._cred_channel.set_allowed([0])
             token = str(random.randint(100000, 999999))
             logging.debug("Token: %s", token)
             logging.info("Opening credentials channel...")
@@ -249,7 +277,9 @@ class CredServer(threading.Thread):
             logging.info("Credentials channel was closed.")
             self._cred_channel = None
         else:
-            logging.warn("Ignored authentication while another one is in progress.")
+            logging.warn("Ignored authentication while another one is "
+                         "in progress.")
+
 
 def main():
     try:
@@ -257,7 +287,8 @@ def main():
         server.start()
         time.sleep(2)
         server.user_authenticated(packcreds('user@domain', 'pass')[6:])
-        while True: time.sleep(1)
+        while True:
+            time.sleep(1)
     except (KeyboardInterrupt, SystemExit):
         server.join()
 
