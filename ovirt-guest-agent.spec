@@ -130,7 +130,18 @@ then
     VIRTIO=`grep "^device" %{_sysconfdir}/ovirt-guest-agent.conf | awk '{ print $3; }'`
     if [ -w $VIRTIO ]
     then
-        echo '{ "__name__" : "uninstalled" }' >> $VIRTIO
+        /usr/bin/python << EOF
+import os
+vp = None
+try:
+    vp = os.open('$VIRTIO', os.O_WRONLY|os.O_NONBLOCK)
+    os.write(vp, '{"__name__": "uninstalled" }\n')
+except OSError:
+    pass
+finally:
+    if vp:
+        os.close(vp)
+EOF
     fi
 fi
 
