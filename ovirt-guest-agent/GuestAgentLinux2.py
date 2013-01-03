@@ -110,6 +110,11 @@ class NicMgr(object):
         self.list_nics = self.ethtool_list_nics
 
     def _get_ipv4_addresses(self, dev):
+        if hasattr(dev, 'get_ipv4_addresses'):
+            ipv4_addrs = []
+            for ip in dev.get_ipv4_addresses():
+                ipv4_addrs.append(ip.address)
+            return ipv4_addrs
         if dev.ipv4_address is not None:
             return [dev.ipv4_address]
         else:
