@@ -18,6 +18,7 @@ AC_PROG_INSTALL
 AC_PROG_MKDIR_P
 AC_PROG_LN_S
 AM_PATH_PYTHON
+
 dnl ---------------------------------------------------------------------------
 dnl needed for systemd detection
 dnl ---------------------------------------------------------------------------
@@ -47,6 +48,14 @@ if test "x$with_systemdsystemunitdir" != xno; then
     AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
 fi
 AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_systemdsystemunitdir" != xno ])
+
+dnl ---------------------------------------------------------------------------
+dnl Checking for pep8
+dnl ---------------------------------------------------------------------------
+AC_PATH_PROG([PEP8], [pep8])
+if test "x$PEP8" = "x"; then
+  AC_MSG_WARN([python-pep8 not found])
+fi
 
 dnl ---------------------------------------------------------------------------
 dnl - Dependencies
