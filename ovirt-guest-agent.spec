@@ -33,6 +33,7 @@ Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
+Requires: tuned >= 0.2.19-10
 Provides: %{name} = %{version}-%{release}
 
 %if 0%{?fc16}
@@ -124,6 +125,24 @@ exit 0
     --attr-match="name=com.redhat.rhevm.vdsm"
 
 /bin/systemctl daemon-reload
+
+TUNED_ADM=/usr/sbin/tuned-adm
+TUNED_PROFILE=virtual-guest
+
+%if 0%{?rhel} == 6
+if $TUNED_ADM active | grep -q -e "default$" -e "off$" && $TUNED_ADM list | grep -q $TUNED_PROFILE; then
+    $TUNED_ADM profile $TUNED_PROFILE
+fi
+%endif
+
+%if 0%{?rhel} == 7
+if ! /bin/systemctl status tuned.service > /dev/null 2>&1; then
+    /bin/systemctl start tuned.service
+fi
+if (! $TUNED_ADM active > /dev/null 2>&1 || $TUNED_ADM active | grep -q "balanced$") && $TUNED_ADM list | grep -q $TUNED_PROFILE; then
+    $TUNED_ADM profile $TUNED_PROFILE
+fi
+%endif
 
 %post kdm-plugin
 if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
@@ -291,6 +310,11 @@ fi
 - Python 2.4 compatability fix
 - Some build fixes applied
 
+* Thu Aug 28 2013 Amador Pahim <apahim@redhat.com> - 1.0.8-2
+- Solved: Configure tuned only if current profile is off or default.
+  performance
+Resolves: BZ#991538
+
 * Thu Jul 11 2013 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.8-1
 - Pep8 rules applied on python files
 - Call restorecon on pidfile
@@ -304,6 +328,11 @@ fi
 - Condrestart now ensures that the pid file does not only exist, but also is
   not empty
 - Added new optional parameter for shutdown to allow reboot
+
+* Thu Jan  3 2013 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.7-2
+- Depend on tuned and set the virtual guest profile for improved
+  performance
+Resolves: BZ#838439
 
 * Tue Dec 25 2012 Gal Hammer <ghammer@redhat.com> - 1.0.7-1
 - reset user rights on virtio-channel during package removal.
