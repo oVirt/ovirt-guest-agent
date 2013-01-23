@@ -34,6 +34,7 @@ start() {
     if [ ! -f ${pidfile} ]; then
         /bin/touch ${pidfile}
         /bin/chown ovirtagent:ovirtagent ${pidfile}
+        [ -x /sbin/restorecon ] && /sbin/restorecon ${pidfile}
     fi
     daemon --pidfile=${pidfile} --user=ovirtagent $agentd -p ${pidfile} -d $OPTIONS
     RETVAL=$?
