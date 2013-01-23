@@ -1,4 +1,4 @@
-ovirt-guest-agent (1.0.7-1) quantal; urgency=low
+ovirt-guest-agent (1.0.8-1) quantal; urgency=low
 
   * Initial release of the ovirt-guest-agent for Ubuntu
 

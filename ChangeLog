@@ -1,56 +1,934 @@
+commit ecae245160db3b90c820a5cabe8134bad3a55b5a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jun 26 16:48:43 2013 +0200
 
-* Thu Oct  6 2011 Gal Hammer <ghammer@redhat.com> - 2.3.16
-- added xorg-x11-drv-qxl to the reported applications.
-- fixed service name in service's status report.
+    agent: Report FQDN of the machine
 
-* Thu Sep 27 2011 Gal Hammer <ghammer@redhat.com> - 2.3.15
-- fixed disk usage report when mount point include spaces.
+    Sending now the fqdn message on refresh and startup
 
-* Thu Sep 22 2011 Gal Hammer <ghammer@redhat.com> - 2.3.14
-- added new 'echo' command.
+    Change-Id: I5d91de94b9ebd4448e9761ce597d970029ca3837
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-* Thu Sep 15 2011 Gal Hammer <ghammer@redhat.com> - 2.3.13
-- report new network interaces information (ipv4, ipv6 and
-  mac address)
-- added disks usage report.
-- a new json-based protocol with the vdsm.
+commit 7487859794205e6bdff7df66948e6028c7f336bd
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 16 13:51:07 2013 +0200
 
-* Thu Aug  4 2011 Gal Hammer <ghammer@redhat.com> - 2.3.12
-- mask the user's password in the credentials block
+    agent: Disable GDM plugin building on Fedora 19+
 
-* Thu Jun 16 2011 Gal Hammer <ghammer@redhat.com> - 2.3.9
-- read report rate values from configuration file.
-- replaced executing privilege commands from sudo to
-  consolehelper.
+    Fedora 19 does no longer have a GDM with plugin capabilities.
+    To allow proper building of the package gdm plugins are no longer
+    built for Fedora 19 and higher.
 
-* Tue Jun 14 2011 Gal Hammer <ghammer@redhat.com> - 2.3.8
-- changed to execute the agent with a non-root user.
-- changed the shutdown timeout value to work in minutes.
+    Change-Id: Iff3f5a3c7c12d9c6ef198aefe163d9633d8364b3
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-* Tue May 25 2011 Gal Hammer <ghammer@redhat.com> - 2.3.7
-- stopped removing the domain part from the user name.
-- show only network interfaces that are up and running.
+commit d05fc4f46c05a6b1b15c8139c372459631e78834
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 16 13:48:34 2013 +0200
 
-* Mon Apr 4 2011 Gal Hammer <ghammer@redhat.com> - 2.3.6
-- added kdm greeter plug-in.
+    agent: Missing BuildRequirements in spec files
 
-* Mon Mar 14 2011 Gal Hammer <ghammer@redhat.com> - 2.3.5
-- replaced rhevcredserver execution from blocking main loop to
-  context's iteration (non-blocking).
+    The following two packages are missing in the build requires
+    * python-pep8
+    * gcc-c++
 
-* Thu Mar 10 2011 Gal Hammer <ghammer@redhat.com> - 2.3.4
-- added some sleep-ing to init script in order to give udev
-  some time to create the symbolic links.
-- changed the kernel version condition.
+    Change-Id: I997a0fd3653688271cfd5ad7ee584d8b6ed1c11d
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-* Wed Mar 2 2011 Gal Hammer <ghammer@redhat.com> - 2.3.3
-- removed unused file (rhevcredserver) from rhel-5 build.
+commit b1e7d5c3a11214cc20df25f0ba57cb4234222dd3
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 16 13:46:36 2013 +0200
 
-* Tue Mar 1 2011 Gal Hammer <ghammer@redhat.com> - 2.3.2
-- updated the agent's makefile to work with auto-tools.
-- added sub packages to support the single-sign-on feature.
-- added -h parameter to shutdown command in order to halt the vm
-  after shutdown (bz#680107).
-- converted configuration file to have unix-style line ending.
-- added redhat-rpm-config to build requirements in order to
-  include *.pyc and *.pyo in the rpm file.
+    agent: Default value for configure should be without-dist
+
+    Change-Id: Ie1f84f06f7a188e59c181a1190ab5a133873cee7
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 2d99359232c8cdd544d192efd3a47603b425e784
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jul 15 17:27:02 2013 +0200
+
+    agent: Reworking the data filtering for the guest agent
+
+    This patchset is oriented on http://gerrit.ovirt.org/#/c/16652
+
+    We're now filtering properly invalid unicode characters and invalid
+    characters. Which would cause VDSM to build invalid XML data.
+
+    Change-Id: I3a4347350d791f4df0b26b1cf81d0ca4f9656981
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 281d5432d18bf191ec2890b21ff6fdb7c81069ec
+Author: Martin Betak <mbetak@redhat.com>
+Date:   Thu Jun 6 15:44:30 2013 +0200
+
+    agent: Support reboot as optional shutdown parameter
+
+    Added optional boolean parameter determining whether to pass the '-r'
+    parameter to the appropriate shutdown script.
+
+    Change-Id: I94929ff49677ee79569117158c53bdaf086b3ae8
+    Signed-off-by: Martin Betak <mbetak@redhat.com>
+
+commit 1ad924dfec7344edb8540544518d60117429800e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jul 8 13:29:50 2013 +0200
+
+    agent: condrestart should check also for pidfile size
+
+    Change-Id: Ia2dff34095430147116491337ea528594cb6ab04
+    Bug-Url: https://bugzilla.redhat.com/977943
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit c4475ac271495d89294664e58157d651c9833ce2
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue May 7 14:08:33 2013 +0200
+
+    agent: Use python 2.4 syntax in GuestAgentLinux2
+
+    Change-Id: I37c570c2cca4a71f15173601aaed27522e01e895
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 412ae0c24ead168907ffbe17ab8b4946ae2e7d06
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jul 11 09:02:30 2013 +0200
+
+    agent: Add possibility to NOT build kdm and/or gdm extensions
+
+    Since with GNOME 3.8 it's no longer possible to build extensions for GDM
+    we're now allowing to disable the build of the extensions for systems
+    not supporting it.
+    Additionally we're now allowing a better control via configure what to build.
+
+    Change-Id: I87745ea0e49860969d782c35e2e83cec12fff864
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit ae56cffd363217964b0079ef75cb88b84e8f5cf3
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jul 10 16:32:53 2013 +0200
+
+    agent: Adding --with-dist for packaging ease
+
+    Since not all platforms can fullfill the requirements of the
+    configure script, but tar balls need to be creatable anyway,
+    add a --with-dist to configure for being able to create the
+    distribution tarballs anywhere.
+
+    --with-dist on configure now disables the requirement checks.
+    This is needed as for example F19 or RHEL6/CentOS won't be able
+    to fulfill the requirements for the GDM plugin.
+
+    Change-Id: If1daa4438d9037d47ed4e7ee0be35cb1c2755779
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit f2d30e7466dc7f582d25687d841280f96d7fac15
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jul 10 16:25:21 2013 +0200
+
+    agent: RHEL6 spec file
+
+    Adding a RHEL6 specific spec file for the ovirt-guest-agent
+
+    Change-Id: Ife545bcfc597a3c0227ec1b17258234b87b2df7a
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 2f001d67d44902dd93d99e02537c0f9e8c9b9287
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Apr 2 18:13:47 2013 +0800
+
+    agent: Build and install ovirt guest agent on Ubuntu
+
+    Implemented necessary changes for making the oVirt Guest Agent
+    working on Ubuntu and Fedora.
+
+    Change-Id: I7a694bf1f7ff4230bac305dd571899265ef63950
+    Signed-off-by: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 15e3f8d01bca1ef49c649ade8c0c99a8566ebba0
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jun 10 09:18:35 2013 +0200
+
+    agent: Do not install Windows files on linux
+
+    Change-Id: Ic7cdb66b2b154901541010135ddf118893182ec9
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit fec9cb42a0bc193071b7be0d473c1b5418d5c3ef
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed May 15 09:39:35 2013 +0200
+
+    agent: Use the locale module to get the preferred encoding
+
+    The guest agent used for the string sanitization sys.stdout.encoding
+    which is set to None when you're running without an allocated console.
+    This is the case on Windows as a service. The locale module provides
+    the function getpreferredencoding() which returns the required value.
+
+    Resolves: BZ#962667
+
+    Change-Id: I9ff6e3c7165599f80d13115e0173eefe0e79e664
+    Bug-Url: https://bugzilla.redhat.com/962667
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 0d9280ec109e0bd6c693999a4c036e70d9324860
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 4 15:54:07 2013 +0200
+
+    agent: Send non-blocking uninstalled notification without python
+
+    Remove the inline python script to send the non-blocking uninstalled
+    message and replace it with echo + dd
+
+    Change-Id: I8b2f84d56377ba4ba42ee206966b7b68deae7fc9
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 67589a7ecbf5dc98d08a7383c2fbf9c90512da5b
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Apr 5 09:49:02 2013 +0200
+
+    agent: Ignore usbfs filesystems'
+
+    Change-Id: Iee799b05f3c700e8e3912305e2984dad6e049f7d
+    Bug-Url: https://bugzilla.redhat.com/947792
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit de1daabc1453c2ae3a6e0f27971f36cc865b05d5
+Author: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+Date:   Thu Apr 11 13:23:57 2013 +0800
+
+    agent: avoid failing to get disk stat when deal with gvfs-fuse
+
+    gvfs-fuse filesystem prevents other user from stat it. Even root can not
+    stat other user's gvfs-fuse fs. Stat on it fails then the whole disk
+    stat function fails.
+
+    This patch skips gvfs-fuse related filesystem when collecting disk stat.
+    Moreover, this patch try..except in a finner per fs granularity, so that
+    failing on stat one fs does not fails the whole operation.
+
+    Change-Id: I69c674904c2ad9cb508c5294591a8ba0813e4238
+    Signed-off-by: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+
+commit f44af16c872a2aceb31bae2c0e93eca1f8a40556
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Mar 26 15:31:03 2013 +0100
+
+    agent: Recommend python 2.7.3 for windows in the README
+
+    Change-Id: Ib051c8f8890e70c3382f366f7272c51f9e711162
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1c77f2661b9ccc3f8897788363ac8600f0b4037f
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Mar 26 15:15:15 2013 +0100
+
+    agent: Windows Guest - ini file lookup
+
+    The ini file is now expected to be in the same folder as the service
+    executable.
+
+    Change-Id: I4d1927a429fcb780119f78f8dc05999f3bae9148
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit d73a85e5ce30fe689d0764d99342c6206fae0e62
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Mar 26 11:26:30 2013 +0100
+
+    agent: Include windows files in tar balls
+
+    In order to be able providing source tar balls and src zips containing
+    all possible build targets we're now including all files necessary.
+    Previously we did not include all files and it was necessary to
+    checkout the source git repository to be able building windows
+    targets for the guest agent.
+    This commit provides the necessary changes to include all necessary
+    files for building it from source tar balls.
+
+    Change-Id: I793b84ac78127593a11ab9894fdbc68fa45d224d
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 9e7a4f08bee74e3bd9e6b223cdb041f7b5984c4c
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 4 14:15:40 2013 +0200
+
+    agent: Perform string sanitization on messages
+
+    Messages sent via VirtIO are now checked for being presentable
+    and additionally filtered for invalid characters due to invalid
+    encodings.
+
+    Change-Id: I499a22e1572b55d1a3a4de7ce6f89ebb130861a8
+    Bug-Url: https://bugzilla.redhat.com/947014
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 61af838faaf017a4f3d31dd2d0246db8a9983154
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Feb 21 13:35:04 2013 +0100
+
+    agent: Add a configure option to disable SSO
+
+    We don't support SSO on all systems, therefore we should at least make
+    it possible to build the guest agent daemon for those systems
+
+    Change-Id: Ic00e4c781a47194bbf6eda62fe3b4f1f107bbbbe
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 2b0260bb267c5b5c539bfae1158845554c267a17
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Mar 26 11:07:20 2013 +0100
+
+    Added myself to AUTHORS
+
+    Change-Id: I541d0ecdf6e623210c5ecd89cdb694cb90e199c2
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 20e08c2c9ee7d3721e57c98dffbd2f55d282ac37
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jan 14 10:22:56 2013 +0100
+
+    agent: Fixing .gitattributes
+
+    .gitattributes should contains text infront of eol
+
+    Change-Id: Iec9a241e05c2c6c9a3922de0c9153e97406118eb
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit c61fabb746b3a7f3e6f8c166578be193b13ed4d4
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jan 8 15:16:03 2013 +0100
+
+    agent: Running PEP8 checks on python files
+
+    Change-Id: Ie41f1126dfd124e393ae11e9c4c054c7c23ce7aa
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 51be0250673f7b81aeb80ecd0183f255e0606a9e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Dec 26 09:24:47 2012 +0100
+
+    agent: Pep8 fixes
+
+    * CredServer
+    * GuestAgentLinux2
+    * VirtIoChannel
+    * WinFile
+    * version
+    * setup.py - FP on py2exe import
+    * OVirtGuestAgent
+    * OVirtAgentLogic
+    * ovirt-guest-agent
+    * LockActiveSession
+    * GuestAgentWin32
+
+    Change-Id: I74c33ed2ef2e5c33b9d25cb8b38e4201d67a957b
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit f5db1a06b8793fa2306c4a387c77dd1f43771e98
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jan 23 12:33:12 2013 +0100
+
+    agent: Call restorecon on pidfile
+
+    Change-Id: I8729ce8018566b400846e0d639dfdb6b11d51862
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 767acc9d433cabd267a6c7f06f314db9e35c45ae
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Feb 14 17:25:05 2013 +0100
+
+    agent: Reported MAC on Windows now the same as on Linux
+
+    Reporting of the MAC differs between linux and Windows guest operating
+    systems. The windows operating system reports it separated by dashes '-'.
+    This changeset will replace those dashes with colons ':'
+
+    Change-Id: Id19a8944025ee22d82a57b99fe4ba1c4315c27e9
+    Bug-Url: https://bugzilla.redhat.com/908761
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1c35798a95890bf90764eb4ee4a38e027f9410b7
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Feb 14 17:18:34 2013 +0100
+
+    agent: Sorted gitignore and added .idea
+
+    Change-Id: Iad052f3d272b5df68275de9baeac3f9e45ea32c5
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 517cf4082f027e2496128e8bfe4fdf2149fa33a0
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Feb 19 13:50:59 2013 +0100
+
+    agent: datadir as default home for the ovirtagent user
+
+    Solves the issue with starting the service when polyinstantiated
+    namespaces are used on the system.
+    Following the Fedora guideline:
+        http://fedoraproject.org/wiki/Packaging:UsersAndGroups
+
+    Bug-Url: https://bugzilla.redhat.com/883124
+    Change-Id: I08cd6e8ca4341c62c0e5f18b6c6226a103873f62
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 31a6af39ad0138e4482b53cddbd3d36d04a67e5c
+Author: Dan Kenigsberg <danken@redhat.com>
+Date:   Thu Jan 3 15:00:57 2013 +0200
+
+    Report multiple IPv4 addresses per device if available
+
+    A future version of python-ethtool is going to expose
+    ethtool.etherinfo.get_ipv4_addresses() method, reporting multiple
+    addresses of a single device. Use this method if available.
+
+    Signed-off-by: Dan Kenigsberg <danken@redhat.com>
+    Change-Id: I77bfd63874134b8d0c626c6d179643c2ec781b44
+
+commit d2defa34e0572cb72ea65c977fb2948bce72008c
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Dec 30 10:00:20 2012 +0200
+
+    agent: Send 'uninstalled' notification non blocking
+
+    The "echo" command blocks if the host is not connected to the
+    virtio-serial port. Replace it with a short python script that
+    opens the port with the O_NONBLOCK flag. This way, removing the
+    agent's doesn't hung if vdsm (or any other listener) doesn't
+    exist during the removal.
+
+    Change-Id: I5b49e53cda2f21bd759b0f3f67619f7f1e45688f
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 172f4b48caf99d1b22271b2f64561c992a3b2751
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Dec 27 10:55:48 2012 +0200
+
+    agent: fixed "modified" files after clone.
+
+    Due to CR/LF issue some files were reported as "modified" even after
+    new clone or hard reset. Recommited the files with the right line-
+    ending.
+
+    Change-Id: I147b60f91335e18d786f79e3ab5d3799c1b18ab8
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 9d83c9f8b652a73a8fae61d69e150b6e7c890490
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Dec 26 10:47:52 2012 +0200
+
+    agent: rewrote nic's addresses functions in python 2.4 syntax.
+
+    Change-Id: I17c6fb0dc2ac818677155444442f4a004f8463ec
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 8524331c852a1689614fa727a6ff1d77874050f5
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue Dec 25 16:14:27 2012 +0200
+
+    updated change-log for version 1.0.7
+
+    Change-Id: I8439b85ca0b479455dc7b03ff25ceccd04594f60
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit bd615da3ceb267b09bd286ebe9860d2ae32ba270
+Author: Vinzenz Feenstra <evilissimo@gmail.com>
+Date:   Thu Dec 20 16:32:45 2012 +0100
+
+    Let udev reset user rights on virtio-channel during package removal
+
+    When the package is removed udev should be triggered to reset
+    the access rights on the virtio-channel.
+
+    Change-Id: If1c80a7f9068aa4f23710b0ba3afa43196e66520
+    Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=882245
+    Signed-off-by: Vinzenz Feenstra <evilissimo@gmail.com>
+
+commit 058df65c0d0ff97474b25c53879792a6ac4f565a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Nov 26 12:54:05 2012 +0100
+
+    guest-agent: Unification of line endings to unix
+
+    Change-Id: I7f85bdc2c295c695d1877641eb89515b6f94974f
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 8fb5aa6dda8187b0d00b777f0c601ed1511d084a
+Author: Antoni S. Puimedon <asegurap@redhat.com>
+Date:   Wed Dec 19 10:43:49 2012 +0100
+
+    Fixed support for reporting devices with only ipv6.
+
+    ethtool.get_active_devices does not consider as up the devices that
+    have only an IPv6 address set. Also, it throws an IOError exception
+    when doing get_ipaddr of a device that is up but does not have an
+    IPv4 address set. Thus, doing the filtering by using the device flags
+    and getting the IPv4 address in a similar way as how we get the IPv6
+    one, not only fixes the issue but increases the consistency of the
+    code.
+
+    Change-Id: I92010740da24bb30c7316c268c704d9067b28aae
+    Signed-off-by: Antoni S. Puimedon <asegurap@redhat.com>
+
+commit 51739c7870be410076d294679807c615f9905bb6
+Author: Antoni S. Puimedon <asegurap@redhat.com>
+Date:   Wed Dec 19 10:29:55 2012 +0100
+
+    Fix pep8 errors in the linux guest agent.
+
+    Cleanup of the code to bring it up to standards of the rest of ovirt.
+
+    Change-Id: I7e8e12bdf42ef86d88a0d4d38750f2e1bc739e22
+    Signed-off-by: Antoni S. Puimedon <asegurap@redhat.com>
+
+commit 4ed4ac6be9451356794467be189b08cf97a512b2
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Oct 22 10:35:31 2012 +0200
+
+    Updated spec file to follow packaging guide lines (BZ#772608)
+
+    * Bumped the ovirt-guest-agent version in configure.ac to 1.0.6
+      as preparation for the next release
+    * Updated INSTALL to the current version
+    * autogen.sh is now using autoreconf -ivf
+    * Added m4 folder
+
+    Changes to spec file:
+    - Introduced ovirt-guest-agent-service noarch package which provides
+      ovirt-guest-agent and avoids duplication of the same package content
+    - Fixed various rpmlint errors and warnings
+    - Added required build requires
+    - Removed unnecessary build requires
+    - Removed unnecessary call to autoreconf in setup section
+    - Marked config files as such
+    - Excluded unwanted files instead of deleting them
+    - Moved folder creation and symlink creation from spec to autotools
+    - License file change reflected
+    - Removed systemd unit file installation
+    - Removed creation of log and lock folders
+
+    Changes to build system:
+    - Added creation of /usr/share/ovirt-guest-agent
+    - Added creation of symlinks for:
+      - ovirt-hibernate
+      - ovirt-shutdown
+      - ovirt-locksession
+    - Systemd unit files are now installed, if systemd is detected
+    - Log and lock folders for ovirt-guest-agent are now created on install
+    - Added missing -fPIC for the pam module
+    - Various improvements to configure.ac and several Makefile.am files in regards
+      of installation directory detection and installation handling
+
+    Change-Id: Iec350b4027bffff8dff73db7986020fdc48261cd
+    Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=772608
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 61401bbed0b3fb2189f7fb51825cf43cb3714a95
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Nov 4 15:50:34 2012 +0200
+
+    agent: added win8 and win2012 to reported os version.
+
+    Change-Id: I80d2fdce98479f0d2ecf693c08bb84aff44c4465
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 71e500b0d4e328f2e337f6b823faab343dda2a5a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Oct 18 10:01:53 2012 +0200
+
+    agent: Added APT package list support
+
+    The newly added functionality allows the guest agent to report installed
+    packages and their version even on systems with APT package managers
+    (e.g Debian) or both RPM + APT side by side.
+
+    Change-Id: I42d9d599b1effdd1b8c205ac9523e9b31922cd73
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 35c77e08698879a43ced2251a562feacd8168d60
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Oct 10 15:47:24 2012 +0200
+
+    replaced agent license to apache software license (asl) 2.0.
+
+    Change-Id: Ibc18a1761236b91644c526a6f4c17eef2ffd7e65
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit af605082e0bf22667f385a3373e02cdc0652a5eb
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Jul 12 10:17:42 2012 +0300
+
+    agent: new implementation for nics' information function.
+
+    The new implementation allows the agent to run without requiring
+    the python-ethtool package to be installed.
+
+    Change-Id: I2cc663150cb1dc17e568fb429ea786b6baa4ca9e
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 7f7554230b7e9e368fac7c71f2b0e47ed0297bf8
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Jul 12 10:00:57 2012 +0300
+
+    agent: new implementation for installed application function.
+
+    The new implementation allows the agent to run on Linux distribution
+    which is not based on rpm packages (i.e. Debian). If the
+    distribution's package system is not implemented an empty list
+    of packages is returned.
+
+    Change-Id: If9694c933dedc9b4f7c76e84e2f621fdee3278a5
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit f9dc229a8b1eb822cd36e9ff8fb2448b3dc73997
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon May 21 12:57:33 2012 +0300
+
+    agent: fixed removal of agent's dir on uninstall (bz#679451).
+
+    Change-Id: I23e6c63421e28ea38277b156c65399299309f9b0
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 5be96c09a9d6c68f795be4ea33b0c38afca10945
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun May 20 16:06:16 2012 +0300
+
+    agent: fixed various rpmlint errors and warnings.
+
+    Change-Id: I7a13d4a345ab3300713e20c291ef8549d0e6f765
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 50285a6e51286d4108bddc7e976f88423ba6c7ab
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun May 20 11:05:50 2012 +0300
+
+    agent: fixed 'udevadm trigger' command line (bz#819945).
+
+    The previous command line cause the trigger to apply to all the
+    devices (udevadm ignores the /dev/* path). This cause a system
+    time jump to occur in relation with the configured time zone.
+
+    Change-Id: I70cb1fa38e0e1fa53f340a79f1f568c04b5f0cf2
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 3ffcf737139222e596441285818626958128f896
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue May 15 12:07:33 2012 +0300
+
+    agent: updated spec file to version 1.0.4-1
+
+    Change-Id: I4a94a5d1fd842a810f974c6071867e2ab75eb4f8
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 05b554f10d7c58c4ab5c3c768066bfd9e98ec382
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Apr 19 15:01:48 2012 +0300
+
+    agent: added files to support RHEL-5 distribution.
+
+    Change-Id: I6ff4b89b3c47d3a0f7d7b04b0c1d9fb3c056e12c
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit 9e2332676f09b3d823daee3e653f0c5161e4081f
+Author: David Ja.a <djasa@redhat.com>
+Date:   Sun May 13 14:06:40 2012 +0300
+
+    Use %{_unitdir} to point systemd file.
+
+    Change-Id: I2504b56e6f05e3ecd420342097402fe433ca597f
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+
+commit b203a4197dffd305d62b023b330074d71449c873
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Apr 18 13:42:32 2012 +0300
+
+    agent: acquire network interfaces' information using wmi.
+
+    Change-Id: I7d031dc7284d51331f988bed6b6c0002d9d16e71
+
+commit 879d779f4492091d3822cc935347bbd9f2e4dc4a
+Author: Mark Wu <wudxw@linux.vnet.ibm.com>
+Date:   Fri Feb 24 14:33:27 2012 +0800
+
+    Add more detailed memory statistics function to guest agent.
+
+    Change-Id: Ic93b8717f99f033caf2b5dc2404a55f903bf4b0a
+    Signed-off-by: Mark Wu <wudxw@linux.vnet.ibm.com>
+    Signed-off-by: Adam Litke <agl@us.ibm.com>
+
+commit 4e80b4d3d7117e4e66eeefae30bca823eed8d7b6
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Apr 15 11:21:53 2012 +0300
+
+    Serveral changes after comments from Steven Dake.
+
+    - removed the RHEL distribution support for the review process.
+    - removed BuildRoot header and %clean section.
+    - fixed ovirtguest user creation.
+
+    Change-Id: I2ebc745ae10ee34caaeec9a17cecc2a10c089cfa
+
+commit 5367aaa81a39716a06833e7ba1a1e3791f670094
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue Apr 10 17:03:06 2012 +0300
+
+    agent: renamed to rhevm-guest-agent in RHEL distribution.
+
+    Change-Id: I7825920f81a37cf4139aa4f37f111510dba3d857
+
+commit d00dbf9eb385fa9d9c478be4adda15472af99241
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Mar 28 12:12:43 2012 +0200
+
+    updated change-log for version 1.0.2-1.
+
+    Change-Id: I3f498eacb6911c114569d5b34caa580d6b68a1af
+
+commit 426006cb57ffba531d11542d3f0661e70fc6cdb4
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Feb 5 10:41:42 2012 +0200
+
+    agent: included a gpl-v2 copying file to match the license stated in spec file.
+
+    Change-Id: Ib54e6861c7cf643a679c881f62d55caab12a9d0f
+
+commit d9ebfae857ac7e203a5f3769e9ed7802dfb972ac
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Feb 22 11:33:39 2012 +0200
+
+    agent: updated required selinux-policy version (rhbz#791113).
+
+    Change-Id: Ia60bf46a7e52279ed9419de732a49ef314fb26b2
+
+commit f471a6c830ccc82fb8b0c6d1eb7d8e5d2ce217b2
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Mar 21 14:21:15 2012 +0200
+
+    agent: build the gdm-plugin using the gdm-devel package.
+
+    Change-Id: Ib405afb2d8f467e33fe29f9c3feafe0452e69a20
+
+commit 66a3820a17e3e0fdc2913e87f77fb7b2b1f99722
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon Mar 19 14:14:37 2012 +0200
+
+    Build gdm and kdm plugin for RHEL distribution.
+
+    Change-Id: Iec3983c08cc499532a7c4b9a705e927bd1ae1db4
+
+commit a0a61cb91f499b3698d180c2f2bb970262342da6
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon Mar 19 14:20:41 2012 +0200
+
+    Use SystemV-style init script for RHEL distribution.
+
+    Change-Id: Ic91b5f81a04e38741a9ba0e32f73a12ee621ce47
+
+commit 99026a78fe44f7dd1d9a972610a713a2cec87feb
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon Mar 19 14:01:45 2012 +0200
+
+    Added new command line arguments to the agent executable.
+
+    The new command line arguments will have running the agent as
+    standalone program or as a daemon and allow changing the
+    location of the PID file without code modification.
+
+    The change was done is order to support both Fedora and RHEL
+    distributions.
+
+    Change-Id: I42bba6b7e498e4f5a6c725a4693b7234d700a1c6
+
+commit cefc212a2b59f3083fd4334cb7afb5f3c932641c
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon Mar 19 13:54:35 2012 +0200
+
+    Renamed agent's user to ovirtagent.
+
+    Change-Id: Ia26e710acfc7826cb020ecf49d00c9985d5fc633
+
+commit 33741de37473a25e7ebb4890c82bc582b599f615
+Author: Barak Azulay <bazulay@redhat.com>
+Date:   Wed Nov 2 20:59:54 2011 +0200
+
+    Added a Gina dll solution to support SSO on win XP
+    For further information about Gina interface take a look at:
+    http://msdn.microsoft.com/en-us/library/aa375457%28v=vs.85%29.aspx
+
+    Change-Id: Id1d1ee228b2655928b836d96a10de91bd578a2f8
+
+commit a89a25f1f66a3b917d43febac0628240f3910e6d
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Jan 25 20:57:02 2012 +0200
+
+    agent: replaced init.d style script to systemd.
+
+    Change-Id: I196cfd5cfe1d53edd4bb45be1b3d1247663cb50a
+
+commit e49aa2333621d4c7ccf4faabf4a9c7cfb47d4f10
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Jan 25 10:08:00 2012 +0200
+
+    agent: more spec file fixes after Stephen Gordon's review.
+
+    Change-Id: Ic2a1fc10e51b70391dcde8abb9a6a3fb70169ce8
+
+commit c56f46a139b2757a494a6bdc85979f2ebe9361e8
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue Jan 17 15:06:15 2012 +0200
+
+    agent: removed some requires from the spec file as a response to Pavel Zhukov's comments.
+
+    Change-Id: If08d8fd6d6d32c1513800d00d4d836fb332ebe97
+
+commit ee9c7d3d916a336988c672b91114721f43a57211
+Author: Mark Wu <wudxw@linux.vnet.ibm.com>
+Date:   Thu Jan 19 17:49:31 2012 +0800
+
+    Add the prefix 'with' to the configure option '--gdm-src-dir' in the
+    output of `configure --help`
+
+    Change-Id: I1fc2802b3436a0c711155bd2c8eb4601e3d61c28
+
+commit 7d602d9fe0bc95984c2da823ccc91cde7693e314
+Author: Mark Wu <wudxw@linux.vnet.ibm.com>
+Date:   Thu Jan 19 17:34:55 2012 +0800
+
+    Don't remove ovirt-guest-agent/ovirt-guest-agent on 'make clean'
+
+    Change-Id: I38aa4da6aebf76f2fe76936b14184c7bb6481c29
+
+commit 299125c97371d7d026b37fc1b81b8d7bb83f7adf
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Wed Jan 18 15:04:53 2012 +0200
+
+    agent: added a support for a guest hibernate command.
+
+    Change-Id: Ic360fa47576121dd7c9e3bddcf758843cb1847b3
+
+commit 6e3dd4d428fb13c1aa6feff737d4c78ff76c12ec
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Dec 25 10:42:30 2011 +0200
+
+    credprov: initial import of the windows's credentials provider.
+
+    Change-Id: If4b713bf3bbb2d80d4b5d41c185471d12db40e69
+
+commit d447ca82461c798e4dc61a00d9af8f451f994471
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Dec 18 13:32:25 2011 +0200
+
+    kdm: handled the error message when plugin was selected.
+
+    A dialog with a "theme not usable with authentication method" error
+    message was shown when the kdm plugin was selected. The cause was
+    a widget with a name that didn't exists in the theme's definitions
+    file.
+
+    Change-Id: Id544f7074ebd7707a3388dc871e72fc865112e1a
+
+commit d1b60f576b9f4fdc60eb55791a2cfd9ec2a67fde
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Dec 15 13:52:09 2011 +0200
+
+    agent: include gdm-plugin in build.
+
+    Change-Id: I097c0a75caa54c49dd0f4602664d9c94f050d675
+
+commit 44852caed00ed45c4552894e89efe160507fae6a
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue Dec 13 15:01:58 2011 +0200
+
+    gdm: updated gdm's plugin files to gdm-3.
+
+    Change-Id: I1a23f162d2f535009c16cd6e07b9f0960b461c73
+
+commit 9d2b6a748a7045ac9c65e4afd604e45f695996ea
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue Dec 13 14:55:49 2011 +0200
+
+    gdm: renamed gdm plugin files.
+
+    Change-Id: Icc801879d9d0cd9c3c9ab0742df73964c895441b
+
+commit 9af5f8d2c12df5c37b17442edf65366f7e6d5835
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Tue Dec 13 16:43:39 2011 +0200
+
+    agent: fixed rhbz#759843. files were changed in %post section.
+
+    Change-Id: Ib0639363c81cb00731db2431543168ed94327f51
+
+commit 5570d3e23c06aa95149504911e26de702f6168b6
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Dec 1 15:44:22 2011 +0200
+
+    agent: fixed service not started after reboot on fc-16.
+
+    The pid file was installed on a tmp fs.
+
+    Change-Id: I759ad27ae8b2e696555074f0c91f2d2a541e7d59
+
+commit 27889e8456b194700cb3bb752f0b080e66d7f174
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Nov 13 15:07:50 2011 +0200
+
+    agent: rewrote the getActiveUser method.
+
+    Change-Id: I187b588c9abe6febd891528cccd0fddf3d7cb2ac
+
+commit 8b55929ec3c091186564f88f0125983d28c8eebc
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Nov 13 14:56:49 2011 +0200
+
+    agent: the WTSGetActiveConsoleSessionId function is now implemented.
+
+    Change-Id: I20f3a411fe0c41921d2c56e8d55c03d4d1a12a33
+
+commit 1c5adad69066889a64a3e89de1dfc96c0fe1b3f2
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Nov 3 15:57:55 2011 +0200
+
+    kdm: updated kdm's plugins files with the new agent's name.
+
+    Change-Id: Icbf5e92ba3c0e61b2da01d35834b7e8b0d3627ad
+
+commit af93ad4418e8378a13a6632bbd2021b3e9e66dfc
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Nov 3 13:31:35 2011 +0200
+
+    kde: renamed kde plugin files.
+
+    Change-Id: Ied3c70ec3aaba7eea96ad45092a51532cd63ffd7
+
+commit a1628ac956120efcd51805aec23cfeb7da6f3834
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Thu Nov 3 13:22:02 2011 +0200
+
+    kde: renamed kde plugin paths.
+
+    Change-Id: Icb0e6d834dee5ffceb3d3281c1bbb8b2e3e83bea
+
+commit a3122f92ace9c0bd3af9ff0db64750dd57903a5a
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Sun Oct 30 17:33:03 2011 +0200
+
+    agent: removed unused legacy usb handling.
+
+commit dd5e58e9685dbe3a5100aa1ca0eaabdccb19762d
+Author: Barak Azulay <bazulay@redhat.com>
+Date:   Sat Oct 29 15:33:01 2011 +0200
+
+    Added Fedora README - how to setup a development environment on a Fedora 15 guest
+
+commit b9370ab61a75564a0f840d1f0ce82a767c48eb82
+Author: Barak Azulay <bazulay@redhat.com>
+Date:   Sat Oct 29 15:17:27 2011 +0200
+
+    Added windows README - on how to setup a development environment on a windows guest
+
+commit 83c7e676fb9d66f239e2c1b72dd74f0c77be0bc9
+Author: Barak Azulay <bazulay@redhat.com>
+Date:   Sat Oct 29 14:30:42 2011 +0200
+
+    Initial commit of ovirt-guest-agent

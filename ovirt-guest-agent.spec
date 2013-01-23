@@ -5,7 +5,7 @@
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.7
+Version: 1.0.8
 Release: %{release_version}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -222,6 +222,20 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Thu Jul 11 2013 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.8-1
+- Pep8 rules applied on python files
+- Call restorecon on pidfile
+- Report multiple IPv4 addresses per device if available
+- Send 'uninstalled' notification non blocking
+- fixed "modified" files after clone.
+- rewrote nic's addresses functions in python 2.4 syntax.
+- GNOME 3.8 no longer supports gdm plugins. Therefore it's now disabled for
+  higher versions
+- Added full qualified domain name reporting
+- Condrestart now ensures that the pid file does not only exist, but also is
+  not empty
+- Added new optional parameter for shutdown to allow reboot
+
 * Tue Dec 25 2012 Gal Hammer <ghammer@redhat.com> - 1.0.7-1
 - reset user rights on virtio-channel during package removal.
 - unification of line endings to unix.

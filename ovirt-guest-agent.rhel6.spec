@@ -2,7 +2,7 @@
 %global release_version 1
 
 Name: ovirt-guest-agent
-Version: 1.0.7
+Version: 1.0.8
 Release: %{release_version}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -129,5 +129,8 @@ fi
 
 
 %changelog
+* Thu Jul 11 2013 Vinzenz Feenstra <evilissimo@redhat.com> - 1.0.8-1
+  - Update to version ovirt-guest-agent 1.0.8
+
 * Wed Jul 10 2013 Vinzenz Feenstra <evilissimo@redhat.com> - 1.0.7-1
   - Initial ovirt-guest-agent RHEL6 package
