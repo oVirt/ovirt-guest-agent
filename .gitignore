@@ -1,14 +1,17 @@
 *.la
 *.lo
+*.ncb
 *.o
 *.pyc
-*.ncb
 *.suo
 *.vcproj.*.user
 .deps
+.idea
 .libs
-autom4te.cache/
+Makefile
+Makefile.in
 aclocal.m4
+autom4te.cache/
 compile
 config.cache
 config.guess
@@ -23,7 +26,5 @@ depcomp
 install-sh
 libtool
 ltmain.sh
-Makefile
-Makefile.in
 missing
 stamp-h1
