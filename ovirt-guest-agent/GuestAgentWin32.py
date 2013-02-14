@@ -58,7 +58,7 @@ def GetNetworkInterfaces():
                             inet6.append(ip)
                 interfaces.append({ 'name' : adapter.Description,
                     'inet' : inet, 'inet6' : inet6,
-                    'hw' : adapter.MacAddress.lower() })
+                    'hw' : adapter.MacAddress.lower().replace('-', ':') })
     except:
         logging.exception("Error retrieving network interfaces.")
     return interfaces
