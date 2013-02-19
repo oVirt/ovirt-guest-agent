@@ -106,7 +106,7 @@ make install DESTDIR=%{buildroot}
 getent group ovirtagent >/dev/null || groupadd -r -g 175 ovirtagent
 getent passwd ovirtagent > /dev/null || \
     /usr/sbin/useradd -u 175 -g 175 -o -r ovirtagent \
-    -c "oVirt Guest Agent" -d / -s /sbin/nologin
+    -c "oVirt Guest Agent" -d %{_datadir}/ovirt-guest-agent -s /sbin/nologin
 exit 0
 
 %post common
