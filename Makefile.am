@@ -1,11 +1,15 @@
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS =                \
-    ovirt-guest-agent    \
-    pam-ovirt-cred       \
+    ovirt-guest-agent
+
+if BUILD_SSO_MODULES
+SUBDIRS += \
+	pam-ovirt-cred       \
     gdm-plugin           \
     gdm2-plugin          \
     kdm-plugin
+endif
 
 CLEANFILES = \
     *~

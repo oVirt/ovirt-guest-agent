@@ -13,23 +13,32 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
 AC_PROG_CXX
+AM_PROG_AR
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MKDIR_P
 AC_PROG_LN_S
 AM_PATH_PYTHON
 
+AC_ARG_WITH(sso,
+            AS_HELP_STRING([--with-sso],
+                           [If single sign on modules should be built, default=yes]),
+            sso=${withval}, sso=yes)
+AC_SUBST(sso)
+AM_CONDITIONAL(BUILD_SSO_MODULES, [test -n "$sso" -a "x$sso" != xno ])
+
 dnl ---------------------------------------------------------------------------
 dnl needed for systemd detection
 dnl ---------------------------------------------------------------------------
 PKG_PROG_PKG_CONFIG
 
+if test "x$sso" == "xyes"; then
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h stdlib.h string.h sys/socket.h unistd.h])
-AC_CHECK_HEADERS([security/pam_ext.h security/pam_modules.h])
 
 AC_CHECK_FUNCS([memset select socket strchr strerror strndup])
 
 AC_CHECK_LIB([pam], [pam_get_user])
+fi
 
 AC_TYPE_SIZE_T
 AC_TYPE_PID_T
@@ -57,9 +66,12 @@ if test "x$PEP8" = "x"; then
   AC_MSG_WARN([python-pep8 not found])
 fi
 
+
 dnl ---------------------------------------------------------------------------
 dnl - Dependencies
 dnl ---------------------------------------------------------------------------
+
+if test "x$sso" == "xyes"; then
 
 DBUS_GLIB_REQUIRED_VERSION=0.74
 GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
@@ -109,6 +121,8 @@ else
 fi
 
 AC_SUBST(GDM_SRC_DIR)
+
+fi # if sso enabled
 
 dnl ---------------------------------------------------------------------------
 dnl - Directory for PAM configuration files
@@ -180,6 +194,9 @@ AC_CONFIG_FILES([
     ovirt-guest-agent/Makefile
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
+])
+if test "x$sso" == "xyes"; then
+AC_CONFIG_FILES([
     pam-ovirt-cred/Makefile
     gdm-plugin/Makefile
     gdm-plugin/icons/Makefile
@@ -188,5 +205,6 @@ AC_CONFIG_FILES([
     gdm2-plugin/Makefile
     kdm-plugin/Makefile
 ])
+fi
 
 AC_OUTPUT
