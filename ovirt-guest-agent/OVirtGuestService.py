@@ -9,8 +9,8 @@ import logging
 import logging.config
 import servicemanager
 import ConfigParser
-# import os
-# import _winreg
+import os
+import _winreg
 
 AGENT_CONFIG = 'ovirt-guest-agent.ini'
 
@@ -32,15 +32,18 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self._shutting_down = False
 
-        #global AGENT_CONFIG
-        #hkey = _winreg.OpenKey(
-        #   _winreg.HKEY_LOCAL_MACHINE,
-        #   "SOFTWARE\\Redhat\\RHEV\\Tools\\OVirt Guest Agent")
-        #AGENT_CONFIG = os.path.join(
-        #   _winreg.QueryValueEx(hkey,
-        #   "InstallDir")[0],
-        #   AGENT_CONFIG)
-        #hkey.Close()
+        global AGENT_CONFIG
+        regKey = "System\\CurrentControlSet\\services\\%s" % self._svc_name_
+        hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, regKey)
+        filePath = _winreg.QueryValueEx(hkey, "ImagePath")[0].replace('"', '')
+        hkey.Close()
+        if "PythonService.exe" in filePath:
+            hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                                   "%s\\PythonClass" % regKey)
+            filePath = _winreg.QueryValueEx(hkey, "")[0].replace('"', '')
+            hkey.Close()
+        filePath = os.path.dirname(filePath)
+        AGENT_CONFIG = os.path.join(filePath, AGENT_CONFIG)
 
         logging.config.fileConfig(AGENT_CONFIG)
 
