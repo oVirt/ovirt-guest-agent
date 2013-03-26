@@ -33,7 +33,10 @@ $(PAM_SERVICE_NAME): $(PAM_SERVICE_NAME).pam
 pamdir = $(PAM_PREFIX)/pam.d
 pam_DATA = $(PAM_SERVICE_NAME)
 
-EXTRA_DIST = $(extension_DATA) $(PAM_SERVICE_NAME).pam
+EXTRA_DIST = \
+	$(extension_DATA) \
+	$(PAM_SERVICE_NAME).pam \
+	$(NULL)
 
 MAINTAINERCLEANFILES = \
 	*~ \

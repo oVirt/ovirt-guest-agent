@@ -191,9 +191,11 @@ AC_SUBST(extensionsdatadir)
 
 AC_CONFIG_FILES([
     Makefile
+    GinaSSO/Makefile
     ovirt-guest-agent/Makefile
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
+    windows-credprov/Makefile
 ])
 if test "x$sso" == "xyes"; then
 AC_CONFIG_FILES([

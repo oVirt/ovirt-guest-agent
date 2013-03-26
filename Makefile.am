@@ -1,11 +1,14 @@
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS =                \
-    ovirt-guest-agent
+    ovirt-guest-agent    \
+    GinaSSO              \
+    windows-credprov     \
+    $(NULL)
 
 if BUILD_SSO_MODULES
-SUBDIRS += \
-	pam-ovirt-cred       \
+SUBDIRS +=               \
+    pam-ovirt-cred       \
     gdm-plugin           \
     gdm2-plugin          \
     kdm-plugin
@@ -18,19 +21,25 @@ MAINTAINERCLEANFILES = \
     config.h.in \
     Makefile.in
 
+EXTRA_DIST=                     \
+    AUTHORS                     \
+    README_Fedora.txt           \
+    ovirt-guest-agent.spec      \
+    $(NULL)
+
 # When fixing a file to conform with pep8 add it to the WL here so it will be
 # checkd from now on
 PEP8_WHITELIST = \
-	ovirt-guest-agent/CredServer.py \
-	ovirt-guest-agent/GuestAgentLinux2.py \
-	ovirt-guest-agent/GuestAgentWin32.py \
-	ovirt-guest-agent/LockActiveSession.py \
-	ovirt-guest-agent/OVirtAgentLogic.py \
-	ovirt-guest-agent/OVirtGuestService.py \
-	ovirt-guest-agent/VirtIoChannel.py \
-	ovirt-guest-agent/WinFile.py \
-	ovirt-guest-agent/ovirt-guest-agent.py \
-	ovirt-guest-agent/version.py
+    ovirt-guest-agent/CredServer.py \
+    ovirt-guest-agent/GuestAgentLinux2.py \
+    ovirt-guest-agent/GuestAgentWin32.py \
+    ovirt-guest-agent/LockActiveSession.py \
+    ovirt-guest-agent/OVirtAgentLogic.py \
+    ovirt-guest-agent/OVirtGuestService.py \
+    ovirt-guest-agent/VirtIoChannel.py \
+    ovirt-guest-agent/WinFile.py \
+    ovirt-guest-agent/ovirt-guest-agent.py \
+    ovirt-guest-agent/version.py
 
 PEP8_BLACKLIST = ovirt-guest-agent/setup.py
 

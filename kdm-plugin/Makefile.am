@@ -24,7 +24,10 @@ $(PAM_SERVICE_NAME): $(PAM_SERVICE_NAME).pam
 pamdir = $(PAM_PREFIX)/pam.d
 pam_DATA = $(PAM_SERVICE_NAME)
 
-EXTRA_DIST = $(PAM_SERVICE_NAME).pam
+EXTRA_DIST = \
+    $(PAM_SERVICE_NAME).pam \
+    credentials.xml \
+    $(NULL)
 
 CLEANFILES =            \
     *~                  \
