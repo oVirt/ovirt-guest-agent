@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+udevadm control --reload-rules
+udevadm trigger --subsystem-match="virtio-ports" --attr-match="name=com.redhat.rhevm.vdsm"
+udevadm settle
+
+#DEBHELPER#

@@ -1,5 +1,5 @@
 
-consoleappsdir = /etc/security/console.apps
+consoleappsdir = $(sysconfdir)/security/console.apps
 consoleapps_DATA = \
     ovirt-shutdown \
     ovirt-locksession \

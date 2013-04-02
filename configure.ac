@@ -10,7 +10,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
-
+DEFINE_FHS
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AR
@@ -43,9 +43,6 @@ fi
 AC_TYPE_SIZE_T
 AC_TYPE_PID_T
 
-# Fix libdir on demand
-test "$libdir" = '${exec_prefix}/lib' && libdir='${exec_prefix}/lib64'
-
 dnl ---------------------------------------------------------------------------
 dnl Check if we have systemd so we know if we have to install the systemd
 dnl service
@@ -72,55 +69,54 @@ dnl - Dependencies
 dnl ---------------------------------------------------------------------------
 
 if test "x$sso" == "xyes"; then
+    DBUS_GLIB_REQUIRED_VERSION=0.74
+    GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
+    GLIB_REQUIRED_VERSION=2.22.0
+    GTK_REQUIRED_VERSION=2.18.0
 
-DBUS_GLIB_REQUIRED_VERSION=0.74
-GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
-GLIB_REQUIRED_VERSION=2.22.0
-GTK_REQUIRED_VERSION=2.18.0
+    # A hack to ignore gdm-devel package when building gdm-2.
+    if ! test -z "$with_gdm_src_dir"; then
+       GDM_SIMPLE_GREETER_REQUIRED=""
+    else
+       GDM_SIMPLE_GREETER_REQUIRED="gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION"
+    fi
 
-# A hack to ignore gdm-devel package when building gdm-2.
-if ! test -z "$with_gdm_src_dir"; then
-   GDM_SIMPLE_GREETER_REQUIRED=""
-else
-   GDM_SIMPLE_GREETER_REQUIRED="gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION"
-fi
+    PKG_CHECK_MODULES(GDM_PLUGIN,
+            dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
+            $GDM_SIMPLE_GREETER_REQUIRED
+            gobject-2.0 >= $GLIB_REQUIRED_VERSION
+            gtk+-2.0 >= $GTK_REQUIRED_VERSION
+    )
+    GDM_PLUGIN_LIBS="$GDM_PLUGIN_LIBS -lm"
+    AC_SUBST(GDM_PLUGIN_CFLAGS)
+    AC_SUBST(GDM_PLUGIN_LIBS)
 
-PKG_CHECK_MODULES(GDM_PLUGIN,
-        dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
-        $GDM_SIMPLE_GREETER_REQUIRED
-        gobject-2.0 >= $GLIB_REQUIRED_VERSION
-        gtk+-2.0 >= $GTK_REQUIRED_VERSION
-)
-GDM_PLUGIN_LIBS="$GDM_PLUGIN_LIBS -lm"
-AC_SUBST(GDM_PLUGIN_CFLAGS)
-AC_SUBST(GDM_PLUGIN_LIBS)
+    QT_REQUIRED_VERSION=4.6.2
 
-QT_REQUIRED_VERSION=4.6.2
+    PKG_CHECK_MODULES(KDM_PLUGIN,
+            QtCore >= $QT_REQUIRED_VERSION
+            QtDBus >= $QT_REQUIRED_VERSION
+            QtGui >= $QT_REQUIRED_VERSION
+    )
+    KDM_PLUGIN_LIBS="$KDM_PLUGIN_LIBS -lm"
+    AC_SUBST(KDM_PLUGIN_CFLAGS)
+    AC_SUBST(KDM_PLUGIN_LIBS)
 
-PKG_CHECK_MODULES(KDM_PLUGIN,
-        QtCore >= $QT_REQUIRED_VERSION
-        QtDBus >= $QT_REQUIRED_VERSION
-        QtGui >= $QT_REQUIRED_VERSION
-)
-KDM_PLUGIN_LIBS="$KDM_PLUGIN_LIBS -lm"
-AC_SUBST(KDM_PLUGIN_CFLAGS)
-AC_SUBST(KDM_PLUGIN_LIBS)
+    dnl ---------------------------------------------------------------------------
+    dnl - Directory for GDM source package files
+    dnl ---------------------------------------------------------------------------
 
-dnl ---------------------------------------------------------------------------
-dnl - Directory for GDM source package files
-dnl ---------------------------------------------------------------------------
+    AC_ARG_WITH(gdm-src-dir,
+                AS_HELP_STRING([--with-gdm-src-dir=<dir>],
+                               [GDM package source files directory]))
 
-AC_ARG_WITH(gdm-src-dir,
-            AS_HELP_STRING([--with-gdm-src-dir=<dir>],
-                           [GDM package source files directory]))
+    if ! test -z "$with_gdm_src_dir"; then
+       GDM_SRC_DIR=$with_gdm_src_dir
+    else
+       GDM_SRC_DIR=
+    fi
 
-if ! test -z "$with_gdm_src_dir"; then
-   GDM_SRC_DIR=$with_gdm_src_dir
-else
-   GDM_SRC_DIR=
-fi
-
-AC_SUBST(GDM_SRC_DIR)
+    AC_SUBST(GDM_SRC_DIR)
 
 fi # if sso enabled
 
@@ -146,17 +142,9 @@ AC_SUBST(PAM_PREFIX)
 dnl ---------------------------------------------------------------------------
 dnl - Directory for PAM modules files
 dnl ---------------------------------------------------------------------------
-
-case "`uname -m`" in
-    x86_64)
-    system_libdir="/lib64";;
-    *)
-    system_libdir="/lib" ;;
-esac
-
 AC_ARG_ENABLE(securedir,
-	AS_HELP_STRING([--enable-securedir=DIR],[path to location of PAMs @<:@default=$system_libdir/security@:>@]),
-	SECUREDIR=$enableval, SECUREDIR=$system_libdir/security)
+	AS_HELP_STRING([--enable-securedir=DIR],[path to location of PAMs @<:@default=$libarchdir/security@:>@]),
+	SECUREDIR=$enableval, SECUREDIR=$libarchdir/security)
 AC_SUBST(SECUREDIR)
 
 dnl ---------------------------------------------------------------------------
@@ -169,7 +157,7 @@ AC_ARG_WITH(simple-greeter-plugins-dir,
 if ! test -z "$with_simple_greeter_plugins_dir"; then
    GDM_SIMPLE_GREETER_PLUGINS_DIR=$with_simple_greeter_plugins_dir
 else
-   GDM_SIMPLE_GREETER_PLUGINS_DIR=$libdir/gdm/simple-greeter/extensions
+   GDM_SIMPLE_GREETER_PLUGINS_DIR=$libarchdir/gdm/simple-greeter/extensions
 fi
 AC_SUBST(GDM_SIMPLE_GREETER_PLUGINS_DIR)
 
@@ -177,7 +165,7 @@ dnl ---------------------------------------------------------------------------
 dnl - Directory for KDM greeter plugins
 dnl ---------------------------------------------------------------------------
 
-KDM_GREETER_PLUGINS_DIR=$libdir/kde4
+KDM_GREETER_PLUGINS_DIR=$libarchdir/kde4
 AC_SUBST(KDM_GREETER_PLUGINS_DIR)
 
 dnl ---------------------------------------------------------------------------
@@ -193,6 +181,7 @@ AC_CONFIG_FILES([
     Makefile
     GinaSSO/Makefile
     ovirt-guest-agent/Makefile
+    ovirt-guest-agent/ovirt-guest-agent
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
     windows-credprov/Makefile

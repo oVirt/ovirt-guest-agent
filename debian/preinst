@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+
+getent group ovirtagent >/dev/null || groupadd -r -g 175 ovirtagent
+getent passwd ovirtagent > /dev/null || useradd -u 175 -g 175 -o -r ovirtagent -c "oVirt Guest Agent" -d /usr/share/ovirt-guest-agent -s /sbin/nologin
+
+#DEBHELPER#

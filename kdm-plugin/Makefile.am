@@ -9,11 +9,11 @@ dist_noinst_DATA =              \
     src/OVirtCred.cpp
 
 all-local:
-	cmake -DCMAKE_INSTALL_PREFIX=/usr src/CMakeLists.txt
+	cmake -DCMAKE_INSTALL_PREFIX=$(prefix) src/CMakeLists.txt
 	make -C src
 
 clean-local:
-	make -C src clean
+	make -C src clean || :
 
 install-exec-hook:
 	make -C src install DESTDIR=$(DESTDIR)

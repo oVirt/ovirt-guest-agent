@@ -14,6 +14,8 @@ SUBDIRS +=               \
     kdm-plugin
 endif
 
+DIST_SUBDIRS=$(SUBDIRS)
+
 CLEANFILES = \
     *~
 
@@ -25,6 +27,8 @@ EXTRA_DIST=                     \
     AUTHORS                     \
     README_Fedora.txt           \
     ovirt-guest-agent.spec      \
+    m4/fhs.m4                   \
+    debian                      \
     $(NULL)
 
 # When fixing a file to conform with pep8 add it to the WL here so it will be
@@ -47,17 +51,17 @@ check-local:
 	$(PEP8) --exclude="$(PEP8_BLACKLIST)" --filename '*.py,*.py.in' \
 		$(PEP8_WHITELIST)
 	@if test -f .gitignore; then \
-	  for i in `git ls-files \*.in`; do \
-	    if ! grep -q -x $${i%%.in} .gitignore; then \
-	      echo "Missing $${i%%.in} in .gitignore"; exit 1; fi; \
-	  done; \
+		for i in `git ls-files \*.in`; do \
+			if ! grep -q -x $${i%%.in} .gitignore; then \
+				echo "Missing $${i%%.in} in .gitignore"; exit 1; \
+			fi; \
+		done; \
 	fi;
 
 
 install-exec-hook:
 	$(MKDIR_P) $(DESTDIR)/$(pkgdatadir)
-	$(LN_S) $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-locksession
-	$(LN_S) $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-shutdown
-	$(LN_S) $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-hibernate
-	$(INSTALL) -d $(DESTDIR)/$(localstatedir)/lock/subsys/ovirt-guest-agent
+	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-locksession
+	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-shutdown
+	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-hibernate
 	$(INSTALL) -d $(DESTDIR)/$(localstatedir)/log/ovirt-guest-agent

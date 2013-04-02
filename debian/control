@@ -1,0 +1,19 @@
+Source: ovirt-guest-agent
+Section: utils
+Priority: extra
+Maintainer: Vinzenz Feenstra <evilissimo@redhat.com>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, libtool, pep8, autoconf, python
+Standards-Version: 3.9.3
+Homepage: http://www.ovirt.org/Ovirt_guest_agent
+#Vcs-Git: git://git.debian.org/collab-maint/ovirt-guest-agent.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/ovirt-guest-agent.git;a=summary
+
+Package: ovirt-guest-agent
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, usermode, python-ethtool, python-dbus
+Description: oVirt Guest Agent
+ This is the oVirt management agent running inside the guest. The agent
+ interfaces with the oVirt manager, supplying heart-beat info as well as
+ run-time data from within the guest itself. The agent also accepts
+ control commands to be run executed within the OS (like: shutdown and
+ restart).

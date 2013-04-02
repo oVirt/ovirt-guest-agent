@@ -189,7 +189,6 @@ fi
 
 %{_unitdir}/ovirt-guest-agent.service
 
-
 %files pam-module
 %{_moduledir}/pam_ovirt_cred.so
 %exclude %{_moduledir}/pam_ovirt_cred.a

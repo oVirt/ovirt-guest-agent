@@ -3,11 +3,10 @@ SUBDIRS = pam consoleapps
 
 AGENT_NAME = ovirt-guest-agent
 
-agentdir=/usr/share/ovirt-guest-agent
+agentdir=$(datadir)/ovirt-guest-agent
 agent_PYTHON= \
     CredServer.py \
     GuestAgentLinux2.py \
-    LockActiveSession.py \
     OVirtAgentLogic.py \
     VirtIoChannel.py \
     ovirt-guest-agent.py \
@@ -21,19 +20,23 @@ noinst_PYTHON=\
     OVirtGuestService.py \
     $(NULL)
 
-agent_DATA=hibernate
+dist_pkgdata_SCRIPTS= \
+	hibernate \
+    LockActiveSession.py \
+	$(NULL)
 
-agentconfdir=/etc
+agentconfdir=$(sysconfdir)
 agentconf_DATA=ovirt-guest-agent.conf
 
-dbusconfdir=/etc/dbus-1/system.d
+dbusconfdir=$(sysconfdir)/dbus-1/system.d
 dbusconf_DATA=org.ovirt.vdsm.Credentials.conf
 
-rulesdir=/etc/udev/rules.d
+rulesdir=$(udevrulesdir)
 rules_DATA = 55-$(AGENT_NAME).rules
 
 55-$(AGENT_NAME).rules: $(AGENT_NAME).rules
 	cp $(AGENT_NAME).rules 55-$(AGENT_NAME).rules
+	cp $(AGENT_NAME).rules ../debian/$(AGENT_NAME).udev
 
 # Conditionally install the systemd service
 if HAVE_SYSTEMD
@@ -46,7 +49,7 @@ EXTRA_DIST= \
     $(daemon_DATA) \
     $(dbusconf_DATA) \
     $(AGENT_NAME).rules \
-    ovirt-guest-agent \
+    ovirt-guest-agent.in \
     ovirt-guest-agent.service \
     ovirt-guest-agent.el5.rules \
     Makefile.el5 \
@@ -57,4 +60,10 @@ EXTRA_DIST= \
 
 CLEANFILES = \
     *~ \
-    55-$(AGENT_NAME).rules
+    55-$(AGENT_NAME).rules \
+	../debian/ovirt-guest-agent.udev \
+	$(NULL)
+
+MAINTAINERCLEANFILES = \
+    ovirt-guest-agent \
+	$(NULL)

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+#DEBHELPER#
+
+if test "x$1" == "xremove" || test "x$1" == "xpurge"; then
+    VIRTIO=`grep "^device" /etc/ovirt-guest-agent.conf | awk '{ print $3; }'`
+    if [ -w $VIRTIO ]; then
+        echo -e '{"__name__": "uninstalled"}\n' | dd of=$VIRTIO oflag=nonblock status=noxfer conv=nocreat 1>& /dev/null || :
+    fi
+fi
+exit 0

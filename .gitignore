@@ -28,3 +28,5 @@ libtool
 ltmain.sh
 missing
 stamp-h1
+ovirt-guest-agent/ovirt-guest-agent
+ovirt-guest-agent/ovirt-guest-agent.upstart.conf

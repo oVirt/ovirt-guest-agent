@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # ovirt-guest-agent - Startup script for the oVirt agent daemon
 #
@@ -13,7 +13,7 @@
 
 agentd=/usr/share/ovirt-guest-agent/ovirt-guest-agent.py
 prog=ovirt-guest-agent
-lockfile=/var/lock/subsys/${prog}
+lockfile=@lock_dir@/${prog}
 pidfile=/var/run/${prog}.pid
 
 RETVAL=0

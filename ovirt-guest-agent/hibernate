@@ -7,9 +7,9 @@ usage() {
 
 state="$1"
 
-if [ $state == "disk" ]; then
+if [ "x$state" = "xdisk" ]; then
     param="hibernate"
-elif [ $state == "mem" ]; then
+elif [ "x$state" = "xmem" ]; then
     param="suspend"
 else
     usage
