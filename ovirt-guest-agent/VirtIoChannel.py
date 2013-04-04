@@ -1,5 +1,5 @@
 #
-# Copyright 2010 Red Hat, Inc. and/or its affiliates.
+# Copyright 2010-2013 Red Hat, Inc. and/or its affiliates.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 import os
 import platform
 import time
+import sys
 
 
 # avoid pep8 warnings
@@ -30,6 +31,65 @@ def import_json():
         import simplejson
         return simplejson
 json = import_json()
+
+
+# Set taken from http://www.w3.org/TR/xml11/#NT-RestrictedChar
+__RESTRICTED_CHARS = set(range(8 + 1)).union(
+    set(range(0xB, 0xC + 1))).union(
+        set(range(0xE, 0x1F + 1))).union(
+            set(range(0x7F, 0x84 + 1))).union(
+                set(range(0x86, 0x9F + 1)))
+
+
+def _string_check(str):
+    """
+    This function tries to convert the given string to a valid representable
+    form. Normal and valid unicode strings should not fail this test. Invalid
+    encodings will fail this and might get characters replaced.
+    """
+    try:
+        str.encode(sys.stdout.encoding, 'strict')
+    except UnicodeError:
+        try:
+            return str.encode('ascii', 'replace')
+        except UnicodeError:
+            # unrepresentable string
+            return unicode()
+    return str
+
+
+def _filter_xml_chars(u):
+    """
+    Filter out restricted xml chars from unicode string. Not using
+    Python's xmlcharrefreplace because it accepts '\x01', which
+    the spec frown upon.
+    """
+    def mask_restricted(c):
+        if ord(c) in __RESTRICTED_CHARS:
+            return '?'
+        else:
+            return c
+
+    return ''.join(mask_restricted(c) for c in u)
+
+
+def _filter_object(obj):
+    """
+    Apply _filter_xml_chars and _string_check on all strings in the given
+    object
+    """
+    def filt(o):
+        if isinstance(o, dict):
+            return dict(map(filt, o.iteritems()))
+        if isinstance(o, list):
+            return map(filt, o)
+        if isinstance(o, tuple):
+            return tuple(map(filt, o))
+        if isinstance(o, basestring):
+            return _filter_xml_chars(_string_check(o))
+        return o
+
+    return filt(obj)
 
 
 class VirtIoChannel:
@@ -91,7 +151,13 @@ class VirtIoChannel:
         if not isinstance(args, dict):
             raise TypeError("2nd arg must be a dict.")
         args['__name__'] = name
+        args = _filter_object(args)
         message = (json.dumps(args) + '\n').encode('utf8')
+        filtered_message = _filter_xml_chars(message)
+        # Sanity check only, on purpose we're throwing away the string
+        # to ensure we've produced a decodable utf-8 string after filtering
+        filtered_message.decode('utf-8')
+        message = filtered_message
         while len(message) > 0:
             if self.is_windows:
                 written = self._vport.write(message)
