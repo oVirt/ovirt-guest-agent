@@ -328,12 +328,13 @@ class LinuxVdsAgent(AgentLogicBase):
 
 
 def test():
+    import pprint
     dr = LinuxDataRetriver()
     dr.app_list = "kernel kernel-headers aspell"
     dr.ignored_fs = set("rootfs tmpfs autofs cgroup selinuxfs udev mqueue "
                         "nfsd proc sysfs devtmpfs hugetlbfs rpc_pipefs devpts "
                         "securityfs debugfs binfmt_misc fuse.gvfsd-fuse "
-                        "fuse.gvfs-fuse-daemon fusectl".split())
+                        "fuse.gvfs-fuse-daemon fusectl usbfs".split())
     print "Machine Name:", dr.getMachineName()
     print "OS Version:", dr.getOsVersion()
     print "Network Interfaces:", dr.getAllNetworkInterfaces()
@@ -341,7 +342,7 @@ def test():
     print "Available RAM:", dr.getAvailableRAM()
     print "Logged in Users:", dr.getUsers()
     print "Active User:", dr.getActiveUser()
-    print "Disks Usage:", dr.getDisksUsage()
+    print "Disks Usage:", pprint.pprint(dr.getDisksUsage())
     print "Memory Stats:", dr.getMemoryStats()
 
 if __name__ == '__main__':
