@@ -237,21 +237,20 @@ class LinuxDataRetriver(DataRetriverBase):
 
     def getDisksUsage(self):
         usages = list()
-        try:
-            mounts = open('/proc/mounts')
+        with open('/proc/mounts') as mounts:
             for mount in mounts:
-                (device, path, fs) = mount.split()[:3]
-                if not fs in self.ignored_fs:
-                    # path might include spaces.
-                    path = path.decode("string-escape")
-                    statvfs = os.statvfs(path)
-                    total = statvfs.f_bsize * statvfs.f_blocks
-                    used = total - statvfs.f_bsize * statvfs.f_bfree
-                    usages.append({'path': path, 'fs': fs, 'total': total,
-                                   'used': used})
-            mounts.close()
-        except:
-            logging.exception("Error retrieving disks usages.")
+                try:
+                    (device, path, fs) = mount.split()[:3]
+                    if not fs in self.ignored_fs:
+                        # path might include spaces.
+                        path = path.decode("string-escape")
+                        statvfs = os.statvfs(path)
+                        total = statvfs.f_bsize * statvfs.f_blocks
+                        used = total - statvfs.f_bsize * statvfs.f_bfree
+                        usages.append({'path': path, 'fs': fs, 'total': total,
+                                       'used': used})
+                except:
+                    logging.exception("Error retrieving disks usages.")
         return usages
 
     def getMemoryStats(self):
@@ -333,7 +332,8 @@ def test():
     dr.app_list = "kernel kernel-headers aspell"
     dr.ignored_fs = set("rootfs tmpfs autofs cgroup selinuxfs udev mqueue "
                         "nfsd proc sysfs devtmpfs hugetlbfs rpc_pipefs devpts "
-                        "securityfs debugfs binfmt_misc".split())
+                        "securityfs debugfs binfmt_misc fuse.gvfsd-fuse "
+                        "fuse.gvfs-fuse-daemon fusectl".split())
     print "Machine Name:", dr.getMachineName()
     print "OS Version:", dr.getOsVersion()
     print "Network Interfaces:", dr.getAllNetworkInterfaces()
