@@ -237,7 +237,8 @@ class LinuxDataRetriver(DataRetriverBase):
 
     def getDisksUsage(self):
         usages = list()
-        with open('/proc/mounts') as mounts:
+        try:
+            mounts = open('/proc/mounts', 'r')
             for mount in mounts:
                 try:
                     (device, path, fs) = mount.split()[:3]
@@ -251,6 +252,12 @@ class LinuxDataRetriver(DataRetriverBase):
                                        'used': used})
                 except:
                     logging.exception("Error retrieving disks usages.")
+            mounts.close()
+        except Exception:
+            logging.exception("Error during reading mounted devices")
+            if mounts:
+                mounts.close()
+
         return usages
 
     def getMemoryStats(self):
@@ -328,7 +335,7 @@ class LinuxVdsAgent(AgentLogicBase):
 
 
 def test():
-    import pprint
+    from pprint import pprint
     dr = LinuxDataRetriver()
     dr.app_list = "kernel kernel-headers aspell"
     dr.ignored_fs = set("rootfs tmpfs autofs cgroup selinuxfs udev mqueue "
@@ -337,12 +344,15 @@ def test():
                         "fuse.gvfs-fuse-daemon fusectl usbfs".split())
     print "Machine Name:", dr.getMachineName()
     print "OS Version:", dr.getOsVersion()
-    print "Network Interfaces:", dr.getAllNetworkInterfaces()
-    print "Installed Applications:", dr.getApplications()
+    print "Network Interfaces:",
+    pprint(dr.getAllNetworkInterfaces())
+    print "Installed Applications:",
+    pprint(dr.getApplications())
     print "Available RAM:", dr.getAvailableRAM()
     print "Logged in Users:", dr.getUsers()
     print "Active User:", dr.getActiveUser()
-    print "Disks Usage:", pprint.pprint(dr.getDisksUsage())
+    print "Disks Usage:",
+    pprint(dr.getDisksUsage())
     print "Memory Stats:", dr.getMemoryStats()
 
 if __name__ == '__main__':
