@@ -19,7 +19,7 @@
 import os
 import platform
 import time
-import sys
+import locale
 
 
 # avoid pep8 warnings
@@ -31,7 +31,6 @@ def import_json():
         import simplejson
         return simplejson
 json = import_json()
-
 
 # Set taken from http://www.w3.org/TR/xml11/#NT-RestrictedChar
 __RESTRICTED_CHARS = set(range(8 + 1)).union(
@@ -48,7 +47,7 @@ def _string_check(str):
     encodings will fail this and might get characters replaced.
     """
     try:
-        str.encode(sys.stdout.encoding, 'strict')
+        str.encode(locale.getpreferredencoding(), 'strict')
     except UnicodeError:
         try:
             return str.encode('ascii', 'replace')
