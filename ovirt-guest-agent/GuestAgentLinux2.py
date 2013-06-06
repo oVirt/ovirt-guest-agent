@@ -163,13 +163,16 @@ class CommandHandlerLinux:
     def logoff(self):
         pass
 
-    def shutdown(self, timeout, msg):
+    def shutdown(self, timeout, msg, reboot=False):
         # The shutdown command works with minutes while vdsm send value in
         # seconds, so we round up the value to minutes.
         delay = (int(timeout) + 59) / 60
-        cmd = ['/usr/share/ovirt-guest-agent/ovirt-shutdown', '-h',
+        param = '-r' if reboot else '-h'
+        cmd = ['/usr/share/ovirt-guest-agent/ovirt-shutdown', param,
                "+%d" % (delay), "\"%s\"" % (msg)]
-        logging.debug("Executing shutdown command: %s", cmd)
+
+        action = 'reboot' if reboot else 'shutdown'
+        logging.debug("Executing %s command: %s", action, cmd)
         subprocess.call(cmd)
 
     def hibernate(self, state):

@@ -200,10 +200,13 @@ class CommandHandlerWin:
         else:
             logging.debug("No active session. Ignoring log off command.")
 
-    def shutdown(self, timeout, msg):
-        cmd = "%s\\system32\\shutdown.exe -s -t %d -f -c \"%s\"" \
-            % (os.environ['WINDIR'], timeout, msg)
-        logging.debug("Executing shutdown command: '%s'", cmd)
+    def shutdown(self, timeout, msg, reboot=False):
+        param = '-r' if reboot else '-s'
+        cmd = "%s\\system32\\shutdown.exe %s -t %d -f -c \"%s\"" \
+            % (os.environ['WINDIR'], param, timeout, msg)
+
+        action = 'reboot' if reboot else 'shutdown'
+        logging.debug("Executing %s command: '%s'", action, cmd)
 
         # Since we're a 32-bit application that sometimes is executed on
         # Windows 64-bit, executing C:\Windows\system32\shutdown.exe is

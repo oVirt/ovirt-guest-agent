@@ -175,9 +175,15 @@ class AgentLogicBase:
                 msg = args['message']
             except:
                 msg = 'System is going down'
-            logging.info("Shutting down (timeout = %d, message = '%s')"
-                         % (timeout, msg))
-            self.commandHandler.shutdown(timeout, msg)
+            try:
+                reboot = args['reboot'].lower() == 'true'
+            except:
+                reboot = False
+
+            action = 'Rebooting' if reboot else 'Shutting down'
+            logging.info("%s (timeout = %d, message = '%s')"
+                         % (action, timeout, msg))
+            self.commandHandler.shutdown(timeout, msg, reboot)
         elif command == 'login':
             username = args['username'].encode('utf8')
             password = args['password'].encode('utf8')
