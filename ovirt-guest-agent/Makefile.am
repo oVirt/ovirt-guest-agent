@@ -13,7 +13,7 @@ agent_PYTHON= \
     ovirt-guest-agent.py \
     $(NULL)
 
-dist_agent_PYTHON=\
+noinst_PYTHON=\
     GuestAgentWin32.py \
     setup.py \
     version.py \
