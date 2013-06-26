@@ -20,6 +20,7 @@ import thread
 import time
 import logging
 import struct
+import socket
 from threading import Event
 from VirtIoChannel import VirtIoChannel
 
@@ -71,6 +72,9 @@ class DataRetriverBase:
     def getMemoryStats(self):
         pass
 
+    def getFQDN(self):
+        return socket.getfqdn()
+
 
 class AgentLogicBase:
 
@@ -109,6 +113,7 @@ class AgentLogicBase:
         self.sendInfo()
         self.sendUserInfo()
         self.sendAppList()
+        self.sendFQDN()
         counter = 0
         hbsecs = self.heartBitRate
         appsecs = self.appRefreshRate
@@ -198,6 +203,7 @@ class AgentLogicBase:
             self.sendAppList()
             self.sendInfo()
             self.sendDisksUsages()
+            self.sendFQDN()
         elif command == 'echo':
             logging.debug("Echo: %s", args)
             self.vio.write('echo', args)
@@ -207,6 +213,9 @@ class AgentLogicBase:
         else:
             logging.error("Unknown external command: %s (%s)"
                           % (command, args))
+
+    def sendFQDN(self):
+        self.vio.write('fqdn', {'fqdn': self.dr.getFQDN()})
 
     def sendUserInfo(self, force=False):
         cur_user = str(self.dr.getActiveUser())

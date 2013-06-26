@@ -346,6 +346,7 @@ def test():
                         "securityfs debugfs binfmt_misc fuse.gvfsd-fuse "
                         "fuse.gvfs-fuse-daemon fusectl usbfs".split())
     print "Machine Name:", dr.getMachineName()
+    print "Fully Qualified Domain Name:", dr.getFQDN()
     print "OS Version:", dr.getOsVersion()
     print "Network Interfaces:",
     pprint(dr.getAllNetworkInterfaces())

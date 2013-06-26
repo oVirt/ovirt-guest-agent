@@ -481,6 +481,7 @@ class WinVdsAgent(AgentLogicBase):
 def test():
     dr = WinDataRetriver()
     print "Machine Name:", dr.getMachineName()
+    print "Fully Qualified Domain Name:", dr.getFQDN()
     print "OS Version:", dr.getOsVersion()
     print "Network Interfaces:", dr.getAllNetworkInterfaces()
     print "Installed Applications:", dr.getApplications()
