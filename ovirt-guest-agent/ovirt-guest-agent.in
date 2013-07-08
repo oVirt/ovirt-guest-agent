@@ -72,7 +72,7 @@ case "$1" in
         ;;
 
     condrestart)
-        if [ -f ${pidfile} ] ; then
+        if [ -s ${pidfile} ] ; then
             stop
             start
         fi
