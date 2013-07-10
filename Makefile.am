@@ -27,6 +27,7 @@ EXTRA_DIST=                     \
     AUTHORS                     \
     README_Fedora.txt           \
     ovirt-guest-agent.spec      \
+    ovirt-guest-agent.rhel6.spec\
     m4/fhs.m4                   \
     debian                      \
     $(NULL)
