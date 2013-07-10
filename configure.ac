@@ -25,6 +25,11 @@ AC_ARG_WITH(sso,
                            [If single sign on modules should be built, default=yes]),
             sso=${withval}, sso=yes)
 AC_SUBST(sso)
+AC_ARG_WITH(dist,
+            AS_HELP_STRING([--with-dist],
+                           [This configuration is for distribution creation only, default=no]),
+            dist=${withval}, dist=yes)
+AC_SUBST(dist)
 AM_CONDITIONAL(BUILD_SSO_MODULES, [test -n "$sso" -a "x$sso" != xno ])
 
 dnl ---------------------------------------------------------------------------
@@ -33,11 +38,13 @@ dnl ---------------------------------------------------------------------------
 PKG_PROG_PKG_CONFIG
 
 if test "x$sso" == "xyes"; then
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h stdlib.h string.h sys/socket.h unistd.h])
+    if test "x$dist" == "xno"; then
+        AC_CHECK_HEADERS([arpa/inet.h fcntl.h stdlib.h string.h sys/socket.h unistd.h])
 
-AC_CHECK_FUNCS([memset select socket strchr strerror strndup])
+        AC_CHECK_FUNCS([memset select socket strchr strerror strndup])
 
-AC_CHECK_LIB([pam], [pam_get_user])
+        AC_CHECK_LIB([pam], [pam_get_user])
+    fi
 fi
 
 AC_TYPE_SIZE_T
@@ -81,23 +88,27 @@ if test "x$sso" == "xyes"; then
        GDM_SIMPLE_GREETER_REQUIRED="gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION"
     fi
 
+    if test "x$dist" == "xno"; then
     PKG_CHECK_MODULES(GDM_PLUGIN,
             dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
             $GDM_SIMPLE_GREETER_REQUIRED
             gobject-2.0 >= $GLIB_REQUIRED_VERSION
             gtk+-2.0 >= $GTK_REQUIRED_VERSION
     )
+    fi
     GDM_PLUGIN_LIBS="$GDM_PLUGIN_LIBS -lm"
     AC_SUBST(GDM_PLUGIN_CFLAGS)
     AC_SUBST(GDM_PLUGIN_LIBS)
 
     QT_REQUIRED_VERSION=4.6.2
 
+    if test "x$dist" == "xno"; then
     PKG_CHECK_MODULES(KDM_PLUGIN,
             QtCore >= $QT_REQUIRED_VERSION
             QtDBus >= $QT_REQUIRED_VERSION
             QtGui >= $QT_REQUIRED_VERSION
     )
+    fi
     KDM_PLUGIN_LIBS="$KDM_PLUGIN_LIBS -lm"
     AC_SUBST(KDM_PLUGIN_CFLAGS)
     AC_SUBST(KDM_PLUGIN_LIBS)
