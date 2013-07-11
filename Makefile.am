@@ -8,9 +8,17 @@ SUBDIRS =                \
 
 if BUILD_SSO_MODULES
 SUBDIRS +=               \
-    pam-ovirt-cred       \
+    pam-ovirt-cred
+endif
+
+if BUILD_GDM_MODULE
+SUBDIRS +=               \
     gdm-plugin           \
-    gdm2-plugin          \
+    gdm2-plugin
+endif
+
+if BUILD_KDM_MODULE
+SUBDIRS +=               \
     kdm-plugin
 endif
 

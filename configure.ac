@@ -30,6 +30,18 @@ AC_ARG_WITH(dist,
                            [This configuration is for distribution creation only, default=no]),
             dist=${withval}, dist=yes)
 AC_SUBST(dist)
+AC_ARG_WITH(gdm,
+            AS_HELP_STRING([--with-gdm],
+                           [Whether or not to build the single sign on GDM extension, default=yes]),
+            gdm=${withval}, gdm=$sso)
+AC_SUBST(gdm)
+AC_ARG_WITH(kdm,
+            AS_HELP_STRING([--with-kdm],
+                           [Whether or not to build the single sign on KDM extension, default=yes]),
+            kdm=${withval}, kdm=$sso)
+AC_SUBST(kdm)
+AM_CONDITIONAL(BUILD_GDM_MODULE, [test -n "$gdm" -a "x$gdm" != xno ])
+AM_CONDITIONAL(BUILD_KDM_MODULE, [test -n "$kdm" -a "x$kdm" != xno ])
 AM_CONDITIONAL(BUILD_SSO_MODULES, [test -n "$sso" -a "x$sso" != xno ])
 
 dnl ---------------------------------------------------------------------------
@@ -76,59 +88,62 @@ dnl - Dependencies
 dnl ---------------------------------------------------------------------------
 
 if test "x$sso" == "xyes"; then
-    DBUS_GLIB_REQUIRED_VERSION=0.74
-    GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
-    GLIB_REQUIRED_VERSION=2.22.0
-    GTK_REQUIRED_VERSION=2.18.0
+    if test "x$gdm" == "xyes"; then
+        DBUS_GLIB_REQUIRED_VERSION=0.74
+        GDM_SIMPLE_GREETER_REQUIRED_VERSION=3.2.1.1
+        GLIB_REQUIRED_VERSION=2.22.0
+        GTK_REQUIRED_VERSION=2.18.0
 
-    # A hack to ignore gdm-devel package when building gdm-2.
-    if ! test -z "$with_gdm_src_dir"; then
-       GDM_SIMPLE_GREETER_REQUIRED=""
-    else
-       GDM_SIMPLE_GREETER_REQUIRED="gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION"
+        # A hack to ignore gdm-devel package when building gdm-2.
+        if ! test -z "$with_gdm_src_dir"; then
+           GDM_SIMPLE_GREETER_REQUIRED=""
+        else
+           GDM_SIMPLE_GREETER_REQUIRED="gdmsimplegreeter >= $GDM_SIMPLE_GREETER_REQUIRED_VERSION"
+        fi
+
+        if test "x$dist" == "xno"; then
+        PKG_CHECK_MODULES(GDM_PLUGIN,
+                dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
+                $GDM_SIMPLE_GREETER_REQUIRED
+                gobject-2.0 >= $GLIB_REQUIRED_VERSION
+                gtk+-2.0 >= $GTK_REQUIRED_VERSION
+        )
+        fi
+        GDM_PLUGIN_LIBS="$GDM_PLUGIN_LIBS -lm"
+        AC_SUBST(GDM_PLUGIN_CFLAGS)
+        AC_SUBST(GDM_PLUGIN_LIBS)
     fi
 
-    if test "x$dist" == "xno"; then
-    PKG_CHECK_MODULES(GDM_PLUGIN,
-            dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
-            $GDM_SIMPLE_GREETER_REQUIRED
-            gobject-2.0 >= $GLIB_REQUIRED_VERSION
-            gtk+-2.0 >= $GTK_REQUIRED_VERSION
-    )
+    if test "x$kdm" == "xyes"; then
+        QT_REQUIRED_VERSION=4.6.2
+
+        if test "x$dist" == "xno"; then
+        PKG_CHECK_MODULES(KDM_PLUGIN,
+                QtCore >= $QT_REQUIRED_VERSION
+                QtDBus >= $QT_REQUIRED_VERSION
+                QtGui >= $QT_REQUIRED_VERSION
+        )
+        fi
+        KDM_PLUGIN_LIBS="$KDM_PLUGIN_LIBS -lm"
+        AC_SUBST(KDM_PLUGIN_CFLAGS)
+        AC_SUBST(KDM_PLUGIN_LIBS)
     fi
-    GDM_PLUGIN_LIBS="$GDM_PLUGIN_LIBS -lm"
-    AC_SUBST(GDM_PLUGIN_CFLAGS)
-    AC_SUBST(GDM_PLUGIN_LIBS)
-
-    QT_REQUIRED_VERSION=4.6.2
-
-    if test "x$dist" == "xno"; then
-    PKG_CHECK_MODULES(KDM_PLUGIN,
-            QtCore >= $QT_REQUIRED_VERSION
-            QtDBus >= $QT_REQUIRED_VERSION
-            QtGui >= $QT_REQUIRED_VERSION
-    )
-    fi
-    KDM_PLUGIN_LIBS="$KDM_PLUGIN_LIBS -lm"
-    AC_SUBST(KDM_PLUGIN_CFLAGS)
-    AC_SUBST(KDM_PLUGIN_LIBS)
-
     dnl ---------------------------------------------------------------------------
     dnl - Directory for GDM source package files
     dnl ---------------------------------------------------------------------------
+    if test "x$gdm" == "xyes"; then
+        AC_ARG_WITH(gdm-src-dir,
+                    AS_HELP_STRING([--with-gdm-src-dir=<dir>],
+                                   [GDM package source files directory]))
 
-    AC_ARG_WITH(gdm-src-dir,
-                AS_HELP_STRING([--with-gdm-src-dir=<dir>],
-                               [GDM package source files directory]))
+        if ! test -z "$with_gdm_src_dir"; then
+           GDM_SRC_DIR=$with_gdm_src_dir
+        else
+           GDM_SRC_DIR=
+        fi
 
-    if ! test -z "$with_gdm_src_dir"; then
-       GDM_SRC_DIR=$with_gdm_src_dir
-    else
-       GDM_SRC_DIR=
+        AC_SUBST(GDM_SRC_DIR)
     fi
-
-    AC_SUBST(GDM_SRC_DIR)
-
 fi # if sso enabled
 
 dnl ---------------------------------------------------------------------------
@@ -198,15 +213,23 @@ AC_CONFIG_FILES([
     windows-credprov/Makefile
 ])
 if test "x$sso" == "xyes"; then
-AC_CONFIG_FILES([
-    pam-ovirt-cred/Makefile
-    gdm-plugin/Makefile
-    gdm-plugin/icons/Makefile
-    gdm-plugin/icons/16x16/Makefile
-    gdm-plugin/icons/48x48/Makefile
-    gdm2-plugin/Makefile
-    kdm-plugin/Makefile
-])
+    AC_CONFIG_FILES([
+        pam-ovirt-cred/Makefile
+    ])
+    if test "x$gdm" == "xyes"; then
+        AC_CONFIG_FILES([
+            gdm-plugin/Makefile
+            gdm-plugin/icons/Makefile
+            gdm-plugin/icons/16x16/Makefile
+            gdm-plugin/icons/48x48/Makefile
+            gdm2-plugin/Makefile
+        ])
+    fi
+    if test "x$kdm" == "xyes"; then
+        AC_CONFIG_FILES([
+            kdm-plugin/Makefile
+        ])
+    fi
 fi
 
 AC_OUTPUT
