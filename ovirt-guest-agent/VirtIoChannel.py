@@ -20,6 +20,7 @@ import os
 import platform
 import time
 import locale
+import unicodedata
 
 
 # avoid pep8 warnings
@@ -32,12 +33,13 @@ def import_json():
         return simplejson
 json = import_json()
 
+__REPLACEMENT_CHAR = u'\ufffd'
 # Set taken from http://www.w3.org/TR/xml11/#NT-RestrictedChar
-__RESTRICTED_CHARS = set(range(8 + 1)).union(
-    set(range(0xB, 0xC + 1))).union(
-        set(range(0xE, 0x1F + 1))).union(
-            set(range(0x7F, 0x84 + 1))).union(
-                set(range(0x86, 0x9F + 1)))
+__RESTRICTED_CHARS = set(range(8 + 1))\
+    .union(set(range(0xB, 0xC + 1)))\
+    .union(set(range(0xE, 0x1F + 1)))\
+    .union(set(range(0x7F, 0x84 + 1)))\
+    .union(set(range(0x86, 0x9F + 1)))
 
 
 def _string_check(str):
@@ -54,22 +56,40 @@ def _string_check(str):
         except UnicodeError:
             # unrepresentable string
             return unicode()
-    return str
+    return unicode(str)
 
 
 def _filter_xml_chars(u):
     """
-    Filter out restricted xml chars from unicode string. Not using
-    Python's xmlcharrefreplace because it accepts '\x01', which
-    the spec frown upon.
+    The set of characters allowed in XML documents is described in
+    http://www.w3.org/TR/xml11/#charsets
+
+    "Char" is defined as any unicode character except the surrogate blocks,
+    \ufffe and \uffff.
+    "RestrictedChar" is defiend as the code points in __RESTRICTED_CHARS above
+
+    It's a little hard to follow, but the uposhot is an XML document must
+    contain only characters in Char that are not in RestrictedChar.
+
+    Note that Python's xmlcharrefreplace option is not relevant here -
+    that's about handling charaters which can't be encoded in a given charset
+    encoding, not which aren't permitted in XML.
     """
-    def mask_restricted(c):
-        if ord(c) in __RESTRICTED_CHARS:
-            return '?'
+    def filter_xml_char(c):
+        if ord(c) > 0x10ffff:
+            return __REPLACEMENT_CHAR  # Outside Unicode range
+        elif unicodedata.category(c) == 'Cs':
+            return __REPLACEMENT_CHAR  # Surrogate pair code point
+        elif ord(c) == 0xFFFE or ord(c) == 0xFFFF:
+            return __REPLACEMENT_CHAR  # Specifically excluded code points
+        elif ord(c) in __RESTRICTED_CHARS:
+            return __REPLACEMENT_CHAR
         else:
             return c
+    if not isinstance(u, unicode):
+        raise TypeError
 
-    return ''.join(mask_restricted(c) for c in u)
+    return ''.join(filter_xml_char(c) for c in u)
 
 
 def _filter_object(obj):
@@ -152,11 +172,6 @@ class VirtIoChannel:
         args['__name__'] = name
         args = _filter_object(args)
         message = (json.dumps(args) + '\n').encode('utf8')
-        filtered_message = _filter_xml_chars(message)
-        # Sanity check only, on purpose we're throwing away the string
-        # to ensure we've produced a decodable utf-8 string after filtering
-        filtered_message.decode('utf-8')
-        message = filtered_message
         while len(message) > 0:
             if self.is_windows:
                 written = self._vport.write(message)
