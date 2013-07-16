@@ -25,6 +25,7 @@ Requires: %{name}-common = %{version}-%{release}
 %package common
 Summary: Commonly used files of the oVirt Guest Agent
 BuildArch: noarch
+BuildRequires: python-pep8
 Requires: dbus-python
 Requires: rpm-python
 Requires: python-ethtool >= 0.4-1
@@ -58,6 +59,7 @@ Requires: gdm
 %package kdm-plugin
 Summary: KDM plug-in for the oVirt Guest Agent
 BuildRequires: kdebase-workspace-devel
+BuildRequires: gcc-c++
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-pam-module = %{version}-%{release}
 Requires: kdm

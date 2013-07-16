@@ -11,6 +11,7 @@ URL: http://wiki.ovirt.org/wiki/Category:Ovirt_guest_agent
 Source0: http://ovirt.org/releases/stable/src/%{name}-%{version}.tar.bz2
 BuildArch: noarch
 BuildRequires: python2-devel
+BuildRequires: python-pep8
 Requires: dbus-python
 Requires: rpm-python
 Requires: python-ethtool >= 0.4-1
