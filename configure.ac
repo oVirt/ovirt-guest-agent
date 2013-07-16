@@ -28,7 +28,7 @@ AC_SUBST(sso)
 AC_ARG_WITH(dist,
             AS_HELP_STRING([--with-dist],
                            [This configuration is for distribution creation only, default=no]),
-            dist=${withval}, dist=yes)
+            dist=${withval}, dist=no)
 AC_SUBST(dist)
 AC_ARG_WITH(gdm,
             AS_HELP_STRING([--with-gdm],
