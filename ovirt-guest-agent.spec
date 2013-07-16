@@ -46,6 +46,7 @@ Summary: PAM module for the oVirt Guest Agent
 Requires: %{name} = %{version}-%{release}
 Requires: pam
 
+%if 0%{?fedora} < 19
 %package gdm-plugin
 Summary: GDM plug-in for the oVirt Guest Agent
 BuildRequires: dbus-glib-devel
@@ -55,6 +56,7 @@ BuildRequires: gtk2-devel
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-pam-module = %{version}-%{release}
 Requires: gdm
+%endif
 
 %package kdm-plugin
 Summary: KDM plug-in for the oVirt Guest Agent
@@ -82,9 +84,11 @@ restart).
 The oVirt PAM module provides the functionality necessary to use the
 oVirt automatic log-in system.
 
+%if 0%{?fedora} < 19
 %description gdm-plugin
 The GDM plug-in provides the functionality necessary to use the
 oVirt automatic log-in system.
+%endif
 
 %description kdm-plugin
 The KDM plug-in provides the functionality necessary to use the
@@ -97,6 +101,9 @@ oVirt automatic log-in system.
 %configure \
     --enable-securedir=%{_moduledir} \
     --includedir=%{_includedir}/security \
+%if 0%{?fedora} >= 19
+    --without-gdm \
+%endif
     --with-pam-prefix=%{_sysconfdir}
 
 make %{?_smp_mflags}
@@ -196,7 +203,7 @@ fi
 %exclude %{_moduledir}/pam_ovirt_cred.a
 %exclude %{_moduledir}/pam_ovirt_cred.la
 
-
+%if 0%{?fedora} < 19
 %files gdm-plugin
 # This is intentionally NOT 'noreplace' If this is modified by an user,
 # this actually might break it.
@@ -208,10 +215,9 @@ fi
 # Unwanted files
 %exclude %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
 %exclude %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
+%endif
 
 %files kdm-plugin
-# This is intentionally NOT 'noreplace' If this is modified by an user,
-# this actually might break it.
 %config %{_sysconfdir}/pam.d/kdm-ovirtcred
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
