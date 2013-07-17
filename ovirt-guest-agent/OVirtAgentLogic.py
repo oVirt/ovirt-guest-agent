@@ -24,6 +24,27 @@ import socket
 from threading import Event
 from VirtIoChannel import VirtIoChannel
 
+_MAX_SUPPORTED_API_VERSION = 0
+_DISABLED_API_VALUE = 0
+
+_MESSAGE_MIN_API_VERSION = {
+    'active-user': 0,
+    'applications': 0,
+    'disks-usage': 0,
+    'echo': 0,
+    'fqdn': 0,
+    'heartbeat': 0,
+    'host-name': 0,
+    'memory-stats': 0,
+    'network-interfaces': 0,
+    'os-version': 0,
+    'session-lock': 0,
+    'session-logoff': 0,
+    'session-logon': 0,
+    'session-shutdown': 0,
+    'session-startup': 0,
+    'session-unlock': 0}
+
 
 # Return a safe (password masked) repr of the credentials block.
 def safe_creds_repr(creds):
@@ -36,6 +57,7 @@ def safe_creds_repr(creds):
 
 class DataRetriverBase:
     def __init__(self):
+        self.apiVersion = _DISABLED_API_VALUE
         self.memStats = {
             'mem_total': 0,
             'mem_free': 0,
@@ -44,6 +66,39 @@ class DataRetriverBase:
             'swap_out': 0,
             'pageflt': 0,
             'majflt': 0}
+
+    def onAPIVersionUpdated(self, oldVersion, newVersion):
+        pass
+
+    def getAPIVersion(self):
+        return self.apiVersion
+
+    def setAPIVersion(self, version):
+        oldVersion = self.apiVersion
+        try:
+            version = int(version)
+        except ValueError:
+            logging.info("Invalid api version value '%s' set. Version value "
+                         "not changed.", version)
+            return
+
+        if _MAX_SUPPORTED_API_VERSION < version:
+            logging.debug("API version requested (%d) higher than known (%d). "
+                          "Using max known version.", version,
+                          _MAX_SUPPORTED_API_VERSION)
+            version = _MAX_SUPPORTED_API_VERSION
+
+        if version == self.apiVersion:
+            logging.debug("API version %d already set, no update necessary",
+                          version)
+            return
+        self.apiVersion = version
+
+        logging.info("API Version updated from %d to %d", oldVersion, version)
+        try:
+            self.onAPIVersionUpdated(oldVersion, version)
+        except Exception:
+            logging.exception("onAPIVersionUpdated failed")
 
     def getMachineName(self):
         pass
@@ -91,6 +146,16 @@ class AgentLogicBase:
         self.dr = None
         self.commandHandler = None
 
+    def _send(self, name, arguments=None):
+        version = _MESSAGE_MIN_API_VERSION.get(name, None)
+        if version is None:
+            logging.error('Undocumented message "%s"', name)
+        elif version <= self.dr.getAPIVersion():
+            self.vio.write(name, arguments or {})
+        else:
+            logging.debug("Message %s not supported by api version %d.",
+                          name, self.dr.getAPIVersion())
+
     def run(self):
         logging.debug("AgentLogicBase:: run() entered")
         thread.start_new_thread(self.doListen, ())
@@ -125,9 +190,10 @@ class AgentLogicBase:
                 counter += 1
                 hbsecs -= 1
                 if hbsecs <= 0:
-                    self.vio.write('heartbeat',
-                                   {'free-ram': self.dr.getAvailableRAM(),
-                                    'memory-stat': self.dr.getMemoryStats()})
+                    self._send('heartbeat',
+                               {'free-ram': self.dr.getAvailableRAM(),
+                                'memory-stat': self.dr.getMemoryStats(),
+                                'apiVersion': _MAX_SUPPORTED_API_VERSION})
                     hbsecs = self.heartBitRate
                 usersecs -= 1
                 if usersecs <= 0:
@@ -165,12 +231,17 @@ class AgentLogicBase:
                                   'channel.')
         logging.debug("AgentLogicBase::doListen() - exiting")
 
+    def _onApiVersion(self, args):
+        self.dr.setAPIVersion(args['apiVersion'])
+
     def parseCommand(self, command, args):
         logging.info("Received an external command: %s..." % (command))
         if command == 'lock-screen':
             self.commandHandler.lock_screen()
         elif command == 'log-off':
             self.commandHandler.logoff()
+        elif command == 'api-version':
+            self._onApiVersion(args)
         elif command == 'shutdown':
             try:
                 timeout = int(args['timeout'])
@@ -201,6 +272,10 @@ class AgentLogicBase:
                           % (safe_creds_repr(credentials)))
             self.commandHandler.login(credentials)
         elif command == 'refresh':
+            if not 'apiVersion' in args and self.dr.getAPIVersion() > 0:
+                logging.info('API versioning not supported by VDSM. Disabling '
+                             'versioning support.')
+                self.dr.setAPIVersion(_DISABLED_API_VALUE)
             self.sendUserInfo(True)
             self.sendAppList()
             self.sendInfo()
@@ -208,7 +283,7 @@ class AgentLogicBase:
             self.sendFQDN()
         elif command == 'echo':
             logging.debug("Echo: %s", args)
-            self.vio.write('echo', args)
+            self._send('echo', args)
         elif command == 'hibernate':
             state = args.get('state', 'disk')
             self.commandHandler.hibernate(state)
@@ -217,31 +292,30 @@ class AgentLogicBase:
                           % (command, args))
 
     def sendFQDN(self):
-        self.vio.write('fqdn', {'fqdn': self.dr.getFQDN()})
+        self._send('fqdn', {'fqdn': self.dr.getFQDN()})
 
     def sendUserInfo(self, force=False):
         cur_user = str(self.dr.getActiveUser())
         logging.debug("AgentLogicBase::sendUserInfo - cur_user = '%s'" %
                       (cur_user))
         if cur_user != self.activeUser or force:
-            self.vio.write('active-user', {'name': cur_user})
+            self._send('active-user', {'name': cur_user})
             self.activeUser = cur_user
 
     def sendInfo(self):
-        self.vio.write('host-name', {'name': self.dr.getMachineName()})
-        self.vio.write('os-version', {'version': self.dr.getOsVersion()})
-        self.vio.write('network-interfaces',
-                       {'interfaces': self.dr.getAllNetworkInterfaces()})
+        self._send('host-name', {'name': self.dr.getMachineName()})
+        self._send('os-version', {'version': self.dr.getOsVersion()})
+        self._send('network-interfaces',
+                   {'interfaces': self.dr.getAllNetworkInterfaces()})
 
     def sendAppList(self):
-        self.vio.write('applications',
-                       {'applications': self.dr.getApplications()})
+        self._send('applications', {'applications': self.dr.getApplications()})
 
     def sendDisksUsages(self):
-        self.vio.write('disks-usage', {'disks': self.dr.getDisksUsage()})
+        self._send('disks-usage', {'disks': self.dr.getDisksUsage()})
 
     def sendMemoryStats(self):
-        self.vio.write('memory-stats', {'memory': self.dr.getMemoryStats()})
+        self._send('memory-stats', {'memory': self.dr.getMemoryStats()})
 
     def sessionLogon(self):
         logging.debug("AgentLogicBase::sessionLogon: user logs on the system.")
@@ -252,29 +326,29 @@ class AgentLogicBase:
             cur_user = self.dr.getActiveUser()
             retries = retries + 1
         self.sendUserInfo()
-        self.vio.write('session-logon')
+        self._send('session-logon')
 
     def sessionLogoff(self):
         logging.debug("AgentLogicBase::sessionLogoff: "
                       "user logs off from the system.")
         self.activeUser = 'None'
-        self.vio.write('session-logoff')
-        self.vio.write('active-user', {'name': self.activeUser})
+        self._send('session-logoff')
+        self._send('active-user', {'name': self.activeUser})
 
     def sessionLock(self):
         logging.debug("AgentLogicBase::sessionLock: "
                       "user locks the workstation.")
-        self.vio.write('session-lock')
+        self._send('session-lock')
 
     def sessionUnlock(self):
         logging.debug("AgentLogicBase::sessionUnlock: "
                       "user unlocks the workstation.")
-        self.vio.write('session-unlock')
+        self._send('session-unlock')
 
     def sessionStartup(self):
         logging.debug("AgentLogicBase::sessionStartup: system starts up.")
-        self.vio.write('session-startup')
+        self._send('session-startup')
 
     def sessionShutdown(self):
         logging.debug("AgentLogicBase::sessionShutdown: system shuts down.")
-        self.vio.write('session-shutdown')
+        self._send('session-shutdown')
