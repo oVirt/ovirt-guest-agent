@@ -56,6 +56,10 @@ class FunctionalTest(GuestAgentTestCase):
 
         self.vdsAgent = agent_class(self._config)
 
+    def testRefresh(self):
+        self._validator.verifyRefreshReply(self.vdsAgent)
+        self._validator.verifyRefreshReply2(self.vdsAgent)
+
     def testSendInfo(self):
         self._validator.verifySendInfo(self.vdsAgent)
 
@@ -91,3 +95,9 @@ class FunctionalTest(GuestAgentTestCase):
 
     def testSessionShutdown(self):
         self._validator.verifySessionShutdown(self.vdsAgent)
+
+    def testAPIVersion(self):
+        self._validator.verifyAPIVersion(self.vdsAgent)
+
+    def testAPIVersion2(self):
+        self._validator.verifyAPIVersion2(self.vdsAgent)

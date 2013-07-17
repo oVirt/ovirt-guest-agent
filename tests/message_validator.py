@@ -5,6 +5,7 @@
 import test_port
 import json
 import logging
+import OVirtAgentLogic
 
 
 class TestPortWriteBuffer(test_port.TestPort):
@@ -23,19 +24,39 @@ class TestPortWriteBuffer(test_port.TestPort):
         self._buffer = ''
 
 
+def _ensure_no_messages(f):
+    def fun(self, *args, **kwargs):
+        result = f(self, *args, **kwargs)
+        parsed = self._get_messages()
+        assert(len(parsed) == 0)
+        return result
+    return fun
+
+
+def assertIn(m, n):
+    if not m in n:
+        raise Exception("%s not in %s" % (m, str(n)))
+
+
+def assertEqual(a, b, msg=None):
+    if a != b:
+        raise Exception(msg or '%s != %s' % (str(a), str(b)))
+
+
 def _ensure_messages(*messages):
     def wrapped(f):
         def fun(self, *args, **kwargs):
             result = f(self, *args, **kwargs)
             names = []
             parsed = self._get_messages()
-            assert(len(parsed) == len(messages))
             for m in parsed:
-                assert('__name__' in m)
+                assertIn('__name__', m)
                 names.append(m['__name__'])
                 self._check(m)
             for m in messages:
-                assert(m in names)
+                assertIn(m, names)
+            for n in names:
+                assertIn(n, messages)
             return result
         return fun
     return wrapped
@@ -66,6 +87,13 @@ def _name_and_one_str_param(msg_name, param_name):
     def wrapped(o):
         assert(o['__name__'] == msg_name)
         assert_string_param(o, param_name)
+    return wrapped
+
+
+def _name_and_one_integral_param(msg_name, param_name):
+    def wrapped(o):
+        assert(o['__name__'] == msg_name)
+        assert_integral_param(o, param_name)
     return wrapped
 
 
@@ -134,6 +162,7 @@ _MSG_VALIDATORS = {
     'session-shutdown': _name_only('session-shutdown'),
     'session-startup': _name_only('session-startup'),
     'session-unlock': _name_only('session-unlock'),
+    'api-version': _name_and_one_integral_param('api-version', 'apiVersion')
 }
 
 
@@ -208,3 +237,36 @@ class MessageValidator(object):
     @_ensure_messages('session-shutdown')
     def verifySessionShutdown(self, agent):
         agent.sessionShutdown()
+
+    def verifyAPIVersion(self, agent):
+        # If not yet activated, monkey patch to support the versioning
+        if OVirtAgentLogic._MAX_SUPPORTED_API_VERSION == 0:
+            OVirtAgentLogic._MAX_SUPPORTED_API_VERSION = 1
+        # Pretend VDSM told us it would support a higher version
+        useVersion = OVirtAgentLogic._MAX_SUPPORTED_API_VERSION + 1
+        agent._onApiVersion({'apiVersion': useVersion})
+
+    def verifyAPIVersion2(self, agent):
+        if OVirtAgentLogic._MAX_SUPPORTED_API_VERSION == 0:
+            OVirtAgentLogic._MAX_SUPPORTED_API_VERSION = 1
+        # Pretend VDSM told us nothing or 0
+        agent.dr.setAPIVersion(0)
+
+    @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
+                      'network-interfaces', 'disks-usage', 'fqdn')
+    def verifyRefreshReply(self, agent):
+        # If not yet activated, monkey patch to support the versioning
+        if OVirtAgentLogic._MAX_SUPPORTED_API_VERSION == 0:
+            OVirtAgentLogic._MAX_SUPPORTED_API_VERSION = 1
+        agent.dr.setAPIVersion(1)
+        assert(agent.dr.getAPIVersion() == 1)
+        agent.parseCommand('refresh', {'apiVersion': 1})
+        assert(agent.dr.getAPIVersion() == 1)
+
+    @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
+                      'network-interfaces', 'disks-usage', 'fqdn')
+    def verifyRefreshReply2(self, agent):
+        agent.dr.setAPIVersion(1)
+        assert(agent.dr.getAPIVersion() == 1)
+        agent.parseCommand('refresh', {})
+        assert(agent.dr.getAPIVersion() == 0)
