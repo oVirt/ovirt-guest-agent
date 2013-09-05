@@ -2,7 +2,14 @@ Source: ovirt-guest-agent
 Section: utils
 Priority: extra
 Maintainer: Vinzenz Feenstra <evilissimo@redhat.com>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev, libtool, pep8, autoconf, python
+Build-Depends: debhelper (>= 8.0.0),
+ autoconf,
+ automake,
+ autotools-dev,
+ libtool,
+ pep8,
+ pkg-config,
+ python
 Standards-Version: 3.9.3
 Homepage: http://www.ovirt.org/Ovirt_guest_agent
 #Vcs-Git: git://git.debian.org/collab-maint/ovirt-guest-agent.git
