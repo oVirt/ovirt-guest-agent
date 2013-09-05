@@ -210,6 +210,7 @@ AC_CONFIG_FILES([
     ovirt-guest-agent/ovirt-guest-agent
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
+    tests/Makefile
     windows-credprov/Makefile
 ])
 if test "x$sso" == "xyes"; then

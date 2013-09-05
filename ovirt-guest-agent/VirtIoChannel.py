@@ -111,25 +111,48 @@ def _filter_object(obj):
     return filt(obj)
 
 
-class VirtIoChannel:
-
+class VirtIoStream(object):
     # Python on Windows 7 returns 'Microsoft' rather than 'Windows' as
     # documented.
     is_windows = platform.system() in ['Windows', 'Microsoft']
+    is_test = False
 
     def __init__(self, vport_name):
-        if self.is_windows:
+        if self.is_test:
+            from test_port import get_test_port
+            self._vport = get_test_port(vport_name)
+            self._read = self._vport.read
+            self._write = self._vport.write
+        elif self.is_windows:
             from WinFile import WinFile
             self._vport = WinFile(vport_name)
+            self._read = self._vport.read
+            self._write = self._vport.write
         else:
             self._vport = os.open(vport_name, os.O_RDWR)
+            self._read = self._os_read
+            self._write = self._os_write
+
+    def _os_read(self, size):
+        return os.read(self._vport, size)
+
+    def _os_write(self, buffer):
+        return os.write(self._vport, buffer)
+
+    def read(self, size):
+        return self._read(size)
+
+    def write(self, buffer):
+        return self._write(buffer)
+
+
+class VirtIoChannel:
+    def __init__(self, vport_name):
+        self._stream = VirtIoStream(vport_name)
         self._buffer = ''
 
     def _readbuffer(self):
-        if self.is_windows:
-            buffer = self._vport.read(4096)
-        else:
-            buffer = os.read(self._vport, 4096)
+        buffer = self._stream.read(4096)
         if buffer:
             self._buffer += buffer
         else:
@@ -173,10 +196,7 @@ class VirtIoChannel:
         args = _filter_object(args)
         message = (json.dumps(args) + '\n').encode('utf8')
         while len(message) > 0:
-            if self.is_windows:
-                written = self._vport.write(message)
-            else:
-                written = os.write(self._vport, message)
+            written = self._stream.write(message)
             message = message[written:]
 
 
