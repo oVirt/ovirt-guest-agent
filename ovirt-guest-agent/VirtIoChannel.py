@@ -19,6 +19,7 @@
 import os
 import platform
 import time
+import locale
 import unicodedata
 
 
@@ -39,6 +40,23 @@ __RESTRICTED_CHARS = set(range(8 + 1))\
     .union(set(range(0xE, 0x1F + 1)))\
     .union(set(range(0x7F, 0x84 + 1)))\
     .union(set(range(0x86, 0x9F + 1)))
+
+
+def _string_check(str):
+    """
+    This function tries to convert the given string to a valid representable
+    form. Normal and valid unicode strings should not fail this test. Invalid
+    encodings will fail this and might get characters replaced.
+    """
+    try:
+        str.encode(locale.getpreferredencoding(), 'strict')
+    except UnicodeError:
+        try:
+            return str.encode('ascii', 'replace')
+        except UnicodeError:
+            # unrepresentable string
+            return unicode()
+    return unicode(str)
 
 
 def _filter_xml_chars(u):
@@ -76,7 +94,7 @@ def _filter_xml_chars(u):
 
 def _filter_object(obj):
     """
-    Apply _filter_xml_chars on all strings in the given
+    Apply _filter_xml_chars and _string_check on all strings in the given
     object
     """
     def filt(o):
@@ -87,7 +105,7 @@ def _filter_object(obj):
         if isinstance(o, tuple):
             return tuple(map(filt, o))
         if isinstance(o, basestring):
-            return _filter_xml_chars(o)
+            return _filter_xml_chars(_string_check(o))
         return o
 
     return filt(obj)
