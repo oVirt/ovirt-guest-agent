@@ -42,21 +42,20 @@ __RESTRICTED_CHARS = set(range(8 + 1))\
     .union(set(range(0x86, 0x9F + 1)))
 
 
-def _string_check(str):
+def _string_convert(str):
     """
-    This function tries to convert the given string to a valid representable
-    form. Normal and valid unicode strings should not fail this test. Invalid
-    encodings will fail this and might get characters replaced.
+    This function tries to convert the given string to an unicode string
     """
+    if isinstance(str, unicode):
+        return str
     try:
-        str.encode(locale.getpreferredencoding(), 'strict')
+        return str.decode(locale.getpreferredencoding(), 'strict')
     except UnicodeError:
         try:
-            return str.encode('ascii', 'replace')
+            return str.decode(locale.getpreferredencoding(), 'replace')
         except UnicodeError:
             # unrepresentable string
-            return unicode()
-    return unicode(str)
+            return u'????'
 
 
 def _filter_xml_chars(u):
@@ -105,7 +104,7 @@ def _filter_object(obj):
         if isinstance(o, tuple):
             return tuple(map(filt, o))
         if isinstance(o, basestring):
-            return _filter_xml_chars(_string_check(o))
+            return _filter_xml_chars(_string_convert(o))
         return o
 
     return filt(obj)
