@@ -185,7 +185,9 @@ class AgentLogicBase:
             except:
                 reboot = False
 
-            action = 'Rebooting' if reboot else 'Shutting down'
+            action = 'Shutting down'
+            if reboot:
+                action = 'Rebooting'
             logging.info("%s (timeout = %d, message = '%s')"
                          % (action, timeout, msg))
             self.commandHandler.shutdown(timeout, msg, reboot)

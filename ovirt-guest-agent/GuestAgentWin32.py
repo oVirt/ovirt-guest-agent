@@ -201,11 +201,15 @@ class CommandHandlerWin:
             logging.debug("No active session. Ignoring log off command.")
 
     def shutdown(self, timeout, msg, reboot=False):
-        param = '-r' if reboot else '-s'
+        param = '-s'
+        action = 'shutdown'
+        if reboot:
+            param = '-r'
+            action = 'reboot'
+
         cmd = "%s\\system32\\shutdown.exe %s -t %d -f -c \"%s\"" \
             % (os.environ['WINDIR'], param, timeout, msg)
 
-        action = 'reboot' if reboot else 'shutdown'
         logging.debug("Executing %s command: '%s'", action, cmd)
 
         # Since we're a 32-bit application that sometimes is executed on

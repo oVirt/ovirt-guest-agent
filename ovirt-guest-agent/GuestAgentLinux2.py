@@ -167,11 +167,14 @@ class CommandHandlerLinux:
         # The shutdown command works with minutes while vdsm send value in
         # seconds, so we round up the value to minutes.
         delay = (int(timeout) + 59) / 60
-        param = '-r' if reboot else '-h'
+        param = '-h'
+        action = 'shutdown'
+        if reboot:
+            param = '-r'
+            action = 'reboot'
         cmd = ['/usr/share/ovirt-guest-agent/ovirt-shutdown', param,
                "+%d" % (delay), "\"%s\"" % (msg)]
 
-        action = 'reboot' if reboot else 'shutdown'
         logging.debug("Executing %s command: %s", action, cmd)
         subprocess.call(cmd)
 
