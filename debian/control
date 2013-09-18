@@ -17,7 +17,11 @@ Homepage: http://www.ovirt.org/Ovirt_guest_agent
 
 Package: ovirt-guest-agent
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, usermode, python-ethtool, python-dbus
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
+ python-apt,
+ python-dbus,
+ python-ethtool,
+ usermode
 Description: oVirt Guest Agent
  This is the oVirt management agent running inside the guest. The agent
  interfaces with the oVirt manager, supplying heart-beat info as well as
