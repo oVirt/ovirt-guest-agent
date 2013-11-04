@@ -420,6 +420,24 @@ class WinDataRetriver(DataRetriverBase):
             logging.exception("Error retrieving disks usages.")
         return usages
 
+    def _getSwapStats(self):
+        try:
+            strComputer = "."
+            objWMIService = \
+                win32com.client.Dispatch("WbemScripting.SWbemLocator")
+            objSWbemServices = \
+                objWMIService.ConnectServer(strComputer, "root\cimv2")
+            colItems = \
+                objSWbemServices.ExecQuery(
+                    "SELECT * FROM Win32_PageFileUsage")
+            for objItem in colItems:
+                # Keep the unit consistent with Linux guests (KiB)
+                self.memStats['swap_usage'] = objItem.CurrentUsage * 1024
+                self.memStats['swap_total'] = objItem.AllocatedBaseSize * 1024
+        except Exception:
+            logging.exception("Failed to retrieve page file stats")
+            pass
+
     def getMemoryStats(self):
         pi = get_perf_info()
         # keep the unit consistent with Linux guests
@@ -447,6 +465,7 @@ class WinDataRetriver(DataRetriverBase):
                 self.memStats['majflt'] = objItem.PageReadsPersec
         except:
             logging.exception("Error retrieving detailed memory stats")
+        self._getSwapStats()
         return self.memStats
 
 

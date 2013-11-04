@@ -284,7 +284,7 @@ class LinuxDataRetriver(DataRetriverBase):
 
     def _get_meminfo(self):
         fields = {'MemTotal:': 0, 'MemFree:': 0, 'Buffers:': 0,
-                  'Cached:': 0}
+                  'Cached:': 0, 'SwapFree:': 0, 'SwapTotal:': 0}
         free = 0
         for line in open('/proc/meminfo'):
             (key, value) = line.strip().split()[0:2]
@@ -292,9 +292,13 @@ class LinuxDataRetriver(DataRetriverBase):
                 fields[key] = int(value)
             if key in ('MemFree:', 'Buffers:', 'Cached:'):
                 free += int(value)
+
         self.memStats['mem_total'] = fields['MemTotal:']
         self.memStats['mem_unused'] = fields['MemFree:']
         self.memStats['mem_free'] = free
+        swap_used = fields['SwapTotal:'] - fields['SwapFree:']
+        self.memStats['swap_usage'] = swap_used
+        self.memStats['swap_total'] = fields['SwapTotal:']
 
     def _get_vmstat(self):
         """
