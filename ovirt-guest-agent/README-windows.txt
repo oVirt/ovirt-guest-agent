@@ -32,7 +32,7 @@ right configuration location.
 Running the service:
 --------------------
 
-> python OVirtGuestService.py -install
+> python OVirtGuestService.py install
 > net start OVirtGuestService
 
 Building executable file:
