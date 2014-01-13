@@ -60,7 +60,10 @@ class WinFile(object):
         return buf[:nr]
 
     def write(self, s):
-        win32file.WriteFile(self._hfile, s, self._write_ovrlpd)
-        return win32file.GetOverlappedResult(self._hfile,
-                                             self._write_ovrlpd,
-                                             True)
+        try:
+            win32file.WriteFile(self._hfile, s, self._write_ovrlpd)
+            return win32file.GetOverlappedResult(self._hfile,
+                                                 self._write_ovrlpd,
+                                                 True)
+        except:
+            return 0
