@@ -18,6 +18,7 @@ Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
+Requires: qemu-guest-agent
 
 Conflicts: rhev-agent
 Conflicts: rhevm-guest-agent

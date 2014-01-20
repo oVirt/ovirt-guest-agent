@@ -28,6 +28,7 @@ BuildArch: noarch
 BuildRequires: python-pep8
 Requires: dbus-python
 Requires: rpm-python
+Requires: qemu-guest-agent
 Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
