@@ -5,7 +5,7 @@
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.8
+Version: 1.0.9
 Release: %{release_version}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -223,6 +223,12 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Mon Jan 20 2014 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.9-1
+- Report swap usage of guests
+- Updated pam conversation approach
+- Python 2.4 compatability fix
+- Some build fixes applied
+
 * Thu Jul 11 2013 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.8-1
 - Pep8 rules applied on python files
 - Call restorecon on pidfile

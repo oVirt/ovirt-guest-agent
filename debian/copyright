@@ -1,9 +1,9 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ovirt-guest-agent
-Source: http://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.8/ovirt-guest-agent-1.0.8.tar.bz2
+Source: http://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.9/ovirt-guest-agent-1.0.9.tar.bz2
 
 Files: *
-Copyright: 2009-2013 Red Hat, Inc. and/or its affiliates
+Copyright: 2009-2014 Red Hat, Inc. and/or its affiliates
 License: Apache
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

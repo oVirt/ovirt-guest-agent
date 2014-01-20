@@ -1,3 +1,8 @@
+ovirt-guest-agent (1.0.9-1) quantal; urgency=low
+
+  * Bump to ovirt-guest-agent 1.0.9
+
+ -- Vinzenz Feenstra <evilissimo@redhat.com>  Wed, 19 Jun 2013 11:08:14 +0200
 ovirt-guest-agent (1.0.8-1) quantal; urgency=low
 
   * Initial release of the ovirt-guest-agent for Ubuntu
