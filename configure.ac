@@ -13,6 +13,7 @@ AC_CONFIG_MACRO_DIR([m4])
 DEFINE_FHS
 AC_PROG_CC
 AC_PROG_CXX
+m4_pattern_allow([AM_PROG_AR])
 AM_PROG_AR
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
@@ -77,11 +78,13 @@ AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_sy
 dnl ---------------------------------------------------------------------------
 dnl Checking for pep8
 dnl ---------------------------------------------------------------------------
+HAVE_PEP8="yes"
 AC_PATH_PROG([PEP8], [pep8])
 if test "x$PEP8" = "x"; then
   AC_MSG_WARN([python-pep8 not found])
+  HAVE_PEP8="no"
 fi
-
+AM_CONDITIONAL(HAVE_PEP8, [ test -n "$HAVE_PEP8" -a "x$HAVE_PEP8" != xno ])
 
 dnl ---------------------------------------------------------------------------
 dnl - Dependencies

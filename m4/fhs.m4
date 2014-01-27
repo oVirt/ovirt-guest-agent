@@ -64,10 +64,8 @@ AC_DEFUN([DEFINE_FHS],[
 
     if test -d /var/lock/subsys; then
         AC_SUBST([lock_dir],   ['/var/lock/subsys'])
-    elif test -d /var/lock; then
-        AC_SUBST([lock_dir],   ['/var/lock'])
     else
-        AC_MSG_ERROR([This system does not seem to have a /var/lock directory.])
+        AC_SUBST([lock_dir],   ['/var/lock'])
     fi
 ])
 

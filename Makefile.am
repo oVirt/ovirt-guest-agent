@@ -58,6 +58,9 @@ PEP8_WHITELIST = \
 
 PEP8_BLACKLIST = ovirt-guest-agent/setup.py
 
+# Only execute the PEP8 checks if it was found
+# If pep8 couldn't be located don't execute this
+if HAVE_PEP8
 check-local:
 	$(PEP8) --exclude="$(PEP8_BLACKLIST)" --filename '*.py,*.py.in' \
 		$(PEP8_WHITELIST)
@@ -68,7 +71,7 @@ check-local:
 			fi; \
 		done; \
 	fi;
-
+endif
 
 install-exec-hook:
 	$(MKDIR_P) $(DESTDIR)/$(pkgdatadir)
