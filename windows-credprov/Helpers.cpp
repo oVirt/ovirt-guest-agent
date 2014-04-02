@@ -11,7 +11,7 @@
 
 #include "Pch.h"
 
-#include "helpers.h"
+#include "Helpers.h"
 
 #define SECURITY_WIN32
 #include <security.h>

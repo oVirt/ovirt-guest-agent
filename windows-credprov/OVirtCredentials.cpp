@@ -1,6 +1,5 @@
 
 #include "Pch.h"
-
 #include "OVirtCredProv.h"
 #include "OVirtCredentials.h"
 #include "Helpers.h"

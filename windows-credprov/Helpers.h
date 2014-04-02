@@ -21,6 +21,7 @@
 #include <shlwapi.h>
 #pragma warning(pop)
 
+#define __inout_bcount(x)
 
 
 //makes a copy of a field descriptor using CoTaskMemAlloc

@@ -1,0 +1,26 @@
+How to produce the credentialprovider.h
+=======================================
+
+The credentials provider header file has been generated from the IDL file
+provided in the Windows SDK
+
+Which can be retrieved from this (ca 1.4 GiB) ISO:
+
+http://www.microsoft.com/en-us/download/details.aspx?id=18950
+
+The IDL file is located on the ISO in /Setup/WinSDKBuild/cab2.cab and is called
+credentialprovider.idl
+
+The header file has been generated on Fedora with help of the following packags:
+
+- wine-devel
+- mingw-w64-tools
+
+The command to produce the header file from the IDL file is the following:
+$ x86_64-w64-mingw32-widl -I /usr/include/wine/windows/ -h ./credentialprovider.idl -o credentialprovider.h
+
+
+Where to get the intsafe.h header
+=================================
+
+https://svn.reactos.org/svn/reactos/trunk/reactos/sdk/include/psdk/

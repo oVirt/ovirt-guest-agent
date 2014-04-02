@@ -3,6 +3,22 @@
 
 #include <credentialprovider.h>
 
+#ifndef __in
+#define __in
+#endif
+#ifndef __out
+#define __out
+#endif
+#ifndef __deref_out
+#define __deref_out
+#endif
+#ifndef __out_range
+#define __out_range(x,y)
+#endif
+#ifndef __deref_out_opt
+#define __deref_out_opt
+#endif
+
 class OVirtCredentials : public ICredentialProviderCredential
 {
 	public:

@@ -5,6 +5,13 @@
 
 #include "CredentialsChannel.h"
 
+#ifndef __in
+#define __in
+#endif
+#ifndef __deref_out
+#define __deref_out
+#endif
+
 class OVirtCredentials;
 
 class OVirtProvider : public ICredentialProvider, public CredChannelListener

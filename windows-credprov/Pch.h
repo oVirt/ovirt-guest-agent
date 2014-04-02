@@ -14,6 +14,6 @@
 #define ASSERT(x) assert(x)
 #define VERIFY(x) ASSERT(x)
 #else
-#define ASSERT(x) __noop
+#define ASSERT(x)
 #define VERIFY(x) (x)
 #endif

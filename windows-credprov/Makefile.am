@@ -16,10 +16,12 @@
 
 EXTRA_DIST= \
     afxres.h \
+    credentialprovider.h \
     CredentialsChannel.cpp \
     CredentialsChannel.h \
     Helpers.cpp \
     Helpers.h \
+    intsafe.h \
     OVirtCredentials.cpp \
     OVirtCredentials.h \
     OVirtCredProv.cpp \
