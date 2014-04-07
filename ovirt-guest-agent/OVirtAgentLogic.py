@@ -21,10 +21,21 @@ import time
 import logging
 import struct
 import socket
+
+multiproc = None
+try:
+    import multiprocessing
+    multiproc = multiprocessing
+except ImportError:
+    class MultiProcessingFake:
+        def cpu_count(self):
+            return -1
+    multiproc = MultiProcessingFake()
+
 from threading import Event
 from VirtIoChannel import VirtIoChannel
 
-_MAX_SUPPORTED_API_VERSION = 0
+_MAX_SUPPORTED_API_VERSION = 1
 _DISABLED_API_VALUE = 0
 
 _MESSAGE_MIN_API_VERSION = {
@@ -37,6 +48,7 @@ _MESSAGE_MIN_API_VERSION = {
     'host-name': 0,
     'memory-stats': 0,
     'network-interfaces': 0,
+    'number-of-cpus': 1,
     'os-version': 0,
     'session-lock': 0,
     'session-logoff': 0,
@@ -130,6 +142,16 @@ class DataRetriverBase:
     def getFQDN(self):
         return socket.getfqdn()
 
+    def getNumberOfCPUs(self):
+        """
+        Reports the number of CPUs or -1 if this was not implemented for the
+        current OS/Platform
+        """
+        try:
+            return multiproc.cpu_count()
+        except NotImplementedError:
+            return -1
+
 
 class AgentLogicBase:
 
@@ -141,6 +163,7 @@ class AgentLogicBase:
         self.appRefreshRate = config.getint("general",
                                             "report_application_rate")
         self.disksRefreshRate = config.getint("general", "report_disk_usage")
+        self.numCPUsCheckRate = config.getint("general", "report_num_cpu_rate")
         self.activeUser = ""
         self.vio = VirtIoChannel(config.get("virtio", "device"))
         self.dr = None
@@ -184,6 +207,7 @@ class AgentLogicBase:
         appsecs = self.appRefreshRate
         disksecs = self.disksRefreshRate
         usersecs = self.userCheckRate
+        numcpusecs = self.numCPUsCheckRate
 
         try:
             while not self.wait_stop.isSet():
@@ -208,6 +232,10 @@ class AgentLogicBase:
                 if disksecs <= 0:
                     self.sendDisksUsages()
                     disksecs = self.disksRefreshRate
+                numcpusecs -= 1
+                if numcpusecs <= 0:
+                    self.sendNumberOfCPUs()
+                    numcpusecs = self.numCPUsCheckRate
                 time.sleep(1)
             logging.debug("AgentLogicBase:: doWork() exiting")
         except:
@@ -316,6 +344,9 @@ class AgentLogicBase:
 
     def sendMemoryStats(self):
         self._send('memory-stats', {'memory': self.dr.getMemoryStats()})
+
+    def sendNumberOfCPUs(self):
+        self._send('number-of-cpus', {'count': self.dr.getNumberOfCPUs()})
 
     def sessionLogon(self):
         logging.debug("AgentLogicBase::sessionLogon: user logs on the system.")

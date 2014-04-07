@@ -50,6 +50,7 @@ class FunctionalTest(GuestAgentTestCase):
 
         self._config.set('general', 'heart_beat_rate', '5')
         self._config.set('general', 'report_user_rate', '10')
+        self._config.set('general', 'report_num_cpu_rate', '60')
         self._config.set('general', 'report_application_rate', '120')
         self._config.set('general', 'report_disk_usage', '300')
         self._config.set('virtio', 'device', self._vport_name)
@@ -77,6 +78,9 @@ class FunctionalTest(GuestAgentTestCase):
 
     def testSendUserInfo(self):
         self._validator.verifySendUserInfo(self.vdsAgent)
+
+    def testSendNumberOfCPUs(self):
+        self._validator.verifySendNumberOfCPUs(self.vdsAgent)
 
     def testSessionLogon(self):
         self._validator.verifySessionLogon(self.vdsAgent)
