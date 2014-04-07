@@ -183,6 +183,9 @@ class CommandHandlerLinux:
         logging.debug("Executing hibernate command: %s", cmd)
         subprocess.call(cmd)
 
+    def set_number_of_cpus(self, count):
+        pass  # currently noop
+
 
 class LinuxDataRetriver(DataRetriverBase):
 

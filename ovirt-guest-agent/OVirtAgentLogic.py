@@ -315,6 +315,11 @@ class AgentLogicBase:
         elif command == 'hibernate':
             state = args.get('state', 'disk')
             self.commandHandler.hibernate(state)
+        elif command == 'set-number-of-cpus':
+            count = args.get('count', 0)
+            if count > 0:
+                self.commandHandler.set_number_of_cpus(count)
+                self.sendNumberOfCPUs()
         else:
             logging.error("Unknown external command: %s (%s)"
                           % (command, args))

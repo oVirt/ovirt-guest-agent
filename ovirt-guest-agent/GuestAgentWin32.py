@@ -300,6 +300,9 @@ class CommandHandlerWin:
         except:
             logging.exception("LockWorkStation exception")
 
+    def setNumberOfCPUs(self, count):
+        pass
+
 
 class WinDataRetriver(DataRetriverBase):
     def __init__(self):
