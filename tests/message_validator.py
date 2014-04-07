@@ -155,6 +155,7 @@ _MSG_VALIDATORS = {
     'host-name': _name_and_one_str_param('host-name', 'name'),
     'memory-stats': validate_memory_stats,
     'network-interfaces': validate_network_interfaces,
+    'number-of-cpus': _name_and_one_integral_param('number-of-cpus', 'count'),
     'os-version': _name_and_one_str_param('os-version', 'version'),
     'session-lock': _name_only('session-lock'),
     'session-logoff': _name_only('session-logoff'),
@@ -205,6 +206,21 @@ class MessageValidator(object):
     @_ensure_messages('memory-stats')
     def verifySendMemoryStats(self, agent):
         agent.sendMemoryStats()
+
+    def verifySendNumberOfCPUs(self, agent):
+        self._verifySendNumberOfCPUsV0(agent)
+        self._verifySendNumberOfCPUsV1(agent)
+
+    @_ensure_messages()
+    def _verifySendNumberOfCPUsV0(self, agent):
+        agent.dr.apiVersion = 0
+        agent.sendNumberOfCPUs()
+
+    @_ensure_messages('number-of-cpus')
+    def _verifySendNumberOfCPUsV1(self, agent):
+        agent.dr.apiVersion = 1
+        agent.sendNumberOfCPUs()
+        agent.dr.apiVersion = 0
 
     @_ensure_messages('active-user')
     def verifySendUserInfo(self, agent):
