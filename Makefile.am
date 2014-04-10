@@ -5,6 +5,7 @@ SUBDIRS =                \
     GinaSSO              \
     tests                \
     windows-credprov     \
+    scripts              \
     $(NULL)
 
 if BUILD_SSO_MODULES
@@ -75,7 +76,4 @@ endif
 
 install-exec-hook:
 	$(MKDIR_P) $(DESTDIR)/$(pkgdatadir)
-	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-locksession
-	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-shutdown
-	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-hibernate
 	$(INSTALL) -d $(DESTDIR)/$(localstatedir)/log/ovirt-guest-agent

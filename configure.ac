@@ -41,6 +41,26 @@ AC_ARG_WITH(kdm,
                            [Whether or not to build the single sign on KDM extension, default=yes]),
             kdm=${withval}, kdm=$sso)
 AC_SUBST(kdm)
+
+AC_ARG_WITH(sudohelper,
+            AS_HELP_STRING([--with-sudohelper],
+                           [[Choose the elevation mechanism to be installed. Available options are usermode or sudo], default=usermode]),
+            sudohelper=${withval}, sudohelper=usermode)
+AC_SUBST(sudohelper)
+
+case $sudohelper in
+    usermode)
+        ;;
+    sudo)
+        ;;
+    *)
+        AC_MSG_ERROR([sudohelper must be one of usermode or sudo])
+        ;;
+esac
+
+AM_CONDITIONAL(INSTALL_USERMODE_SCRIPTS, [test -n "$sudohelper" -a "$sudohelper" == "usermode"])
+AM_CONDITIONAL(INSTALL_SUDO_SCRIPTS, [test -n "$sudohelper" -a "$sudohelper" == "sudo"])
+
 AM_CONDITIONAL(BUILD_GDM_MODULE, [test -n "$gdm" -a "x$gdm" != xno ])
 AM_CONDITIONAL(BUILD_KDM_MODULE, [test -n "$kdm" -a "x$kdm" != xno ])
 AM_CONDITIONAL(BUILD_SSO_MODULES, [test -n "$sso" -a "x$sso" != xno ])
@@ -213,6 +233,8 @@ AC_CONFIG_FILES([
     ovirt-guest-agent/ovirt-guest-agent
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
+    scripts/Makefile
+    scripts/wrappers/Makefile
     tests/Makefile
     windows-credprov/Makefile
 ])
