@@ -18,6 +18,26 @@ AC_DEFUN([DEFINE_FHS_REDHAT],[
         AC_SUBST([udevdir],        ['${sysconfdir}/udev'])
 ])
 
+AC_DEFUN([DEFINE_FHS_SUSE],[
+        AC_SUBST([exec_prefix],    ['${prefix}'])
+        AC_SUBST([bindir],         ['${exec_prefix}/bin'])
+        AC_SUBST([sbindir],        ['${exec_prefix}/sbin'])
+        AC_SUBST([libexecdir],     ['${exec_prefix}/libexec'])
+        AC_SUBST([datarootdir],    ['${prefix}/share'])
+        AC_SUBST([datadir],        ['${datarootdir}'])
+        AC_SUBST([sysconfdir],     ['/etc'])
+        AC_SUBST([localstatedir],  ['/var'])
+        AC_SUBST([sharedstatedir], ['/var/lib'])
+        AC_SUBST([includedir],     ['${prefix}/include'])
+        AC_SUBST([oldincludedir],  ['/usr/include'])
+        AC_SUBST([libdir],         ['${exec_prefix}/lib'])
+        AC_SUBST([localedir],      ['${datarootdir}/locale'])
+        AC_SUBST([mandir],         ['/usr/share/man'])
+        AC_SUBST([infodir],        ['/usr/share/info'])
+        AC_SUBST([rundir],         ['${sharedstatedir}/run'])
+        AC_SUBST([udevdir],        ['/lib/udev'])
+])
+
 AC_DEFUN([DEFINE_FHS_DEBIAN],[
         AC_SUBST([exec_prefix],    ['${prefix}'])
         AC_SUBST([bindir],         ['${exec_prefix}/bin'])
@@ -42,6 +62,8 @@ AC_DEFUN([DEFINE_FHS_DEBIAN],[
 AC_DEFUN([DEFINE_FHS],[
     if test -f /etc/redhat-release; then
         DEFINE_FHS_REDHAT
+    elif test -f /etc/SuSE-release; then
+        DEFINE_FHS_SUSE
     elif test -f /etc/debian_version; then
         DEFINE_FHS_DEBIAN
     fi
@@ -50,6 +72,9 @@ AC_DEFUN([DEFINE_FHS],[
                                     ['${docdir}/${PACKAGE_TARNAME}'],
                                      ['${docdir}/${PACKAGE}'])])
 
+    if test "x${udevdir}" == "x"; then
+        AC_SUBST([udevdir], ['${sysconfdir}/udev'])
+    fi
     AC_SUBST([udevrulesdir], ['${udevdir}/rules.d'])
     AC_SUBST([pkgdatadir], ['${datadir}/${PACKAGE}'])
     AC_SUBST([pkgdaemonpidpath], ['${rundir}/${PACKAGE}.pid'])
