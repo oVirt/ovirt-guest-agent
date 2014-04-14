@@ -51,6 +51,7 @@ EXTRA_DIST= \
     $(AGENT_NAME).rules \
     ovirt-guest-agent.in \
     ovirt-guest-agent.service \
+    ovirt-guest-agent.sles \
     ovirt-guest-agent.el5.rules \
     Makefile.el5 \
     README-windows.txt \
