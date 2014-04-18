@@ -47,6 +47,13 @@ def QueryStringValue(hkey, name):
     return key_value.value
 
 
+def GetActiveSessionId():
+    for session in win32ts.WTSEnumerateSessions():
+        if session['State'] == win32ts.WTSActive:
+            return session['SessionId']
+    return win32ts.WTSGetActiveConsoleSessionId()
+
+
 def GetNetworkInterfaces():
     interfaces = list()
     try:
@@ -192,7 +199,7 @@ class CommandHandlerWin:
             logging.exception("Error occurred during user login.")
 
     def logoff(self):
-        sessionId = win32ts.WTSGetActiveConsoleSessionId()
+        sessionId = GetActiveSessionId()
         if sessionId != 0xffffffff:
             logging.debug("Logging off current user (session %d)", sessionId)
             win32ts.WTSLogoffSession(win32ts.WTS_CURRENT_SERVER_HANDLE,
@@ -257,7 +264,7 @@ class CommandHandlerWin:
     def LockWorkStation(self):
         try:
             logging.debug("LockWorkStation was called.")
-            sessionId = win32ts.WTSGetActiveConsoleSessionId()
+            sessionId = GetActiveSessionId()
             if sessionId != 0xffffffff:
                 logging.debug("Locking workstation (session %d)", sessionId)
                 dupToken = None
@@ -360,7 +367,7 @@ class WinDataRetriver(DataRetriverBase):
         user = "None"
         try:
             domain = ""
-            sessionId = win32ts.WTSGetActiveConsoleSessionId()
+            sessionId = GetActiveSessionId()
             if sessionId != 0xffffffff:
                 user = win32ts.WTSQuerySessionInformation(
                     win32ts.WTS_CURRENT_SERVER_HANDLE,
