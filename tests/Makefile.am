@@ -7,3 +7,12 @@ TESTS=\
     guest_agent_test.py \
     $(NULL)
 
+EXTRA_DIST=                 \
+    encoding_test.py        \
+    guest_agent_test.py     \
+    message_validator.py    \
+    test_port.py            \
+    testrunner.py           \
+    unittest.bat            \
+    $(NULL)
+
