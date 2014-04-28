@@ -299,6 +299,8 @@ class LinuxDataRetriver(DataRetriverBase):
         self.memStats['mem_total'] = fields['MemTotal:']
         self.memStats['mem_unused'] = fields['MemFree:']
         self.memStats['mem_free'] = free
+        self.memStats['mem_buffers'] = fields['Buffers:']
+        self.memStats['mem_cached'] = fields['Cached:']
         swap_used = fields['SwapTotal:'] - fields['SwapFree:']
         self.memStats['swap_usage'] = swap_used
         self.memStats['swap_total'] = fields['SwapTotal:']

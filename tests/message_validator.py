@@ -141,6 +141,8 @@ def validate_memory_stats(msg):
     assert_integral_param(mem, 'mem_free')
     assert_integral_param(mem, 'mem_total')
     assert_integral_param(mem, 'mem_unused')
+    assert_integral_param(mem, 'mem_buffers')
+    assert_integral_param(mem, 'mem_cached')
     assert_integral_param(mem, 'pageflt')
     assert_integral_param(mem, 'swap_in')
     assert_integral_param(mem, 'swap_out')
