@@ -456,6 +456,8 @@ class WinDataRetriver(DataRetriverBase):
         self.memStats['mem_free'] = \
             str(int((pi.PhysicalAvailable * pi.PageSize) / 1024))
         self.memStats['mem_unused'] = self.memStats['mem_free']
+        self.memStats['mem_cached'] = 0   # TODO: Can this be reported?
+        self.memStats['mem_buffers'] = 0  # TODO: Can this be reported?
         try:
             strComputer = "."
             objWMIService = \
