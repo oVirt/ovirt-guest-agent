@@ -26,8 +26,8 @@ import _winreg
 # _winreg.QueryValueEx and win32api.RegQueryValueEx don't support reading
 # Unicode strings from the registry (at least on Python 2.5.1).
 def QueryStringValue(hkey, name):
-    #if type(hkey) != type(PyHKEY):
-    #    raise TypeError("1nd arg must be a PyHKEY.")
+    # if type(hkey) != type(PyHKEY):
+    #     raise TypeError("1nd arg must be a PyHKEY.")
     if type(name) != type(unicode()):
         raise TypeError("2nd arg must be a unicode.")
     key_type = c_ulong(0)
@@ -342,7 +342,7 @@ class WinDataRetriver(DataRetriverBase):
         return retval
 
     def getAvailableRAM(self):
-        ## Returns the available physical memory (including the system cache).
+        # Returns the available physical memory (including the system cache).
         pi = get_perf_info()
         return str(int((pi.PhysicalAvailable * pi.PageSize) / (1024 ** 2)))
 

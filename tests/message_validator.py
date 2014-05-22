@@ -34,7 +34,7 @@ def _ensure_no_messages(f):
 
 
 def assertIn(m, n):
-    if not m in n:
+    if m not in n:
         raise Exception("%s not in %s" % (m, str(n)))
 
 

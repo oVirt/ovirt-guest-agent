@@ -300,7 +300,7 @@ class AgentLogicBase:
                           % (safe_creds_repr(credentials)))
             self.commandHandler.login(credentials)
         elif command == 'refresh':
-            if not 'apiVersion' in args and self.dr.getAPIVersion() > 0:
+            if 'apiVersion' not in args and self.dr.getAPIVersion() > 0:
                 logging.info('API versioning not supported by VDSM. Disabling '
                              'versioning support.')
                 self.dr.setAPIVersion(_DISABLED_API_VALUE)
