@@ -148,6 +148,13 @@ def validate_memory_stats(msg):
     assert_integral_param(mem, 'swap_out')
 
 
+def validate_timezone(msg):
+    assertIn('zone', msg)
+    assertIn('offset', msg)
+    assert_string_param(msg, 'zone')
+    assert_integral_param(msg, 'offset')
+
+
 _MSG_VALIDATORS = {
     'active-user': _name_and_one_str_param('active-user', 'name'),
     'applications': _name_and_one_string_list_param('applications',
@@ -165,6 +172,7 @@ _MSG_VALIDATORS = {
     'session-shutdown': _name_only('session-shutdown'),
     'session-startup': _name_only('session-startup'),
     'session-unlock': _name_only('session-unlock'),
+    'timezone': validate_timezone,
     'api-version': _name_and_one_integral_param('api-version', 'apiVersion')
 }
 
@@ -286,5 +294,13 @@ class MessageValidator(object):
     def verifyRefreshReply2(self, agent):
         agent.dr.setAPIVersion(1)
         assert(agent.dr.getAPIVersion() == 1)
+        agent.parseCommand('refresh', {})
+        assert(agent.dr.getAPIVersion() == 0)
+
+    @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
+                      'network-interfaces', 'disks-usage', 'fqdn', 'timezone')
+    def verifyRefreshReply3(self, agent):
+        agent.dr.setAPIVersion(2)
+        assert(agent.dr.getAPIVersion() == 2)
         agent.parseCommand('refresh', {})
         assert(agent.dr.getAPIVersion() == 0)

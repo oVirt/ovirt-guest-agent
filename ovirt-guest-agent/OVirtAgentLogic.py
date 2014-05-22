@@ -34,8 +34,9 @@ except ImportError:
 
 from threading import Event
 from VirtIoChannel import VirtIoChannel
+import timezone
 
-_MAX_SUPPORTED_API_VERSION = 1
+_MAX_SUPPORTED_API_VERSION = 2
 _DISABLED_API_VALUE = 0
 
 _MESSAGE_MIN_API_VERSION = {
@@ -55,7 +56,8 @@ _MESSAGE_MIN_API_VERSION = {
     'session-logon': 0,
     'session-shutdown': 0,
     'session-startup': 0,
-    'session-unlock': 0}
+    'session-unlock': 0,
+    'timezone': 2}
 
 
 # Return a safe (password masked) repr of the credentials block.
@@ -155,6 +157,9 @@ class DataRetriverBase:
         except NotImplementedError:
             return -1
 
+    def getTimezoneInfo(self):
+        return timezone.get_timezone_info()
+
 
 class AgentLogicBase:
 
@@ -206,6 +211,7 @@ class AgentLogicBase:
         self.sendUserInfo()
         self.sendAppList()
         self.sendFQDN()
+        self.sendTimezone()
         counter = 0
         hbsecs = self.heartBitRate
         appsecs = self.appRefreshRate
@@ -314,6 +320,7 @@ class AgentLogicBase:
             self.sendInfo()
             self.sendDisksUsages()
             self.sendFQDN()
+            self.sendTimezone()
         elif command == 'echo':
             logging.debug("Echo: %s", args)
             self._send('echo', args)
@@ -339,6 +346,10 @@ class AgentLogicBase:
         if cur_user != self.activeUser or force:
             self._send('active-user', {'name': cur_user})
             self.activeUser = cur_user
+
+    def sendTimezone(self):
+        ti = self.dr.getTimezoneInfo()
+        self._send('timezone', {'zone': ti[0], 'offset': ti[1]})
 
     def sendInfo(self):
         self._send('host-name', {'name': self.dr.getMachineName()})

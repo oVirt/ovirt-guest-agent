@@ -10,6 +10,7 @@ agent_PYTHON= \
     OVirtAgentLogic.py \
     VirtIoChannel.py \
     ovirt-guest-agent.py \
+    timezone.py \
     $(NULL)
 
 noinst_PYTHON=\
