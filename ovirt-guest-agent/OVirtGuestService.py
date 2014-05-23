@@ -8,11 +8,16 @@ from GuestAgentWin32 import WinVdsAgent
 import logging
 import logging.config
 import servicemanager
-import ConfigParser
 import os
+import os.path
 import _winreg
+import ConfigParser
+import io
+import cStringIO
 
 AGENT_CONFIG = 'ovirt-guest-agent.ini'
+AGENT_DEFAULT_CONFIG = 'default.ini'
+AGENT_DEFAULT_LOG_CONFIG = 'default-logger.ini'
 
 # Values from WM_WTSSESSION_CHANGE message
 # (http://msdn.microsoft.com/en-us/library/aa383828.aspx)
@@ -32,7 +37,7 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self._shutting_down = False
 
-        global AGENT_CONFIG
+        global AGENT_CONFIG, AGENT_DEFAULT_CONFIG, AGENT_DEFAULT_LOG_CONFIG
         regKey = "System\\CurrentControlSet\\services\\%s" % self._svc_name_
         hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, regKey)
         filePath = _winreg.QueryValueEx(hkey, "ImagePath")[0].replace('"', '')
@@ -44,8 +49,20 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
             hkey.Close()
         filePath = os.path.dirname(filePath)
         AGENT_CONFIG = os.path.join(filePath, AGENT_CONFIG)
+        AGENT_DEFAULT_CONFIG = os.path.join(filePath, AGENT_DEFAULT_CONFIG)
+        AGENT_DEFAULT_LOG_CONFIG = os.path.join(filePath,
+                                                AGENT_DEFAULT_LOG_CONFIG)
 
-        logging.config.fileConfig(AGENT_CONFIG)
+        cparser = ConfigParser.ConfigParser()
+        if os.path.exists(AGENT_DEFAULT_LOG_CONFIG):
+            cparser.read(AGENT_DEFAULT_LOG_CONFIG)
+        cparser.read(AGENT_CONFIG)
+        strio = cStringIO.StringIO()
+        cparser.write(strio)
+        bio = io.BytesIO(strio.getvalue())
+        logging.config.fileConfig(bio)
+        bio.close()
+        strio.close()
 
     # Overriding this method in order to accept session change notifications.
     def GetAcceptedControls(self):
@@ -61,8 +78,9 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
         # Write a 'started' event to the event log...
         self.ReportEvent(servicemanager.PYS_SERVICE_STARTED)
         logging.info("Starting OVirt Guest Agent service")
-
         config = ConfigParser.ConfigParser()
+        if os.path.exists(AGENT_DEFAULT_CONFIG):
+            config.read(AGENT_DEFAULT_CONFIG)
         config.read(AGENT_CONFIG)
 
         self.vdsAgent = WinVdsAgent(config)

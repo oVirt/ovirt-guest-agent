@@ -228,6 +228,7 @@ AC_SUBST(extensionsdatadir)
 
 AC_CONFIG_FILES([
     Makefile
+    configurations/Makefile
     GinaSSO/Makefile
     ovirt-guest-agent/Makefile
     ovirt-guest-agent/ovirt-guest-agent
