@@ -1,6 +1,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS =                \
+    configurations       \
     ovirt-guest-agent    \
     GinaSSO              \
     tests                \

@@ -4,7 +4,8 @@
 #
 
 FILES=ovirt-guest-agent.py OVirtAgentLogic.py VirtIoChannel.py \
-	GuestAgentLinux2.py hibernate
+	GuestAgentLinux2.py hibernate bytesio.py ../configurations/default.conf \
+	../configurations/default-logger.conf
 
 AGENTDIR=/usr/share/ovirt-guest-agent
 CONFDIR=/etc

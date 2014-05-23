@@ -22,21 +22,42 @@ import signal
 import sys
 import getopt
 import ConfigParser
+import cStringIO
+
+io = None
+try:
+    import io as modio
+    io = modio
+except ImportError:
+    import bytesio as modio
+    io = modio
+
 from GuestAgentLinux2 import LinuxVdsAgent
 
 AGENT_CONFIG = '/etc/ovirt-guest-agent.conf'
+AGENT_DEFAULT_CONFIG = '/usr/share/ovirt-guest-agent/default.conf'
+AGENT_DEFAULT_LOG_CONFIG = '/usr/share/ovirt-guest-agent/default-logger.conf'
 AGENT_PIDFILE = '/run/ovirt-guest-agent.pid'
 
 
 class OVirtAgentDaemon:
 
     def __init__(self):
-        logging.config.fileConfig(AGENT_CONFIG)
+        cparser = ConfigParser.ConfigParser()
+        cparser.read(AGENT_DEFAULT_LOG_CONFIG)
+        cparser.read(AGENT_CONFIG)
+        strio = cStringIO.StringIO()
+        cparser.write(strio)
+        bio = io.BytesIO(strio.getvalue())
+        logging.config.fileConfig(bio)
+        bio.close()
+        strio.close()
 
     def run(self, daemon, pidfile):
         logging.info("Starting oVirt guest agent")
-
         config = ConfigParser.ConfigParser()
+        config.read(AGENT_DEFAULT_CONFIG)
+        config.read(AGENT_DEFAULT_LOG_CONFIG)
         config.read(AGENT_CONFIG)
 
         self.agent = LinuxVdsAgent(config)

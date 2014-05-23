@@ -21,12 +21,9 @@ noinst_PYTHON=\
     $(NULL)
 
 dist_pkgdata_SCRIPTS= \
-	hibernate \
+    hibernate \
     LockActiveSession.py \
-	$(NULL)
-
-agentconfdir=$(sysconfdir)
-agentconf_DATA=ovirt-guest-agent.conf
+    $(NULL)
 
 dbusconfdir=$(sysconfdir)/dbus-1/system.d
 dbusconf_DATA=org.ovirt.vdsm.Credentials.conf
@@ -55,7 +52,6 @@ EXTRA_DIST= \
     Makefile.el5 \
     README-windows.txt \
     win-guest-agent-build-exe.bat \
-    ovirt-guest-agent.ini \
     $(NULL)
 
 CLEANFILES = \
