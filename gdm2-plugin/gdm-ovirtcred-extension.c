@@ -193,7 +193,15 @@ static void
 gdm_ovirtcred_extension_ask_secret (GdmConversation *conversation,
                                    const char      *message)
 {
-
+        GdmOVirtCredExtension *extension = GDM_OVIRTCRED_EXTENSION (conversation);
+        
+        if (g_strcmp0 ("Token?", message) != 0) {
+                return;
+        }
+        
+        if (extension->priv->token) {
+                gdm_ovirtcred_extension_request_answer (GDM_CONVERSATION (extension));
+        }
 }
 
 static void

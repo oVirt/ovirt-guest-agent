@@ -251,7 +251,13 @@ static void
 gdm_ovirtcred_extension_ask_secret (GdmLoginExtension *login_extension,
                                     const char *message)
 {
+        GdmOVirtCredExtension *extension = GDM_OVIRTCRED_EXTENSION (login_extension);
 
+        if (g_strcmp0 ("Token?", message) != 0) {
+                return;
+        }
+
+        _gdm_login_extension_emit_answer (login_extension, extension->priv->token);
 }
 
 static void
