@@ -227,6 +227,7 @@ class AgentLogicBase:
                 if appsecs <= 0:
                     self.sendAppList()
                     self.sendInfo()
+                    self.sendFQDN()
                     appsecs = self.appRefreshRate
                 disksecs -= 1
                 if disksecs <= 0:
