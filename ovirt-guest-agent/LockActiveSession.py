@@ -18,6 +18,8 @@
 import dbus
 import logging
 import os
+import os.path
+import subprocess
 
 
 class SessionWrapper(object):
@@ -135,15 +137,19 @@ def LockSession(session):
 
 
 def main():
-    session = GetActiveSession()
-    if session is not None:
-        try:
-            LockSession(session)
-            logging.info("Session %s should be locked now.", session.GetId())
-        except dbus.DBusException:
-            logging.exception("Error while trying to lock session.")
+    if os.path.exists('/usr/bin/loginctl'):
+        subprocess.call(['/usr/bin/loginctl', 'lock-sessions'])
     else:
-        logging.error("Error locking session (no active session).")
+        session = GetActiveSession()
+        if session is not None:
+            try:
+                LockSession(session)
+                logging.info("Session %s should be locked now.",
+                             session.GetId())
+            except dbus.DBusException:
+                logging.exception("Error while trying to lock session.")
+        else:
+            logging.error("Error locking session (no active session).")
 
 if __name__ == '__main__':
     main()
