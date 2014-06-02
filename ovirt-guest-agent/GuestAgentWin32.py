@@ -327,16 +327,22 @@ class WinDataRetriver(DataRetriverBase):
             cur_key_path = _winreg.EnumKey(rootkey, idx)
             cur_key = _winreg.OpenKey(rootkey, cur_key_path)
             try:
-                cur_key_value = QueryStringValue(cur_key, u"DisplayName")
-                if len(cur_key_value) == 0:
+                release_type = QueryStringValue(cur_key, u'ReleaseType')
+                if release_type.find("Hotfix") >= 0:
                     continue
-                if cur_key_value.find("Hotfix") >= 0:
+                if release_type.find("Security Update") >= 0:
                     continue
-                if cur_key_value.find("Security Update") >= 0:
+                if release_type.find("Software Update") >= 0:
                     continue
-                if cur_key_value.find("Update for Windows") >= 0:
+                if release_type.find("Update") >= 0:
                     continue
-                retval.append(cur_key_value)
+                parent_key_name = QueryStringValue(cur_key, u'ParentKeyName')
+                if parent_key_name.find("OperatingSystem") >= 0:
+                    continue
+                display_name = QueryStringValue(cur_key, u'DisplayName')
+                if len(display_name) == 0:
+                    continue
+                retval.append(display_name)
             except:
                 pass
         return retval
