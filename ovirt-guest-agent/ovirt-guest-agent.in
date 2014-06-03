@@ -54,11 +54,17 @@ stop() {
 case "$1" in
 
     start)
-        start
+        $0 status > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            start
+        fi
         ;;
 
     stop)
-        stop
+        $0 status > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            stop
+        fi
         ;;
 
     status)
@@ -67,14 +73,14 @@ case "$1" in
         ;;
 
     restart)
-        stop
-        start
+        $0 stop
+        $0 start
         ;;
 
     condrestart)
         if [ -s ${pidfile} ] ; then
-            stop
-            start
+            $0 stop
+            $0 start
         fi
         ;;
 
