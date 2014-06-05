@@ -318,6 +318,17 @@ class WinDataRetriver(DataRetriverBase):
     def getAllNetworkInterfaces(self):
         return GetNetworkInterfaces()
 
+    def _is_item_update(self, reg_key):
+        RTPATTERNS = ("Hotfix", "Security Update", "Software Update", "Update")
+        release_type = QueryStringValue(reg_key, u'ReleaseType')
+        for pattern in RTPATTERNS:
+            if release_type.find(pattern) >= 0:
+                return True
+        parent_key_name = QueryStringValue(reg_key, u'ParentKeyName')
+        if parent_key_name.find("OperatingSystem") >= 0:
+            return True
+        return False
+
     def getApplications(self):
         retval = []
         key_path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
@@ -327,17 +338,7 @@ class WinDataRetriver(DataRetriverBase):
             cur_key_path = _winreg.EnumKey(rootkey, idx)
             cur_key = _winreg.OpenKey(rootkey, cur_key_path)
             try:
-                release_type = QueryStringValue(cur_key, u'ReleaseType')
-                if release_type.find("Hotfix") >= 0:
-                    continue
-                if release_type.find("Security Update") >= 0:
-                    continue
-                if release_type.find("Software Update") >= 0:
-                    continue
-                if release_type.find("Update") >= 0:
-                    continue
-                parent_key_name = QueryStringValue(cur_key, u'ParentKeyName')
-                if parent_key_name.find("OperatingSystem") >= 0:
+                if self._is_item_update(cur_key):
                     continue
                 display_name = QueryStringValue(cur_key, u'DisplayName')
                 if len(display_name) == 0:
