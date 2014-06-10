@@ -330,23 +330,29 @@ class WinDataRetriver(DataRetriverBase):
         return False
 
     def getApplications(self):
-        retval = []
+        retval = set()
+        # Constants according to
+        # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724878.aspx
+        KEY_WOW64_32KEY = 0x0100
+        KEY_WOW64_64KEY = 0x0200
         key_path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
-        rootkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key_path)
-        items = _winreg.QueryInfoKey(rootkey)[0]
-        for idx in range(items):
-            cur_key_path = _winreg.EnumKey(rootkey, idx)
-            cur_key = _winreg.OpenKey(rootkey, cur_key_path)
-            try:
-                if self._is_item_update(cur_key):
-                    continue
-                display_name = QueryStringValue(cur_key, u'DisplayName')
-                if len(display_name) == 0:
-                    continue
-                retval.append(display_name)
-            except:
-                pass
-        return retval
+        for view_flag in (KEY_WOW64_32KEY, KEY_WOW64_64KEY):
+            rootkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key_path,
+                                      view_flag | _winreg.KEY_READ)
+            items = _winreg.QueryInfoKey(rootkey)[0]
+            for idx in range(items):
+                cur_key_path = _winreg.EnumKey(rootkey, idx)
+                cur_key = _winreg.OpenKey(rootkey, cur_key_path)
+                try:
+                    if self._is_item_update(cur_key):
+                        continue
+                    display_name = QueryStringValue(cur_key, u'DisplayName')
+                    if len(display_name) == 0:
+                        continue
+                    retval.add(display_name)
+                except:
+                    pass
+        return list(retval)
 
     def getAvailableRAM(self):
         # Returns the available physical memory (including the system cache).
