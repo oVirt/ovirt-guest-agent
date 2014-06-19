@@ -51,6 +51,7 @@ _MESSAGE_MIN_API_VERSION = {
     'network-interfaces': 0,
     'number-of-cpus': 1,
     'os-version': 0,
+    'os-info': 2,
     'session-lock': 0,
     'session-logoff': 0,
     'session-logon': 0,
@@ -147,6 +148,9 @@ class DataRetriverBase:
     def getFQDN(self):
         return socket.getfqdn()
 
+    def getOsInfo(self):
+        pass
+
     def getNumberOfCPUs(self):
         """
         Reports the number of CPUs or -1 if this was not implemented for the
@@ -212,6 +216,7 @@ class AgentLogicBase:
         self.sendAppList()
         self.sendFQDN()
         self.sendTimezone()
+        self.sendOsInfo()
         counter = 0
         hbsecs = self.heartBitRate
         appsecs = self.appRefreshRate
@@ -321,6 +326,7 @@ class AgentLogicBase:
             self.sendDisksUsages()
             self.sendFQDN()
             self.sendTimezone()
+            self.sendOsInfo()
         elif command == 'echo':
             logging.debug("Echo: %s", args)
             self._send('echo', args)
@@ -369,6 +375,9 @@ class AgentLogicBase:
 
     def sendNumberOfCPUs(self):
         self._send('number-of-cpus', {'count': self.dr.getNumberOfCPUs()})
+
+    def sendOsInfo(self):
+        self._send('os-info', self.dr.getOsInfo())
 
     def sessionLogon(self):
         logging.debug("AgentLogicBase::sessionLogon: user logs on the system.")

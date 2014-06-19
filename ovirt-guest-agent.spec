@@ -1,5 +1,5 @@
 
-%global release_version 1
+%global release_version 2
 
 %global _moduledir /%{_lib}/security
 %global _kdmrc /etc/kde/kdm/kdmrc
@@ -191,6 +191,9 @@ fi
 %{_datadir}/ovirt-guest-agent/CredServer.py*
 %{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
 %{_datadir}/ovirt-guest-agent/timezone.py*
+%{_datadir}/ovirt-guest-agent/ovirt-osinfo
+
+# consolehelper symlinks
 %{_datadir}/ovirt-guest-agent/ovirt-locksession
 %{_datadir}/ovirt-guest-agent/ovirt-shutdown
 %{_datadir}/ovirt-guest-agent/ovirt-hibernate
@@ -228,6 +231,9 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Tue Feb 10 2015 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.10-2
+- Adding ovirt-osinfo script
+
 * Tue Jul 01 2014 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.10-1
 - New upstream version 1.0.10
 

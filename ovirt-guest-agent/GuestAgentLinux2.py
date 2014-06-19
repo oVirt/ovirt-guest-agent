@@ -240,6 +240,27 @@ class LinuxDataRetriver(DataRetriverBase):
     def getOsVersion(self):
         return os.uname()[2]
 
+    def getOsInfo(self):
+        cmd = [_get_script_path('ovirt-osinfo')]
+        logging.debug('Executing ovirt-osinfo command: %s', cmd)
+        result = {
+            'version': '',
+            'distribution': '',
+            'codename': '',
+            'arch': '',
+            'type': 'linux',
+            'kernel': ''}
+        try:
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            for line in p.stdout.read().split('\n'):
+                k, v = line.split('=', 1)
+                if v and k in result:
+                    result[k] = v
+            p.close()
+        except Exception:
+            logging.exception('ovirt-osinfo invocation failed')
+        return result
+
     def getAllNetworkInterfaces(self):
         return self.list_nics()
 

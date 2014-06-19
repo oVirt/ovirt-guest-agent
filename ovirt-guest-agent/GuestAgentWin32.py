@@ -17,12 +17,12 @@ import pythoncom
 import subprocess
 import socket
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
+import ctypes
 from ctypes import c_ulong, byref, windll, create_unicode_buffer,\
     Structure, sizeof, c_void_p
 from ctypes.util import find_library
 from ctypes.wintypes import DWORD
 import _winreg
-import ctypes
 import ctypes.wintypes
 
 # Constants according to
@@ -197,27 +197,29 @@ class WinOsTypeHandler:
         '3.3.0': WINCE3_3_0}
 
     def getWinOsType(self):
-        retval = self.UNKNOWN
+        name = self.UNKNOWN
+        version = ''
         try:
             versionTupple = win32api.GetVersionEx(1)
             key = "%d.%d.%d" % (
                 versionTupple[3], versionTupple[0], versionTupple[1])
+            version = '%d.%d' % versionTupple[:2]
             if key in self.winVersionMatrix:
-                retval = self.winVersionMatrix[key]
+                name = self.winVersionMatrix[key]
             # Window 7 and Window Server 2008 R2 share the same version.
             # Need to fix it using the wProductType field.
                 VER_NT_WORKSTATION = 1
-            if (retval == WinOsTypeHandler.WIN2008R2 and
+            if (name == WinOsTypeHandler.WIN2008R2 and
                     versionTupple[8] == VER_NT_WORKSTATION):
-                retval = WinOsTypeHandler.WIN7
-            elif (retval == WinOsTypeHandler.WIN2012 and
+                name = WinOsTypeHandler.WIN7
+            elif (name == WinOsTypeHandler.WIN2012 and
                     versionTupple[8] == VER_NT_WORKSTATION):
-                retval = WinOsTypeHandler.WIN8
-            logging.debug("WinOsTypeHandler::getWinOsType osType = '%s'",
-                          retval)
+                name = WinOsTypeHandler.WIN8
+            logging.debug("WinOsTypeHandler::getWinOsType osType = '%s' "
+                          "version = '%s'", name, version)
         except:
             logging.exception("getWinOsType - failed")
-        return retval
+        return {'name': name, 'version': version}
 
 
 class CommandHandlerWin:
@@ -386,6 +388,7 @@ class CommandHandlerWin:
 
 class WinDataRetriver(DataRetriverBase):
     def __init__(self):
+        self.arch = self._getArch()
         self.os = WinOsTypeHandler().getWinOsType()
         DataRetriverBase.__init__(self)
 
@@ -393,7 +396,29 @@ class WinDataRetriver(DataRetriverBase):
         return os.environ.get('COMPUTERNAME', '')
 
     def getOsVersion(self):
-        return self.os
+        return self.os['name']
+
+    def _getArch(self):
+        arch = 'x86'
+        try:
+            kernel32 = ctypes.windll.kernel32
+            result = ctypes.c_int()
+            proc = kernel32.GetCurrentProcess()
+            if kernel32.IsWow64Process(proc, ctypes.byref(result)) == 1:
+                if result:
+                    arch = 'x86_64'
+        except AttributeError:
+            pass
+        return arch
+
+    def getOsInfo(self):
+        return {
+            'version': self.os['version'],
+            'distribution': '',
+            'codename': self.os['name'],
+            'arch': self.arch,
+            'type': 'windows',
+            'kernel': ''}
 
     def getAllNetworkInterfaces(self):
         return GetNetworkInterfaces()

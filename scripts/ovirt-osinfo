@@ -1,0 +1,11 @@
+#!/usr/bin/python
+
+import platform
+info = platform.linux_distribution()
+
+print 'distribution=%s' % info[0]
+print 'version=%s' % info[1]
+print 'codename=%s' % info[2]
+print 'arch=%s' % platform.uname()[-1]
+print 'kernel=%s' % platform.release()
+print 'type=linux'

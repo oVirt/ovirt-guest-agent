@@ -21,7 +21,13 @@ SUBDIRS =        \
     wrappers     \
     $(NULL)
 
+osinfoscriptdir = $(pkgdatadir)
+osinfoscript_SCRIPTS= \
+    ovirt-osinfo         \
+    $(NULL)
+
 EXTRA_DIST=                    \
+    ovirt-osinfo               \
     sudoers.ovirt-guest-agent  \
     $(NULL)
 

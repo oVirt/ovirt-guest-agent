@@ -148,6 +148,18 @@ def validate_memory_stats(msg):
     assert_integral_param(mem, 'swap_out')
 
 
+def validate_os_info(msg):
+    assert_string_param(msg, 'version')
+    assert_string_param(msg, 'distribution')
+    assert_string_param(msg, 'codename')
+    assert_string_param(msg, 'arch')
+    assert_string_param(msg, 'type')
+    assert_string_param(msg, 'kernel')
+    assert(msg['arch'])
+    assert(msg['version'])
+    assert(msg['type'])
+
+
 def validate_timezone(msg):
     assertIn('zone', msg)
     assertIn('offset', msg)
@@ -166,6 +178,7 @@ _MSG_VALIDATORS = {
     'network-interfaces': validate_network_interfaces,
     'number-of-cpus': _name_and_one_integral_param('number-of-cpus', 'count'),
     'os-version': _name_and_one_str_param('os-version', 'version'),
+    'os-info': validate_os_info,
     'session-lock': _name_only('session-lock'),
     'session-logoff': _name_only('session-logoff'),
     'session-logon': _name_only('session-logon'),
@@ -298,9 +311,18 @@ class MessageValidator(object):
         assert(agent.dr.getAPIVersion() == 0)
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
-                      'network-interfaces', 'disks-usage', 'fqdn', 'timezone')
+                      'network-interfaces', 'disks-usage', 'fqdn')
     def verifyRefreshReply3(self, agent):
         agent.dr.setAPIVersion(2)
         assert(agent.dr.getAPIVersion() == 2)
         agent.parseCommand('refresh', {})
         assert(agent.dr.getAPIVersion() == 0)
+
+    @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
+                      'network-interfaces', 'disks-usage', 'fqdn', 'timezone',
+                      'os-info')
+    def verifyRefreshReply4(self, agent):
+        agent.dr.setAPIVersion(2)
+        assert(agent.dr.getAPIVersion() == 2)
+        agent.parseCommand('refresh', {'apiVersion': 2})
+        assert(agent.dr.getAPIVersion() == 2)
