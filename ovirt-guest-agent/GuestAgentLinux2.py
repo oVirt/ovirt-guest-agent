@@ -37,6 +37,13 @@ except ImportError:
     CredServer = CredServerFake
 
 
+_GUEST_SCRIPTS_INSTALL_PATH = '/usr/share/ovirt-guest-agent'
+
+
+def _get_script_path(name):
+    return os.path.join(_GUEST_SCRIPTS_INSTALL_PATH, name)
+
+
 def _readLinesFromProcess(cmdline):
     try:
         process = subprocess.Popen(cmdline, stdout=subprocess.PIPE,
@@ -172,7 +179,7 @@ class CommandHandlerLinux:
         self.agent = agent
 
     def lock_screen(self):
-        cmd = ['/usr/share/ovirt-guest-agent/ovirt-locksession']
+        cmd = [_get_script_path('ovirt-locksession')]
         logging.debug("Executing lock session command: '%s'", cmd)
         subprocess.call(cmd)
 
@@ -191,14 +198,14 @@ class CommandHandlerLinux:
         if reboot:
             param = '-r'
             action = 'reboot'
-        cmd = ['/usr/share/ovirt-guest-agent/ovirt-shutdown', param,
+        cmd = [_get_script_path('ovirt-shutdown'), param,
                "+%d" % (delay), "\"%s\"" % (msg)]
 
         logging.debug("Executing %s command: %s", action, cmd)
         subprocess.call(cmd)
 
     def hibernate(self, state):
-        cmd = ['/usr/share/ovirt-guest-agent/ovirt-hibernate', state]
+        cmd = [_get_script_path('ovirt-hibernate'), state]
         logging.debug("Executing hibernate command: %s", cmd)
         subprocess.call(cmd)
 

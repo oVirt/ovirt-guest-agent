@@ -4,12 +4,18 @@
 
 
 from ConfigParser import ConfigParser
+import os.path
 import platform
 
 from message_validator import MessageValidator
 from testrunner import GuestAgentTestCase
 
 import test_port
+
+
+def _get_scripts_path():
+    scriptdir = os.path.dirname(__file__)
+    return os.path.abspath(os.path.join(scriptdir, '../scripts'))
 
 
 def _linux_setup_test(conf):
@@ -23,8 +29,9 @@ def _linux_setup_test(conf):
              'securityfs debugfs binfmt_misc fuse.gvfsd-fuse '
              'fuse.gvfs-fuse-daemon fusectl usbfs')
     conf.set('general', 'ignore_zero_size_fs', 'true')
-    from GuestAgentLinux2 import LinuxVdsAgent
-    return port_name, LinuxVdsAgent
+    import GuestAgentLinux2
+    GuestAgentLinux2._GUEST_SCRIPTS_INSTALL_PATH = _get_scripts_path()
+    return port_name, GuestAgentLinux2.LinuxVdsAgent
 
 
 def _win32_setup_test(conf):
