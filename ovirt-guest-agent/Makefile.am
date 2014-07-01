@@ -13,6 +13,7 @@ agent_PYTHON= \
     $(NULL)
 
 noinst_PYTHON=\
+    bytesio.py \
     GuestAgentWin32.py \
     setup.py \
     version.py \
