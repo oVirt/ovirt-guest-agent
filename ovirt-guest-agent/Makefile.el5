@@ -19,7 +19,7 @@ install:
 	mkdir -p $(DESTDIR)$(CONFDIR)/pam.d
 	mkdir -p $(DESTDIR)$(CONFDIR)/security/console.apps
 	cp $(FILES) $(DESTDIR)$(AGENTDIR)
-	cp ovirt-guest-agent.conf $(DESTDIR)$(CONFDIR)
+	cp ../configurations/ovirt-guest-agent.conf $(DESTDIR)$(CONFDIR)
 	cp ovirt-guest-agent $(DESTDIR)$(CONFDIR)/init.d
 	cp ovirt-guest-agent.el5.rules $(DESTDIR)$(CONFDIR)/udev/rules.d/55-ovirt-guest-agent.rules
 	cp pam/ovirt-shutdown $(DESTDIR)$(CONFDIR)/pam.d
