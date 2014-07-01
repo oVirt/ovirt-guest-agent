@@ -5,7 +5,7 @@
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.9
+Version: 1.0.10
 Release: %{release_version}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -226,6 +226,9 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Tue Jul 01 2014 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.10-1
+- New upstream version 1.0.10
+
 * Mon Jan 20 2014 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.9-1
 - Report swap usage of guests
 - Updated pam conversation approach

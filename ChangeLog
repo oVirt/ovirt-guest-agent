@@ -1,3 +1,588 @@
+commit 11c0e70b946ca661eea53c446cd3b8583bab8bfa
+Author: Dan Kenigsberg <danken@redhat.com>
+Date:   Tue Jun 17 10:51:30 2014 +0100
+
+    sudoers: fix path to ovirt-shutdown-wrappers.sh
+
+    Thanks to John Xue for reporting the issue.
+
+    Change-Id: I6964e654cff6e0c602ff87ee5502fac2d9db7705
+    Signed-off-by: Dan Kenigsberg <danken@redhat.com>
+
+commit 000580fbc36360af370021e35880b6f53a120fcb
+Author: Lev Veyde <lveyde@redhat.com>
+Date:   Mon Jun 16 13:05:43 2014 +0300
+
+    Fix win-guest-agent-build-exe.bat
+
+    File paths must use backslashes.
+
+    Change-Id: I24609f3afccd364ba2717e57cf241711f2461c91
+    Signed-off-by: Lev Veyde <lveyde@redhat.com>
+
+commit bea77cdfe1f2ada3fba8c66c8864cb420f229709
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 29 08:58:03 2014 +0200
+
+    Speed up screenlocking on systems with logind
+
+    Since logind is able to handle the screen locking, we're now prefering
+    to use it, since it is handling the locking much more simple and reliable
+    than our attempts to support multiple desktop environments.
+
+    Change-Id: Iaaf01e5c6c612178f207e3acfc877d30e0a09ec8
+    Bug-Url: https://bugzilla.redhat.com/1097390
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 0f5e43fd823d49563d31eb697c173038c2638e2d
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jun 10 12:40:01 2014 +0200
+
+    win32: Also report 64-Bit applications Win-x64
+
+    Up until now we did not report entries from the 64-Bit view of the
+    registry. This commit reports those entries and also deduplicates the
+    entries.
+
+    Change-Id: I99e08710257331f5dce36ca64653de6f88139592
+    Bug-Url: https://bugzilla.redhat.com/1105056
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 264a0f8fd54117c38b33a6c201bb549ff12cb1a2
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jun 5 14:56:09 2014 +0200
+
+    Cleanup the getApplications code
+
+    Change-Id: Iceb493bb6b6703e426606febb0cdbce9a8890953
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 6666b1d9c82ba6fdaa27bc4300d1d223bf487063
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jun 3 12:19:06 2014 +0200
+
+    No output when guest agent already running or stopped on RHEL5/6
+
+    When the guest agent is already running and 'service ovirt-guest-agent start'
+    is executed it no longer prints anything.
+    The same for 'service ovirt-guest-agent stop' when the agent is already
+    stopped.
+    Additionally restart will use the same behaviour
+
+    Change-Id: Id27e5b9f91b675fb5f2d2be8d5d1663efd34293f
+    Bug-Url: https://bugzilla.redhat.com/1028381
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 41761f0a6676cf03ed5157842e95fc8827c03e7f
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jun 2 16:23:54 2014 +0200
+
+    Filter Windows HotFixes by ReleaseType value
+
+    Non-english releases contain a field 'ReleaseType' which contains
+    an english string 'Security Update', 'Hotfix' or 'Update'
+    Additionally we're checking for 'ParentKeyName' which contains
+    'OperatingSystem' in case of an update.
+
+    Change-Id: I4ab40ed538a48d79f30ee300d791ce4636371634
+    Bug-Url: https://bugzilla.redhat.com/1103710
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 8e9f7f50dde29150cb93a7d308a84e41a020c8c1
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 29 11:26:19 2014 +0200
+
+    Report FQDN more periodically
+
+    Change-Id: I6754a6d77226636b8753425ca75cb7ccd56aa093
+    Bug-Url: https://bugzilla.redhat.com/1101947
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit e48aab60028e59188ac1b1fe1c02651c3b14a329
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed May 28 16:14:02 2014 +0200
+
+    Fix SSO on RHEL6
+
+    The new pam implementation needs the ask_secret to be answered as well.
+
+    Change-Id: I21f5da545d4fa26f816c4e25c88eccb09d4cfd56
+    Bug-Url: https://bugzilla.redhat.com/1102095
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 3bf47a823485e828519514129cad62f2bdfb5850
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri May 23 09:58:26 2014 +0200
+
+    Implement default configuration values
+
+    When adding new config values to the configuration files, it's possible
+    that due to the installation the configuration files won't get updated,
+    when they are modified by an user/administrator on that given system.
+
+    By using defaults, we can override this problem and ensure a proper
+    application start, when config values are missing which are mandatory,
+    to the functionality.
+
+    Change-Id: I5ce9d457e826448aad205ce4abda5dc4b0210804
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+    Bug-Url: https://bugzilla.redhat.com/1100249
+
+commit 3f26e26c3b5209e5c4f62ceb1e37ba170869e489
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 22 16:16:56 2014 +0200
+
+    Fixing pep8 errors
+
+    Change-Id: Ic7c9c31493926deb7ae4f11a0f0bc487b04a7365
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1431b7a5c07b98a586fb3376dfe22d02f5a51782
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Apr 25 11:45:30 2014 +0200
+
+    packaging: Include python unit test files
+
+    Change-Id: I65b246a05192d5898e2e122b8c90cf1a7160b50b
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit ac2926fce74246d7512a1322c9cb510007a1602a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Apr 29 16:24:31 2014 +0200
+
+    agent: Report Windows fake cached/buffers memory entries
+
+    To unifiy the OS report structure this has to be reported
+    for Windows as well.
+
+    Change-Id: Id71a250084aa6a5efc9583f757accdde772128be
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 169b01871c264560bb93ca49a41e62d3681c1ad9
+Author: Amador Pahim <apahim@redhat.com>
+Date:   Mon Apr 28 10:34:13 2014 -0300
+
+    agent: report Linux cached/buffers memory
+
+    Some applications, like Oracle Directory Server, use cached memory
+    and never release it. Users need to take this memory into account
+    when planning the memory requirements.
+
+    Engine counterpart tracked by bz#1024010.
+
+    Change-Id: Id46f85b94937779ea899b05dd1bfa73780a1a4e9
+    Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=1024007
+    Signed-off-by: Amador Pahim <apahim@redhat.com>
+
+commit 9e608c41bb7789fc20d6cbc6068caec52336d0ae
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Apr 7 16:13:01 2014 +0200
+
+    agent: setNumberOfCPUs support
+
+    Change-Id: I0b03bd96bd52b76e7d3bf1f8bbcdd7d8e8fbc560
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 01939815964c4bcb976702faa5da9d68cdc3f051
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Apr 29 11:33:09 2014 +0200
+
+    Try to load the virtio_console module before starting
+
+    Change-Id: I124bf87f940dae09cb237439e213326a8747938a
+    Bug-Url: https://bugzilla.redhat.com/1061139
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 2856433a70b20d0dda20d8c6e53cc0f172f598a2
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Apr 14 17:28:18 2014 +0200
+
+    Init script for SLES
+
+    Change-Id: Ic647c42e986937cc5e18cb40bec7023997e6dd1c
+    Bug-Url: https://bugzilla.redhat.com/1043471
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit bbe5e9751017f499a9b36056f4042f9e99d22e68
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 10 13:51:23 2014 +0200
+
+    Remove trailing whitespaces in configuration files
+
+    Change-Id: I6caa2a32f924d787c2f2db08d33bcc511b7e41e3
+    Bug-Url: https://bugzilla.redhat.com/1043471
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit a0ee5679aff2a122b98c264ba41072c19e5836de
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 10 13:45:38 2014 +0200
+
+    List of SUSE packages
+
+    Change-Id: I209a8f466ffb6152d2f9f43e8651df9e5d01413e
+    Bug-Url: https://bugzilla.redhat.com/1043471
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 2fc297ea523a2bc4a0b94141dda638e0b5fc954a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 10 13:34:14 2014 +0200
+
+    m4: Detect SUSE
+
+    Change-Id: Ic5dda77121a7ccb1e77604324c06bda720ca05d0
+    Bug-Url: https://bugzilla.redhat.com/1043471
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit f17e052aba4435e607f5b5d06e7b97a412dda378
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 10 12:16:56 2014 +0200
+
+    Added support for sudo
+
+    This patch introduces configure controlled choice of the elevation mechanism
+    used on the system.
+
+    configure has now a new option --with-sudohelper=[usermode|sudo]
+
+    Values:
+     - usermode: elevation via consolehelper and pam
+     - sudo: elevation via sudo
+
+    Change-Id: I202c1bbea8c95f5ad12edb4959a7d614c89ea246
+    Bug-Url: https://bugzilla.redhat.com/1043471
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 9f69e31195aeb439734d6158a5c0ab0a1abc3050
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Apr 18 11:37:51 2014 +0200
+
+    win32: Retrieve the active session through enumeration
+
+    Using WTSGetActiveConsoleSessionId() does in case of RDP connections give
+    a session id which is not corresponding to the users session in some cases.
+    By enumerating through the sessions and retriving the session with the 'State'
+    'WTSActive' we are able to reliably retrieve the current active session.
+    This is required in order to get the logged-in user and being able to retrieve
+    the user token for performing operations in their name.
+
+    Change-Id: I569d4b6b80e102b83b7e6e39c12524f2d588ad37
+    Bug-Url: https://bugzilla.redhat.com/1068750
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1367a3436b66010a05542342ab5e8966a6e85f67
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Apr 7 11:12:41 2014 +0200
+
+    agent: Report number of CPU cores visible online on the guest OS
+
+    This patches a new message and increases the Guest Agent API to
+    version 1.
+
+    The new message has this format:
+    {"__name__": "number-of-cpus", "count": <int>}
+
+    The reported number 'count' is the number of visible online CPU cores
+    on the guest OS system.
+
+    Change-Id: Ief777608519a35319665c4cd0f580b7b38305b3e
+    Guest-Agent-API-Version: 1
+    Bug-URL: https://bugzilla.redhat.com/show_bug.cgi?id=1063280
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 906949e7f8e2936bbd7a268b3adcb0b676783aab
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jul 17 11:05:51 2013 +0200
+
+    agent: Implement basics for API Versioning
+
+    This commit introduces the basics needed to support API versioning between
+    the ovirt-guest-agent and VDSM.
+
+    How the negotiation works:
+    - VDSM has as a default the apiVersion value set to _DISABLED_API_VALUE marking
+      it as unsupported
+    - The guest agent sends its max supported version with every `heartbeat`
+      message
+    - VDSM checks that `apiVersion` exists in the `heartbeat` message arguments
+      - If it exists it retrieves the minimum common version and sends the
+        `api-version` message with the common version as `apiVersion` argument
+      - If it does NOT exist it and the apiVersion is not set to
+        _DISABLED_API_VALUE it will set it to _DISABLED_API_VALUE, with the meaning
+        that it is not supported at all by the guest agent on the other end.
+    - The guest agent on receiving this message makes it own check and sets the
+      `apiVersion` to the commonVersion
+
+    - If VDSM sends the `refresh` command it also sends its `apiVersion` value
+      however if it does not, capable guest agents are disabling the versioning
+      support and will know it in pre-supported state as well.
+
+    NOTE: VDSM will never send an api-version message without being triggered.
+          This is to ensure backwards compatibility.
+
+    Change-Id: I754d52009538914dd0143894b24ad48fbf13cb38
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 723de8e6075a255cf49df0d16b03cce185580a21
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Feb 18 11:28:26 2014 +0100
+
+    Implementation of logind based session locking
+
+    Support screen lock for logind based systems, since ConsoleKit
+    is no longer developed in the long run this will be the way to
+    go.
+
+    Change-Id: Iafc4b88d9c508647e1d09407556359fbefbba34c
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 5168c478284fa75e1b1a19940233be493560ef12
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jan 20 14:42:35 2014 +0100
+
+    Version 1.0.9 update
+
+    Change-Id: I4a914522846fb879ed09c47992bc5f13d0456ead
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit bfeb7ce71086d7b5fe7ef061bc05eec42b6176b6
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jan 27 12:39:01 2014 +0100
+
+    Build fixes
+
+    * Don't execute PEP8 checks when PEP8 is not installed
+    * configure.ac: Don't fail on systems where AM_PROG_AR is not yet
+      available in automake
+    * m4/fhs.m4 don't fail if neither /var/lock/subsys nor /var/lock
+      are present
+
+    Change-Id: Iaa33a029b2e8fbbbd2e1329814dd8dc182109552
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 52b97cfbd5f1a4378b0be168ffd8293e29f99f46
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jan 20 14:28:47 2014 +0100
+
+    packaging: Depend on the qemu-guest-agent
+
+    For support of freezing and thawing the filesystem for the
+    Backup and Restore API feature of oVirt
+
+    Change-Id: I4c550801326dfa0b8d9357770f48a6d9b64eb3a1
+    Bug-Url: https://bugzilla.redhat.com/1055524
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 17d61aa3be1f85b70f72bb2756f8b3f046db3de8
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon Jan 13 15:20:00 2014 +0200
+
+    agent: handle failures on Windows' write requests.
+
+    Windows' virtio-serial driver behavior was changed so a write
+    request when the host is not connected results in immediate
+    return with an error.
+
+    Change-Id: I28ca3c1115f6b18295a29d1f87bf3144c00759e1
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+    Bug-Url: https://bugzilla.redhat.com/1026474
+
+commit 8ad7e901e70fe40fa885bbbeb0b530dccefdc34f
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Oct 10 12:15:08 2013 +0200
+
+    pam: Fix the pam conversation approach
+
+    Until now our PAM conversation was errorneous using pam_get_user
+    which is not correct for requests other than accquiring the username.
+
+    To correctly request the Token from the frontend we have to use a PAM
+    conversation. This is done via the pam_prompt function.
+
+    We also do check now, if the requesting user (if set) is identical with
+    the preset user. If this is not the case we will not unlock the screen.
+    Preset users should only be available if the screen was locked.
+    If the usernames aren't equal, the module will return PAM_CRED_UNAVAIL.
+
+    Additionally the logging was rewritten to use the syslog and more comments
+    have been added to describe the steps we're doing.
+
+    Change-Id: I4455ea61ffb27e854fe93bdc51068e12617955a2
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit c39f0c2d4cb71c761cbb4447d680c4e11d4de19c
+Author: rexcze <rexcze@gmail.com>
+Date:   Wed Nov 20 17:22:52 2013 +0100
+
+    Update README-windows.txt
+
+    python OVirtGuestService.py install should be without "-" near install to work as expected. Tested on 3.3. and windows 2003 and 2008
+
+    Change-Id: I0e5eb8a6a78a9a6c1a036a4fb451e75bb6fb2d3e
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 08a588cfde023ea78bc509511323cdac3eaca7cb
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Nov 4 10:43:12 2013 +0100
+
+    agent: Report swap usage of the guests
+
+    Change-Id: I09f1c0dbbe12eee352637c97a4fa23835d14307a
+    Bug-Url: https://bugzilla.redhat.com/1025845
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 8c7738a2e56a6fee73cacbd9ddbc36ca8577ee13
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Oct 9 08:11:55 2013 +0200
+
+    Fixed package name in ovirt-guest-agent.conf
+
+    The package is called ovirt-guest-agent-common now, if searched for
+    the package in the package database.
+
+    Change-Id: Ia647838379e5823a8451721ed3f76c248e59e234
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit d55dbd69c717f48a56d5aa6c5847252781478003
+Author: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+Date:   Fri Sep 13 21:06:57 2013 +0800
+
+    Ubuntu packaging: add python-nose to build requirements
+
+    "make check" during the build process runs tests which import
+    python-nose modules.
+
+    Change-Id: I529b4fe19e191cf2551943f2ed132edee7349ac0
+    Signed-off-by: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+
+commit 4013bc70ede921b99bc47d0ae096583f3527a842
+Author: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+Date:   Wed Sep 18 11:17:07 2013 +0800
+
+    Ubuntu Packaging: add python-apt to dependency
+
+    In ovirt-guest-agent/GuestAgentLinux2.py we try to import apt module.
+    This module is provided by python-apt on Debian and Ubuntu. This patch
+    adds python-apt to package dependency.
+
+    Change-Id: I7a248b43c541ded03a26625896881d89a0d6401d
+    Signed-off-by: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+
+commit 7ceef1528359bea44aa2f705318bff1bbfb9d7a6
+Author: Martin Betak <mbetak@redhat.com>
+Date:   Wed Sep 11 17:26:21 2013 +0200
+
+    agent: Fix python-2.4 compatibility
+
+    Rewrote the use of ternary operator to if since it is not
+    supported in python-2.4.
+
+    Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=1006861
+    Change-Id: I03c63477a2d2bcb9eb4c4307946a3486300663e1
+    Signed-off-by: Martin Betak <mbetak@redhat.com>
+
+commit bb587ab97da7d67faa029d5a9a613ad244468029
+Author: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+Date:   Thu Sep 5 09:25:36 2013 +0800
+
+    Packaging: Add the missing dependencies
+
+    automake and pkg-confg are needed when building ovirt-guest-agent in a
+    fresh Ubuntu environment.
+
+    This patch also split each dependency to separated lines. The debhelper
+    is a boilerplate so leave it at the first line. The other lines are
+    custom dependencies so sort them to make it easier to maintain.
+
+    Change-Id: I90f86100946c5b60cc816e664a2857cad5b4b0f5
+    Signed-off-by: Zhou Zheng Sheng <zhshzhou@linux.vnet.ibm.com>
+
+commit 1ed717196ff4a38766b5ec22eafb42e54ca99fa1
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Sep 10 12:20:09 2013 +0200
+
+    Replaced String check with string conversion
+
+    Currently the string_check is destroying the data when the system
+    is not able to convert them properly.
+    This is now fixed by allowing unicode strings as they are
+    and an attempt of decoding input (non-unicode) strings based
+    on the prefered locale encoding.
+
+    If this will fail, the replacement of unknown characters are applied.
+
+    In any case an unicode string is created. If the string is not
+    convertible, the return value will be "????" as a replacement.
+    This however is the last resort, to allow at least some level of
+    data to go through. (e.g. when the application list contains one
+    invalid data string currently it would cause the whole list NOT to
+    be sent. Now it will be sent)
+
+    Please also note that this commit will fix the failing unit tests.
+
+    Change-Id: Ie277069cbfa39f9735a2b85b9e9da9c3fcfe5938
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 6d3aa51d6ba0256ff6915e6b551a86ab8cb3d3b8
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Sep 5 15:47:09 2013 +0200
+
+    Adding Unit Tests and Functional Tests
+
+    The functional tests so far are testing the retrieval
+    of data from the underlying system and ensures the structure
+    of the data. It does not however validate the content.
+    It ensures that the messages sent over the VirtIO Serial
+    channel have the format defined.
+    If we change the format it will break the unit tests.
+
+    Additionally a check for the unicode filtering.
+
+    Change-Id: I4c1d740c948e33aed8a04a1013b22276cf7d85e3
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit e90629f193c5eb0bebaf37963b336566db819e54
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Sep 9 12:22:09 2013 +0200
+
+    Revert "Remove contra productive _string_check"
+
+    This reverts commit b06a6c4c8e61013b7461c6fc946c1530ae47584e.
+    The previous commit breaks the guest agent badly because the
+    string type is required to be unicode, this code previously was
+    converting it most of the times to unicode, however in some cases
+    it won't do so and causes the data to be an ascii string or even
+    replaces valid characters even though it should not.
+
+    The attempt for fixing this issue will be addressed by a new patch.
+
+    Change-Id: I47176ac60e069e7d557312d7047d9bc4b15ac768
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit b06a6c4c8e61013b7461c6fc946c1530ae47584e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Sep 3 12:29:10 2013 +0200
+
+    Remove contra productive _string_check
+
+    _string_check is rather harmful when using the new filtering. It creates
+    non-unicode strings out of valid strings.
+    The new unicode validation code covers the boundaries much better than
+    _string_check therefore we remove it.
+
+    Change-Id: Id01d8dc1374ae33435c5aefaae559ab8aa0ff062
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit c24385fab64a0192c0dee8092c9bb1c2c235b815
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jan 23 12:47:14 2013 +0100
+
+    agent: ovirt-guest-agent version 1.0.8
+
+    ChangeLog updated
+
+    Change-Id: I71b6165b799a730bfe1b3559b8840b0457af997a
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
 commit ecae245160db3b90c820a5cabe8134bad3a55b5a
 Author: Vinzenz Feenstra <vfeenstr@redhat.com>
 Date:   Wed Jun 26 16:48:43 2013 +0200
