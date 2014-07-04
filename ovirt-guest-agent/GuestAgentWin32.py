@@ -452,6 +452,9 @@ class WinDataRetriver(DataRetriverBase):
 
     def _is_item_update(self, reg_key):
         RTPATTERNS = ("Hotfix", "Security Update", "Software Update", "Update")
+        help_link = QueryStringValue(reg_key, u'HelpLink')
+        if help_link.startswith('http://support.microsoft.com'):
+            return True
         release_type = QueryStringValue(reg_key, u'ReleaseType')
         for pattern in RTPATTERNS:
             if release_type.find(pattern) >= 0:
