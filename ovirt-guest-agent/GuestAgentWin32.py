@@ -80,6 +80,7 @@ def GetNetworkInterfaces():
                     'hw': adapter.MacAddress.lower().replace('-', ':')})
     except:
         logging.exception("Error retrieving network interfaces.")
+    interfaces.sort(lambda x,y : cmp(x['name'], y['name'])) 
     return interfaces
 
 
