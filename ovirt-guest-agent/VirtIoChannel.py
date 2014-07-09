@@ -21,6 +21,7 @@ import platform
 import time
 import locale
 import unicodedata
+import logging
 
 
 # avoid pep8 warnings
@@ -196,6 +197,7 @@ class VirtIoChannel:
         message = (json.dumps(args) + '\n').encode('utf8')
         while len(message) > 0:
             written = self._stream.write(message)
+            logging.debug("Written %s" % message[:written])
             message = message[written:]
 
 

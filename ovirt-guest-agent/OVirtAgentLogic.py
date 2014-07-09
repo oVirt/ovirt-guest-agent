@@ -177,6 +177,7 @@ class AgentLogicBase:
         if version is None:
             logging.error('Undocumented message "%s"', name)
         elif version <= self.dr.getAPIVersion():
+            logging.debug("Sending %s with args %s" % (name, arguments))
             self.vio.write(name, arguments or {})
         else:
             logging.debug("Message %s not supported by api version %d.",
