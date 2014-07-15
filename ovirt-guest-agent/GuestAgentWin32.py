@@ -54,6 +54,23 @@ def GetActiveSessionId():
     return win32ts.WTSGetActiveConsoleSessionId()
 
 
+def merge_duplicate_interfaces(interfaces):
+    temp = {}
+    for interface in interfaces:
+        hw = interface['hw']
+        if hw in temp:
+            temp[hw]['inet'] += interface['inet']
+            temp[hw]['inet6'] += interface['inet6']
+        else:
+            temp[hw] = interface
+    result = []
+    for intf in temp.itervalues():
+        intf['inet'] = list(set(intf['inet']))
+        intf['inet6'] = list(set(intf['inet6']))
+        result.append(intf)
+    return result
+
+
 def GetNetworkInterfaces():
     interfaces = list()
     try:
@@ -80,7 +97,7 @@ def GetNetworkInterfaces():
                     'hw': adapter.MacAddress.lower().replace('-', ':')})
     except:
         logging.exception("Error retrieving network interfaces.")
-    return interfaces
+    return merge_duplicate_interfaces(interfaces)
 
 
 class PERFORMANCE_INFORMATION(Structure):
