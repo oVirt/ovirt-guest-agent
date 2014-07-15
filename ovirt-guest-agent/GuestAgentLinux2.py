@@ -73,10 +73,13 @@ class PkgMgr(object):
         """ Implements the package retrieval for apt and rpm if present and
             returns a joined list of packages installed on the system. """
         apps = set()
-        if self.rpm:
-            apps.update(self.rpm_list_packages(app_list))
-        if self.apt_pkg:
-            apps.update(self.apt_list_packages(app_list))
+        try:
+            if self.rpm:
+                apps.update(self.rpm_list_packages(app_list))
+            if self.apt_pkg:
+                apps.update(self.apt_list_packages(app_list))
+        except Exception:
+            logging.exception("Failed to get package list")
         apps = list(apps)
         logging.debug("PkgMgr: list_pkgs returns [%s]" % (str(apps)))
         return apps
