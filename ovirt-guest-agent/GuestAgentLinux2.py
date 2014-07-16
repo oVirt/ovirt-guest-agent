@@ -147,6 +147,7 @@ class NicMgr(object):
                          'hw': self.ethtool.get_hwaddr(dev)})
         except:
             logging.exception("Error retrieving network interfaces.")
+        interfaces.sort(lambda x,y : cmp(x['name'], y['name'])) 
         return interfaces
 
 
