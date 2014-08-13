@@ -1,5 +1,5 @@
 #
-# Copyright 2010-2012 Red Hat, Inc. and/or its affiliates.
+# Copyright 2010-2014 Hat, Inc. and/or its affiliates.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,21 @@ except ImportError:
             pass
     CredServer = CredServerFake
 
+
+def _readLinesFromProcess(cmdline):
+    try:
+        process = subprocess.Popen(cmdline, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+    except OSError:
+        logging.exception("Failed to run process %s", cmdline)
+        return []
+
+    out, err = process.communicate()
+    if process.returncode != 0:
+        logging.error("Process %s returned err code %d", cmdline,
+                      process.returncode)
+        return []
+    return out.splitlines()
 
 class PkgMgr(object):
 
@@ -272,6 +287,19 @@ class LinuxDataRetriver(DataRetriverBase):
 
         return usages
 
+    def getDiskMapping(self):
+        CMD = '/usr/share/ovirt-guest-agent/diskmapper'
+        mapping = {}
+        for line in _readLinesFromProcess([CMD]):
+            try:
+                name, serial = line.split('|', 1)
+            except ValueError:
+                logging.exception("diskmapper tool used an invalid format")
+                return {}
+
+            mapping[serial] = {'name': name}
+        return mapping
+
     def getMemoryStats(self):
         try:
             self._get_meminfo()
@@ -372,6 +400,8 @@ def test():
     print "Active User:", dr.getActiveUser()
     print "Disks Usage:",
     pprint(dr.getDisksUsage())
+    print "Disk Mapping:",
+    pprint(dr.getDiskMapping())
     print "Memory Stats:", dr.getMemoryStats()
 
 if __name__ == '__main__':

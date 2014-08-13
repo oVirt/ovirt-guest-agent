@@ -460,6 +460,23 @@ class WinDataRetriver(DataRetriverBase):
             logging.exception("Error retrieving disks usages.")
         return usages
 
+    def getDiskMapping(self):
+        result = {}
+        try:
+            strComputer = "."
+            objWMIService = \
+                win32com.client.Dispatch("WbemScripting.SWbemLocator")
+            objSWbemServices = \
+                objWMIService.ConnectServer(strComputer, "root\cimv2")
+            colItems = \
+                objSWbemServices.ExecQuery(
+                    "SELECT * FROM Win32_DiskDrive")
+            for objItem in colItems:
+                result[objItem.SerialNumber] = {'name': objItem.DeviceID}
+        except Exception:
+            logging.exception("Failed to retrieve disk mapping")
+        return result
+
     def _getSwapStats(self):
         try:
             strComputer = "."

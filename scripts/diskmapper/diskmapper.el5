@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Copyright 2014 Red Hat, Inc. and/or its affiliates.
 #
@@ -16,17 +17,10 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-SUBDIRS =        \
-    diskmapper   \
-    wrappers     \
-    $(NULL)
 
-EXTRA_DIST=                    \
-    sudoers.ovirt-guest-agent  \
-    $(NULL)
-
-if INSTALL_SUDO_SCRIPTS
-install-data-hook:
-	$(MKDIR_P) $(DESTDIR)/$(sysconfdir)/sudoers.d
-	$(INSTALL) -m 440 sudoers.ovirt-guest-agent $(DESTDIR)/$(sysconfdir)/sudoers.d/50_ovirt-guest-agent
-endif
+for devname in `ls /sys/block`; do
+    if [ -f /sys/block/$devname/device/serial ]; then
+        serial=`cat /sys/block/$devname/device/serial`
+        echo "/dev/$devname|$serial"
+    fi
+done

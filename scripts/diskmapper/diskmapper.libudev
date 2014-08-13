@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+#
+# Copyright 2014 Red Hat, Inc. and/or its affiliates.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Refer to the README and COPYING files for full details of the license.
+#
+
+from ctypes import CDLL, POINTER, c_ulonglong, c_char_p, c_int, Structure
+from ctypes.util import find_library
+
+
+class udev(Structure):
+    pass
+
+
+class udev_enumerate(Structure):
+    pass
+
+
+class udev_list_entry(Structure):
+    pass
+
+
+class udev_device(Structure):
+    pass
+
+
+udev_p = POINTER(udev)
+udev_enumerate_p = POINTER(udev_enumerate)
+udev_list_entry_p = POINTER(udev_list_entry)
+udev_device_p = POINTER(udev_device)
+dev_t = c_ulonglong
+
+
+_SIGNATURES = {
+    'udev': dict(
+        new=([], udev_p),
+        unref=([udev_p], None),
+    ),
+    'udev_enumerate': dict(
+        new=([udev_p], udev_enumerate_p),
+        unref=([udev_enumerate_p], None),
+        add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
+        add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+        scan_devices=([udev_enumerate_p], c_int),
+        get_list_entry=([udev_enumerate_p], udev_list_entry_p)
+    ),
+    'udev_list_entry': dict(
+        get_next=([udev_list_entry_p], udev_list_entry_p),
+        get_name=([udev_list_entry_p], c_char_p),
+    ),
+    'udev_device': dict(
+        new_from_syspath=([udev_p, c_char_p], udev_device_p),
+        unref=([udev_device_p], None),
+        get_devtype=([udev_device_p], c_char_p),
+        get_devnode=([udev_device_p], c_char_p),
+        get_property_value=([udev_device_p, c_char_p], c_char_p)
+    )
+}
+
+
+def load_udev():
+    libudev_name = find_library("udev")
+    ludev = CDLL(libudev_name, use_errno=True)
+    for cls, funcs in _SIGNATURES.iteritems():
+        for name, signature in funcs.iteritems():
+            f = getattr(ludev, '%s_%s' % (cls, name))
+            if f:
+                (argtypes, restype) = signature
+                f.argtypes = argtypes
+                f.restype = restype
+            else:
+                print 'Couldn\'t load', '%s_%s' % (cls, name)
+    return ludev
+
+if __name__ == '__main__':
+    ludev = load_udev()
+    udev = ludev.udev_new()
+    udevenum = ludev.udev_enumerate_new(udev)
+    try:
+        ludev.udev_enumerate_add_match_subsystem(udevenum, "block")
+        ludev.udev_enumerate_scan_devices(udevenum)
+        devices = ludev.udev_enumerate_get_list_entry(udevenum)
+        entry = devices
+        while entry:
+            name = ludev.udev_list_entry_get_name(entry)
+            dev = ludev.udev_device_new_from_syspath(udev, name)
+            devtype = ludev.udev_device_get_devtype(dev)
+            if devtype == "disk":
+                devnode = ludev.udev_device_get_devnode(dev)
+                serial = ludev.udev_device_get_property_value(dev, "ID_SERIAL")
+                if serial:
+                    print '%s|%s' % (devnode, serial)
+            entry = ludev.udev_list_entry_get_next(entry)
+    finally:
+        ludev.udev_enumerate_unref(udevenum)
+        ludev.udev_unref(udev)

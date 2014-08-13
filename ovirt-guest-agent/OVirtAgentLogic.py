@@ -136,6 +136,9 @@ class DataRetriverBase:
     def getDisksUsage(self):
         pass
 
+    def getDiskMapping(self):
+        pass
+
     def getMemoryStats(self):
         pass
 
@@ -346,7 +349,8 @@ class AgentLogicBase:
         self._send('applications', {'applications': self.dr.getApplications()})
 
     def sendDisksUsages(self):
-        self._send('disks-usage', {'disks': self.dr.getDisksUsage()})
+        self._send('disks-usage', {'disks': self.dr.getDisksUsage(),
+                                   'mapping': self.dr.getDiskMapping()})
 
     def sendMemoryStats(self):
         self._send('memory-stats', {'memory': self.dr.getMemoryStats()})
