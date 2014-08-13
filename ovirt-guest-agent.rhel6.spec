@@ -125,6 +125,7 @@ fi
 
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default.conf
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default-logger.conf
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/diskmapper
 
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate

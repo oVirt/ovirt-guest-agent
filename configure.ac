@@ -235,6 +235,7 @@ AC_CONFIG_FILES([
     ovirt-guest-agent/consoleapps/Makefile
     ovirt-guest-agent/pam/Makefile
     scripts/Makefile
+    scripts/diskmapper/Makefile
     scripts/wrappers/Makefile
     tests/Makefile
     windows-credprov/Makefile
