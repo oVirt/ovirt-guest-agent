@@ -431,8 +431,8 @@ class WinDataRetriver(DataRetriverBase):
                 user = u"%s@%s" % (user, domain)
         except:
             logging.exception("Error retrieving active user name.")
-        logging.debug("Activer user: %s", user)
-        return user.encode('utf8')
+        logging.debug("Active user: %s", user)
+        return user
 
     def getDisksUsage(self):
         usages = list()

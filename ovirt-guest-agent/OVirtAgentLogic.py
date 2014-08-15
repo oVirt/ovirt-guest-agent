@@ -329,7 +329,7 @@ class AgentLogicBase:
         self._send('fqdn', {'fqdn': self.dr.getFQDN()})
 
     def sendUserInfo(self, force=False):
-        cur_user = str(self.dr.getActiveUser())
+        cur_user = self.dr.getActiveUser()
         logging.debug("AgentLogicBase::sendUserInfo - cur_user = '%s'" %
                       (cur_user))
         if cur_user != self.activeUser or force:
