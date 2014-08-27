@@ -52,6 +52,7 @@ def _readLinesFromProcess(cmdline):
         return []
     return out.splitlines()
 
+
 class PkgMgr(object):
 
     def rpm_list_packages(self, app_list):
