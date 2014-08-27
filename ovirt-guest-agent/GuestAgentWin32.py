@@ -23,6 +23,12 @@ from ctypes.wintypes import DWORD
 import _winreg
 
 
+# Constants according to
+# http://msdn.microsoft.com/en-us/library/windows/desktop/ms724878.aspx
+KEY_WOW64_32KEY = 0x0100
+KEY_WOW64_64KEY = 0x0200
+
+
 # _winreg.QueryValueEx and win32api.RegQueryValueEx don't support reading
 # Unicode strings from the registry (at least on Python 2.5.1).
 def QueryStringValue(hkey, name):
@@ -191,14 +197,40 @@ class CommandHandlerWin:
     def lock_screen(self):
         self.LockWorkStation()
 
+    def _setSoftwareSASPolicy(self, value):
+        KEY_PATH = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion" \
+                   "\\Policies\\System"
+        if value is not None:
+            view_flag = KEY_WOW64_64KEY
+            handle = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, KEY_PATH,
+                                     view_flag | _winreg.KEY_READ |
+                                     _winreg.KEY_WRITE)
+            try:
+                old = _winreg.QueryValueEx(handle, 'SoftwareSASGeneration')
+            except OSError:
+                # Expected to happen if it does not exist
+                old = (None, None)
+            _winreg.SetValue(handle, 'SoftwareSASGeneration',
+                             _winreg.REG_DWORD, value)
+            return old[0]
+        return None
+
+    def _performSAS(self):
+        if find_library('sas') is not None:
+            logging.debug("Simulating a secure attention sequence (SAS).")
+            # setSoftwareSASPolicy is used to set the value to 3 to enable the
+            # simulated secure attention sequence, and reverts the to the
+            # previous value after the function was performed.
+            oldValue = self._setSoftwareSASPolicy(3)
+            windll.sas.SendSAS(0)
+            self._setSoftwareSASPolicy(oldValue)
+
     def login(self, credentials):
         PIPE_NAME = "\\\\.\\pipe\\VDSMDPipe"
         BUFSIZE = 1024
         RETIRES = 3
         try:
-            if find_library('sas') is not None:
-                logging.debug("Simulating a secure attention sequence (SAS).")
-                windll.sas.SendSAS(0)
+            self._performSAS()
             retries = 1
             while retries <= RETIRES:
                 try:
@@ -348,10 +380,6 @@ class WinDataRetriver(DataRetriverBase):
 
     def getApplications(self):
         retval = set()
-        # Constants according to
-        # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724878.aspx
-        KEY_WOW64_32KEY = 0x0100
-        KEY_WOW64_64KEY = 0x0200
         key_path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
         for view_flag in (KEY_WOW64_32KEY, KEY_WOW64_64KEY):
             rootkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key_path,
