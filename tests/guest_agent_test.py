@@ -22,6 +22,7 @@ def _linux_setup_test(conf):
              'nfds proc sysfs devtmpfs hugetlbfs rpc_pipefs devpts '
              'securityfs debugfs binfmt_misc fuse.gvfsd-fuse '
              'fuse.gvfs-fuse-daemon fusectl usbfs')
+    conf.set('general', 'ignore_zero_size_fs', 'true')
     from GuestAgentLinux2 import LinuxVdsAgent
     return port_name, LinuxVdsAgent
 
