@@ -223,6 +223,7 @@ class LinuxDataRetriver(DataRetriverBase):
             self.list_nics = nicmgr.list_nics
         self.app_list = ""
         self.ignored_fs = ""
+        self.ignore_zero_size_fs = True
         self._init_vmstat()
         DataRetriverBase.__init__(self)
 
@@ -276,6 +277,8 @@ class LinuxDataRetriver(DataRetriverBase):
                         statvfs = os.statvfs(path)
                         total = statvfs.f_bsize * statvfs.f_blocks
                         used = total - statvfs.f_bsize * statvfs.f_bfree
+                        if self.ignore_zero_size_fs and used == total == 0:
+                            continue
                         usages.append({'path': path, 'fs': fs, 'total': total,
                                        'used': used})
                 except:
@@ -369,6 +372,8 @@ class LinuxVdsAgent(AgentLogicBase):
         self.dr = LinuxDataRetriver()
         self.dr.app_list = config.get("general", "applications_list")
         self.dr.ignored_fs = set(config.get("general", "ignored_fs").split())
+        self.dr.ignore_zero_size_fs = config.get("general",
+                                                 "ignore_zero_size_fs")
         self.commandHandler = CommandHandlerLinux(self)
         self.cred_server = CredServer()
 
