@@ -202,7 +202,7 @@ class CommandHandlerWin:
                    "\\Policies\\System"
         if value is not None:
             view_flag = KEY_WOW64_64KEY
-            handle = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, KEY_PATH,
+            handle = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, KEY_PATH, 0,
                                      view_flag | _winreg.KEY_READ |
                                      _winreg.KEY_WRITE)
             try:
@@ -382,7 +382,7 @@ class WinDataRetriver(DataRetriverBase):
         retval = set()
         key_path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
         for view_flag in (KEY_WOW64_32KEY, KEY_WOW64_64KEY):
-            rootkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key_path,
+            rootkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key_path, 0,
                                       view_flag | _winreg.KEY_READ)
             items = _winreg.QueryInfoKey(rootkey)[0]
             for idx in range(items):
