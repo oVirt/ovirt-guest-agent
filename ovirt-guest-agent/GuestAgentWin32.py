@@ -571,10 +571,16 @@ class WinVdsAgent(AgentLogicBase):
         except:
             logging.exception("WinVdsAgent::run")
 
+    def doListen(self):
+        # CoInitializeEx() should be called in multi-threading program
+        # according to msdn document.
+        pythoncom.CoInitializeEx(0)
+        AgentLogicBase.doListen(self)
+
     def doWork(self):
-        # CoInitialize() should be called in multi-threading program according
-        # to msdn document.
-        pythoncom.CoInitialize()
+        # CoInitializeEx() should be called in multi-threading program
+        # according to msdn document.
+        pythoncom.CoInitializeEx(0)
         AgentLogicBase.doWork(self)
 
     def disable_screen_saver(self):
