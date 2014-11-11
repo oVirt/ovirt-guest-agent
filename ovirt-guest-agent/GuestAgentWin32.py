@@ -7,6 +7,7 @@ import win32netcon
 import win32net
 import win32ts
 import win32api
+import win32file
 import win32pipe
 import win32security
 import win32process
@@ -21,12 +22,39 @@ from ctypes import c_ulong, byref, windll, create_unicode_buffer,\
 from ctypes.util import find_library
 from ctypes.wintypes import DWORD
 import _winreg
-
+import ctypes
+import ctypes.wintypes
 
 # Constants according to
 # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724878.aspx
 KEY_WOW64_32KEY = 0x0100
 KEY_WOW64_64KEY = 0x0200
+
+
+class StoragePropertyQuery(ctypes.Structure):
+    _fields_ = (
+        ("a", ctypes.wintypes.ULONG),
+        ("b", ctypes.wintypes.ULONG),
+        ("c", ctypes.wintypes.BYTE),
+    )
+
+
+class StorageDeviceDescriptor(ctypes.Structure):
+    _fields_ = (
+        ("Version", ctypes.wintypes.ULONG),
+        ("Size", ctypes.wintypes.ULONG),
+        ("DeviceType", ctypes.wintypes.BYTE),
+        ("DeviceTypeModifier", ctypes.wintypes.BYTE),
+        ("RemovableMedia", ctypes.wintypes.BOOLEAN),
+        ("CommandQueueing", ctypes.wintypes.BOOLEAN),
+        ("VendorIdOffset", ctypes.wintypes.ULONG),
+        ("ProductIdOffset", ctypes.wintypes.ULONG),
+        ("ProductRevisionOffset", ctypes.wintypes.ULONG),
+        ("SerialNumberOffset", ctypes.wintypes.ULONG),
+        ("BusType", ctypes.wintypes.DWORD),
+        ("RawPropertiesLength", ctypes.wintypes.ULONG),
+        ("DATA", ctypes.wintypes.BYTE * 1024),
+    )
 
 
 # _winreg.QueryValueEx and win32api.RegQueryValueEx don't support reading
@@ -488,6 +516,35 @@ class WinDataRetriver(DataRetriverBase):
             logging.exception("Error retrieving disks usages.")
         return usages
 
+    def _readSMART(self, name):
+        serial = 'NO SERIAL NUMBER'
+        handle = ctypes.windll.kernel32.CreateFileW(
+            name,
+            win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+            win32file.FILE_SHARE_READ | win32file.FILE_SHARE_WRITE,
+            None, win32file.OPEN_EXISTING, 0, 0)
+        if handle == -1:
+            logging.warning("Failed to open device '%s' for querying the "
+                            "serial number. Error code: %d", name,
+                            win32api.GetLastError())
+            return serial
+        q = StoragePropertyQuery()
+        r = StorageDeviceDescriptor()
+        read_count = ctypes.wintypes.ULONG()
+        ret = ctypes.windll.kernel32.DeviceIoControl(
+            handle, 0x002D1400, ctypes.addressof(q), ctypes.sizeof(q),
+            ctypes.addressof(r), ctypes.sizeof(r),
+            ctypes.addressof(read_count), 0)
+
+        if ret:
+            serial = buffer(r)[r.SerialNumberOffset:r.SerialNumberOffset + 20]
+        else:
+            logging.warning("DeviceIoControl for device %s failed with"
+                            "eror code: %d. Could not look up serial number",
+                            name, win32api.GetLastError())
+        ctypes.windll.kernel32.CloseHandle(handle)
+        return serial
+
     def getDiskMapping(self):
         result = {}
         try:
@@ -500,7 +557,11 @@ class WinDataRetriver(DataRetriverBase):
                 objSWbemServices.ExecQuery(
                     "SELECT * FROM Win32_DiskDrive")
             for objItem in colItems:
-                result[objItem.SerialNumber] = {'name': objItem.DeviceID}
+                try:
+                    serial = objItem.SerialNumber
+                except AttributeError:
+                    serial = self._readSMART(objItem.DeviceID)
+                result[serial] = {'name': objItem.DeviceID}
         except Exception:
             logging.exception("Failed to retrieve disk mapping")
         return result
@@ -606,6 +667,7 @@ def test():
     print "Active User:", dr.getActiveUser()
     print "Disks Usage:", dr.getDisksUsage()
     print "Memory Stats:", dr.getMemoryStats()
+    print "DiskMapping:", dr.getDiskMapping()
 
 if __name__ == '__main__':
     test()
