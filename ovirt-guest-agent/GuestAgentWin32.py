@@ -238,8 +238,8 @@ class CommandHandlerWin:
             except OSError:
                 # Expected to happen if it does not exist
                 old = (None, None)
-            _winreg.SetValue(handle, 'SoftwareSASGeneration',
-                             _winreg.REG_DWORD, value)
+            _winreg.SetValueEx(handle, 'SoftwareSASGeneration', 0,
+                               _winreg.REG_DWORD, value)
             return old[0]
         return None
 
@@ -259,6 +259,9 @@ class CommandHandlerWin:
         RETIRES = 3
         try:
             self._performSAS()
+        except Exception:
+            logging.warning("Failed to perform SAS", exc_info=True)
+        try:
             retries = 1
             while retries <= RETIRES:
                 try:
