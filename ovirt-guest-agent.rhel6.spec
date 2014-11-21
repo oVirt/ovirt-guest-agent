@@ -104,11 +104,13 @@ fi
 
 # These are intentionally NOT 'noreplace' If this is modified by an user,
 # this actually might break it.
+%config(noreplace) %{_sysconfdir}/pam.d/ovirt-logout
 %config(noreplace) %{_sysconfdir}/pam.d/ovirt-locksession
 %config(noreplace) %{_sysconfdir}/pam.d/ovirt-shutdown
 %config(noreplace) %{_sysconfdir}/pam.d/ovirt-hibernate
 %config(noreplace) %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
+%config(noreplace) %{_sysconfdir}/security/console.apps/ovirt-logout
 %config(noreplace) %{_sysconfdir}/security/console.apps/ovirt-locksession
 %config(noreplace) %{_sysconfdir}/security/console.apps/ovirt-shutdown
 %config(noreplace) %{_sysconfdir}/security/console.apps/ovirt-hibernate
@@ -121,6 +123,7 @@ fi
 %{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
 %{_datadir}/ovirt-guest-agent/timezone.py*
 %{_datadir}/ovirt-guest-agent/ovirt-osinfo
+%{_datadir}/ovirt-guest-agent/ovirt-logout
 
 # consolehelper symlinks
 %{_datadir}/ovirt-guest-agent/ovirt-locksession
@@ -131,6 +134,7 @@ fi
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default-logger.conf
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/diskmapper
 
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/LogoutActiveUser.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
 

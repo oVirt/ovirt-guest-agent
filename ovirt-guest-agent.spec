@@ -175,11 +175,13 @@ fi
 
 # These are intentionally NOT 'noreplace' If this is modified by an user,
 # this actually might break it.
+%config %{_sysconfdir}/pam.d/ovirt-logout
 %config %{_sysconfdir}/pam.d/ovirt-locksession
 %config %{_sysconfdir}/pam.d/ovirt-shutdown
 %config %{_sysconfdir}/pam.d/ovirt-hibernate
 %config %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
 %config %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
+%config %{_sysconfdir}/security/console.apps/ovirt-logout
 %config %{_sysconfdir}/security/console.apps/ovirt-locksession
 %config %{_sysconfdir}/security/console.apps/ovirt-shutdown
 %config %{_sysconfdir}/security/console.apps/ovirt-hibernate
@@ -192,6 +194,7 @@ fi
 %{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
 %{_datadir}/ovirt-guest-agent/timezone.py*
 %{_datadir}/ovirt-guest-agent/ovirt-osinfo
+%{_datadir}/ovirt-guest-agent/ovirt-logout
 
 # consolehelper symlinks
 %{_datadir}/ovirt-guest-agent/ovirt-locksession
@@ -199,6 +202,7 @@ fi
 %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/LogoutActiveUser.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
 
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default.conf

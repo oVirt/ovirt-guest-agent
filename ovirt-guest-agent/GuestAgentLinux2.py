@@ -187,7 +187,9 @@ class CommandHandlerLinux:
         self.agent.cred_server.user_authenticated(credentials)
 
     def logoff(self):
-        pass
+        CMD = ['/usr/share/ovirt-guest-agent/ovirt-logout']
+        logging.debug("Executing logout command: '%s'", CMD)
+        subprocess.call(CMD)
 
     def shutdown(self, timeout, msg, reboot=False):
         # The shutdown command works with minutes while vdsm send value in

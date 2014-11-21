@@ -25,6 +25,7 @@ noinst_PYTHON=\
 dist_pkgdata_SCRIPTS= \
     hibernate \
     LockActiveSession.py \
+    LogoutActiveUser.py \
     $(NULL)
 
 dbusconfdir=$(sysconfdir)/dbus-1/system.d
