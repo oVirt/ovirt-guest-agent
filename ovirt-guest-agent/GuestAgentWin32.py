@@ -418,7 +418,8 @@ class WinDataRetriver(DataRetriverBase):
             items = _winreg.QueryInfoKey(rootkey)[0]
             for idx in range(items):
                 cur_key_path = _winreg.EnumKey(rootkey, idx)
-                cur_key = _winreg.OpenKey(rootkey, cur_key_path)
+                cur_key = _winreg.OpenKey(rootkey, cur_key_path, 0,
+                                          view_flag | _winreg.KEY_READ)
                 try:
                     if self._is_item_update(cur_key):
                         continue
