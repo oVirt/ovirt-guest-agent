@@ -16,6 +16,7 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
+import ctypes
 import logging
 import os
 import socket
@@ -58,6 +59,35 @@ def _readLinesFromProcess(cmdline):
                       process.returncode)
         return []
     return out.splitlines()
+
+
+class Container(object):
+    def __init__(self):
+        self.container = False
+        if 'container' in os.environ:
+            self.container = os.environ['container'] == 'docker'
+        if self.container:
+            self.libc = ctypes.CDLL('libc.so.6')
+            try:
+                self.selffd = os.open('/hostproc/self/ns/mnt', os.O_RDONLY)
+                self.hostfd = os.open('/hostproc/1/ns/mnt', os.O_RDONLY)
+            except (IOError, OSError):
+                # We can't leave anyway, so no need to even try
+                self.container = False
+                logging.warning('Failed to open mounts for container')
+
+    def resetns(self):
+        if self.container:
+            self.libc.setns(self.selffd, 0)
+
+    def setns(self):
+        if self.container:
+            self.libc.setns(self.hostfd, 0)
+
+    def make_procfs(self, path):
+        if self.container:
+            return path.replace('/proc/', '/hostproc/')
+        return path
 
 
 class PkgMgr(object):
@@ -218,6 +248,7 @@ class CommandHandlerLinux:
 class LinuxDataRetriver(DataRetriverBase):
 
     def __init__(self):
+        self.container = Container()
         try:
             pkgmgr = PkgMgr()
         except NotImplementedError:
@@ -271,33 +302,37 @@ class LinuxDataRetriver(DataRetriverBase):
 
     def getAvailableRAM(self):
         free = 0
-        for line in open('/proc/meminfo'):
+        for line in open(self.container.make_procfs('/proc/meminfo')):
             var, value = line.strip().split()[0:2]
             if var in ('MemFree:', 'Buffers:', 'Cached:'):
                 free += long(value)
         return str(free / 1024)
 
     def getUsers(self):
+        self.container.setns()
         users = ''
         try:
             cmdline = '/usr/bin/users | /usr/bin/tr " " "\n" | /usr/bin/uniq'
             users = ' '.join(os.popen(cmdline).read().split())
         except:
             logging.exception("Error retrieving logged in users.")
+        self.container.resetns()
         return users
 
     def getActiveUser(self):
+        self.container.setns()
         users = os.popen('/usr/bin/users').read().split()
         try:
             user = users[0]
         except:
             user = 'None'
+        self.container.resetns()
         return user
 
     def getDisksUsage(self):
         usages = list()
         try:
-            mounts = open('/proc/mounts', 'r')
+            mounts = open(self.container.make_procfs('/proc/mounts'), 'r')
             for mount in mounts:
                 try:
                     (device, path, fs) = mount.split()[:3]
@@ -354,7 +389,7 @@ class LinuxDataRetriver(DataRetriverBase):
         fields = {'MemTotal:': 0, 'MemFree:': 0, 'Buffers:': 0,
                   'Cached:': 0, 'SwapFree:': 0, 'SwapTotal:': 0}
         free = 0
-        for line in open('/proc/meminfo'):
+        for line in open(self.container.make_procfs('/proc/meminfo')):
             (key, value) = line.strip().split()[0:2]
             if key in fields.keys():
                 fields[key] = int(value)
@@ -382,7 +417,7 @@ class LinuxDataRetriver(DataRetriverBase):
         interval = self.vmstat['timestamp_cur'] - self.vmstat['timestamp_prev']
         self.vmstat['timestamp_prev'] = self.vmstat['timestamp_cur']
 
-        for line in open('/proc/vmstat'):
+        for line in open(self.container.make_procfs('/proc/vmstat')):
             (key, value) = line.strip().split()[0:2]
             if key in fields.keys():
                 name = fields[key]
