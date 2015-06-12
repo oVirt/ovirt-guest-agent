@@ -276,7 +276,19 @@ class AgentLogicBase:
         logging.debug("AgentLogicBase::doListen() - exiting")
 
     def _onApiVersion(self, args):
+        before = self.dr.apiVersion
         self.dr.setAPIVersion(args['apiVersion'])
+        if before != self.dr.apiVersion:
+            self._refresh()
+
+    def _refresh(self):
+        self.sendUserInfo(True)
+        self.sendAppList()
+        self.sendInfo()
+        self.sendDisksUsages()
+        self.sendFQDN()
+        self.sendTimezone()
+        self.sendOsInfo()
 
     def parseCommand(self, command, args):
         logging.info("Received an external command: %s..." % (command))
@@ -320,13 +332,7 @@ class AgentLogicBase:
                 logging.info('API versioning not supported by VDSM. Disabling '
                              'versioning support.')
                 self.dr.setAPIVersion(_DISABLED_API_VALUE)
-            self.sendUserInfo(True)
-            self.sendAppList()
-            self.sendInfo()
-            self.sendDisksUsages()
-            self.sendFQDN()
-            self.sendTimezone()
-            self.sendOsInfo()
+            self._refresh()
         elif command == 'echo':
             logging.debug("Echo: %s", args)
             self._send('echo', args)
