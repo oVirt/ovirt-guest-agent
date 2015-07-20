@@ -1,11 +1,11 @@
 
-%global release_version 2
+%global release_version 1
 
 %global _moduledir /%{_lib}/security
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.10
+Version: 1.0.11
 Release: %{release_version}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -235,6 +235,9 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Mon Jul 20 2015 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.11-1
+- New upstream version 1.0.11
+
 * Tue Feb 10 2015 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.10-2
 - Adding ovirt-osinfo script
 

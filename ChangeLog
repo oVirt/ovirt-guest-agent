@@ -1,3 +1,344 @@
+commit deeaf0ffa9dd087bbdf89ef20bc12b1b934ef308
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Jun 12 09:17:17 2015 +0200
+
+    Send an automatic refresh if the version changed
+
+    Currently OGA does not send any updated information in case the version
+    changed. That causes data to be missing on the VDSM side when there's
+    a version difference.
+    The only solution to solve this was until now is to restart VDSM, this
+    patch addresses this limitation.
+
+    Change-Id: I4b53609644438f661d8db1025e609b4b8d4efc7e
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit fd7439fccadc71af656b2c7bbea70b335af61324
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Jun 12 09:12:10 2015 +0200
+
+    Fix exceptions on guest os reporting
+
+    During the verification of the engine side of this feature, stacktraces
+    have been found in the guest agent logs.
+    The functionality was not affected by these exceptions, however need to
+    be addressed properly. This patch solves this.
+
+    Change-Id: I626081377ca6eb25588f4fc42aa70af7048ab7bd
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 81e314bec8f83cdf201bff10a168c7ba59cd7a1e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Apr 10 13:03:12 2015 +0200
+
+    Adding atomic host support to the ovirt guest agent
+
+    Change-Id: Id7c2d8b00ce4fab7dc61e449a012a8a7d32ec4de
+    Bug-Url: https://bugzilla.redhat.com/1201516
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 08b9d0f0dd9180d31cb922dae40c2096fed2655c
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 21 08:46:14 2015 +0200
+
+    app-list: Tracking also cloud-init now
+
+    Change-Id: I15a1d4fedaee29c3da2f2e4602e081b53ed2270a
+    Bug-Url: https://bugzilla.redhat.com/1206102
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 787b55e6340441f15ae2ca2699ec3217d2022c32
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Nov 21 10:11:39 2014 +0100
+
+    linux: Logout active user support
+
+    Change-Id: I1173dc8cb6c2bd68b5e2a2ba4ad69284b2085171
+    Bug-Url: https://bugzilla.redhat.com/1171638
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit bcd1e4b6adcc49574a4f7027d0a910442b8cfb37
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jun 19 13:23:40 2014 +0200
+
+    Add OS info reporting
+
+    Change-Id: I682fd9683cf9e4b392ecd4824e4a9526bf7e5e59
+    Bug-Url: https://bugzilla.redhat.com/869296
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit f2140c47768190b58c1cd28d7ba1aaf14640df6e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jun 19 13:44:18 2014 +0200
+
+    Make GuestAgentLinux2 patchable for unit tests
+
+    Change-Id: I6f0a927976272687b47f1e78e3a34eb6f23b64c9
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit bee68e003eda4b1d29ff7be06efe803941a7ac3a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 22 16:13:38 2014 +0200
+
+    Support for timezone reporting
+
+    This patch introduces the reporting the timezone and time offset
+    of the guest operating system.
+
+    Change-Id: I94c1429f40448a262d0d72fcc6dba2b4b59340c2
+    Bug-Url: https://bugzilla.redhat.com/869296
+    Guest-Agent-API-Version: 2
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 25390c075d0a0566d00dfab741fb6370b0fa76e0
+Author: Lev Veyde <lveyde@redhat.com>
+Date:   Tue Dec 16 17:41:52 2014 +0200
+
+    win32: Application list is not returned on 2K3 R2
+
+    The application list is not returned, as it seems that under Windows
+    2003 R2 the subsequent call to the OpenKey, after the parent key has
+    been already opened, for some reason looses the correct WOW property,
+    resulting in key not found error.
+
+    Change-Id: I1a801f53fe917e1327b50c75de102d7635959c76
+    Signed-off-by: Lev Veyde <lveyde@redhat.com>
+    Bug-Url: https://bugzilla.redhat.com/1174853
+
+commit e0e6e452f29730ea8c4a2dc889787e09e71c6bc7
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Nov 18 08:49:36 2014 +0100
+
+    sudoers: Fix of typo ovirt-shutdown-wrapper{s,}
+
+    Change-Id: I9247c6c2048a1f20f048c8232d2c18698a414073
+    Bug-Url: https://bugzilla.redhat.com/1155921
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 901e298c5030568002a8d86ffed267e13a7f7b7f
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Nov 14 12:57:16 2014 +0100
+
+    win32: Set registry value with SetValueEx not SetValue
+
+    _winreg.SetValue only allows to set the default value on a subkey
+    SetValueEx lets one specify the value name and the value itself.
+
+    Additionally as a security measure we're now encapsulating all
+    exceptions coming from SAS handling to still at least attempt the
+    login, even if the SAS portion may fail.
+    This is just a precaution to prevent SSO from breaking due to some
+    unforeseen bug.
+
+    Change-Id: I51d70381de43d62e96f9f24de60bdf0226e20f54
+    Bug-Url: https://bugzilla.redhat.com/1158470
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit e5081665565b461b680d0ee094b9e82bdc08e313
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Nov 11 13:58:57 2014 +0100
+
+    win32: Read serial info directly when not available through WMI
+
+    The SerialNumber field in the WMI table 'Win32_DiskDrive' is only
+    available from Windows Vista and Windows 2008 Server.
+
+    This patch works around this issue by querying the device directly,
+    but only if the SerialNumber field is not available.
+
+    Change-Id: Id39914464377c388b8ef3e2551a47a295de4a750
+    Bug-Url: https://bugzilla.redhat.com/1158907
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 5c484c61148ae50a8d1670482c59ed34dc7139ad
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Oct 30 12:24:06 2014 +0100
+
+    win32: Also the listener thread needs to call CoInitialize
+
+    Change-Id: If31c9703d177930922769b98187fae67a28efd4f
+    Bug-Url: https://bugzilla.redhat.com/1158855
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 93aa6178f79189b41c28312e9c839e8d8045e52f
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Oct 29 15:54:02 2014 +0100
+
+    win32: OpenKey third parameter must always be 0
+
+    The third parameter is a reserved parameter, where the fourth is
+    the parameter for the requested access rights. Previously the requested
+    access was passed as the reserved parameter which is wrong, however it
+    did not fail any testing.
+    This patch corrects the misusage.
+
+    Change-Id: I9fb3747edec2a7ea7270522ac7104748f7021870
+    Bug-Url: https://bugzilla.redhat.com/1158470
+    Bug-Url: https://bugzilla.redhat.com/1105056
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 76b9e84931c8c4b72ffa72238591a0b6fe5251fa
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Aug 27 16:11:27 2014 +0200
+
+    win: Enable policy for software SAS
+
+    On some systems the policy for enabling the Secure Attention Sequence
+    might not have been set or has been set to a value which would not allow
+    the guest agent to perform SSO.
+    This patch introduces setting the policy before calling 'SendSAS' and
+    reverting the policy to the previous value (in case it was set before).
+
+    Change-Id: Ie2b5f58e461c92e06789d46fa9113441ea48e659
+    Bug-Url: https://bugzilla.redhat.com/1124263
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 94f25df69d2acf1f0915ee4fc7672fd848f1f402
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Oct 10 11:09:03 2014 +0200
+
+    SLE: Adding kernel-ppc64 to reported kernel packages
+
+    Change-Id: Ibaade99efe4fbfe82d9174ef263531a1de1ff7c5
+    Bug-Url: https://bugzilla.redhat.com/1151038
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 87179d348dd775629b31d13b45f5478492776b4a
+Author: Tim Speetjens <tim.speetjens@redhat.com>
+Date:   Wed Jul 9 14:07:58 2014 +0200
+
+    Added additional logging for debugging guest/vdsm communication
+
+    Change-Id: I76d6b41e2ee3775c560bedf6f948e382b694322a
+    Signed-off-by: Tim Speetjens <tim.speetjens@redhat.com>
+
+commit cc8d0418fcfa23bfcc60ef150f4375bea7bc4751
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Aug 28 08:57:25 2014 +0200
+
+    linux: Ignore filesystems in disks usage with zero size
+
+    This patch introduces a new option in the linux configuration files
+    to ignore mounted filesystems with zero size.
+    We're currently black listing file system types and with every
+    new distribution we support new filesystem types have to be added
+    which usually have no size. (total/used size equals 0)
+
+    This patch introduces the ignore_zero_size_fs option to allow users
+    to revert back to the old behaviour by setting the value to `false`.
+
+    Change-Id: Iacaf57966aec2d973be39776b5f2457b27dac689
+    Bug-Url: https://bugzilla.redhat.com/1130993
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 84e2216c39a2f4b4fb0768d561cf4e85e1f88939
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Aug 27 16:16:48 2014 +0200
+
+    Fix pep8 error
+
+    ovirt-guest-agent/GuestAgentLinux2.py:55:1: E302 expected 2 blank lines, found 1
+
+    Change-Id: Ib05330955224108fa30b46e11b13b0fe99fab247
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 692b3ea13a7b4ea5a5426424d6aaf13a0f45ba32
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Aug 13 16:12:03 2014 +0200
+
+    Support for mapping image ids to physical devices
+
+    This patch uses libudev through ctypes for systems providing
+    libudev due to the instable nature of sysfs. While on RHEL5
+    we're using sysfs we cannot for example use it on Fedora 20
+    with kernel 3.15 since the serial values seem not to be exposed
+    by sysfs.
+
+    This patch extends the disks-usage message with the 'mapping' field.
+    The value of the mapping field is an object {'$serial': {'name': '$devname'}}
+
+    Change-Id: Ie8961b3703703df573dbf2f0fca2143b463ae76b
+    Bug-Url: https://bugzilla.redhat.com/1127607
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 6fc1a18b2be2e93070fce2cd3cb0d5e23e2ecc5e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Aug 15 14:18:42 2014 +0200
+
+    Fix username handling on Windows
+
+    We forcibly encoded the unicode string to UTF-8 right after retrieval
+    which broke the encoding later on.
+
+    This patch fixes this issue.
+
+    Change-Id: I65b33e4f38f801f1770cf94a5ed36234c2fae90d
+    Bug-Url: https://bugzilla.redhat.com/1010201
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit f531f482a2b2fa03ba7ec61449f5c3539a607a03
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 15 14:14:42 2014 +0200
+
+    Filter out duplicated network adapters on Windows
+
+    Change-Id: I19d4b91ea4fb6fcec6699ab6892ba1d6240919f6
+    Bug-Url: https://bugzilla.redhat.com/1113089
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 3f1b5396f07145b830713b5643ca766bc6c817e7
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 15 10:22:40 2014 +0200
+
+    Handle exceptions on reading package lists
+
+    In some cases it might be possible that the package database
+    is not accessible to non-privileged users.
+    This patch handles and logs this issue and prevents the exception
+    from stopping the guest agent thread with an unhandled exception.
+
+    Change-Id: Id44210235a3bd8fadf91cb919896c1abe8b4c250
+    Bug-Url: https://bugzilla.redhat.com/1117632
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1d8b7aadd24ef2e35e91dfc5f45d659dcf616bb3
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 15 11:51:59 2014 +0200
+
+    Open mode for logfiles should be 'a+' rather than 'a'
+
+    Change-Id: Ic4914ea6da41df191475896c0c9180d347c57501
+    Bug-Url: https://bugzilla.redhat.com/1115515
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 7db458e77c0576f12c13a6f7e7cf3d5a46855beb
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 15 11:49:04 2014 +0200
+
+    Remove downstream names from upstream ini
+
+    Change-Id: Ic5ef41725a95bb19d2748d53a51bdbac432c9f84
+    Bug-Url: https://bugzilla.redhat.com/1117690
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 34b3537a707c485174897d3f8e23ce97f904586b
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 1 14:53:56 2014 +0200
+
+    Corrections to the build system for el5
+
+    Change-Id: I401b4b0ff68abaf492ab31379c79a18c588cfa00
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 46821e25e131b5ba3d7fd0f389ad609d5af910d2
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 1 14:20:51 2014 +0200
+
+    Bump to 1.0.10 for ovirt-3.5
+
+    Change-Id: Ife1c6f7db53228d0e40242d620f9e40ff2344439
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
 commit 11c0e70b946ca661eea53c446cd3b8583bab8bfa
 Author: Dan Kenigsberg <danken@redhat.com>
 Date:   Tue Jun 17 10:51:30 2014 +0100
