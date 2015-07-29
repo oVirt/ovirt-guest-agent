@@ -1,0 +1,7 @@
+make
+automake
+autoconf
+aclocal
+libtool
+python-pep8
+python-nose

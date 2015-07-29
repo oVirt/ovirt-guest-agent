@@ -5,6 +5,7 @@
 *.pyc
 *.suo
 *.vcproj.*.user
+*.sw?
 .deps
 .idea
 .libs
