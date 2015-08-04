@@ -3,7 +3,7 @@
 
 Name: ovirt-guest-agent
 Version: 1.0.11
-Release: %{release_version}%{?dist}
+Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
 License: ASL 2.0

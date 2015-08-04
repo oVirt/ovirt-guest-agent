@@ -1,9 +1,10 @@
 Name:		ovirt-guest-agent-windows
 Version:	1.0.11
-Release:	1
+Release:	1%{?release_suffix}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
-Source:		https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.11/ovirt-guest-agent-%{version}.tar.bz2
+Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.11/ovirt-guest-agent-%{version}.tar.bz2
+
 URL:		http://www.ovirt.org/
 BuildArch:	noarch
 Packager:	Lev Veyde <lveyde@redhat.com>
@@ -51,7 +52,7 @@ popd
 pushd ovirt-guest-agent
 mkdir -p build/bdist.win32/winexe/bundle-2.7/
 cp  $WINEPREFIX/drive_c/Python27/python27.dll build/bdist.win32/winexe/bundle-2.7/
-wineconsole win-guest-agent-build-exe.bat
+wine cmd.exe /C win-guest-agent-build-exe.bat
 popd
 
 %install

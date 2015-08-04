@@ -6,12 +6,12 @@
 
 Name: ovirt-guest-agent
 Version: 1.0.11
-Release: %{release_version}%{?dist}
+Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
 License: ASL 2.0
 URL: http://wiki.ovirt.org/wiki/Category:Ovirt_guest_agent
-Source0: http://ovirt.org/releases/stable/src/%{name}-%{version}.tar.bz2
+Source0: https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.11/%{name}-%{version}.tar.bz2
 BuildRequires: libtool
 BuildRequires: pam-devel
 BuildRequires: python2-devel
@@ -320,7 +320,7 @@ Resolves: BZ#803503
 - renamed user name to ovirtguest.
 - reset version numbering after changing the package name.
 
-* Thu Sep 27 2011 Gal Hammer <ghammer@redhat.com> - 2.3.15-1
+* Tue Sep 27 2011 Gal Hammer <ghammer@redhat.com> - 2.3.15-1
 - fixed disk usage report when mount point include spaces.
 - added a minimum version for python-ethtool.
 Resolves: BZ#736426
@@ -367,7 +367,7 @@ Resolves: BZ#713079 BZ#632959
 - fixed the local user check when stripping the domain part.
 Resolves: BZ#632959 BZ#711428 BZ#694088 BZ#661713 BZ#681123
 
-* Tue May 25 2011 Gal Hammer <ghammer@redhat.com> - 2.3.7-1
+* Wed May 25 2011 Gal Hammer <ghammer@redhat.com> - 2.3.7-1
 - stopped removing the domain part from the user name.
 - show only network interfaces that are up and running.
 Resolves: BZ#661713 BZ#681123 BZ#704845
@@ -429,7 +429,7 @@ Resolves: BZ#641886
 - BZ#660231 register daemon for startup.
 Resolves: BZ#660343 BZ#660231
 
-* Wed Dec 05 2010 Barak Azulay <bazulay@redhat.com> - 2.3-2
+* Sun Dec 05 2010 Barak Azulay <bazulay@redhat.com> - 2.3-2
 - initial build for RHEL-6
 - works over vioserial
 - Agent reports only heartbeats, IPs, app list
@@ -437,5 +437,5 @@ Resolves: BZ#660343 BZ#660231
   ConsoleKit & gnome-screensaver is installed)
 Resolves: BZ#613059
 
-* Thu Aug 27 2010 Gal Hammer <ghammer@redhat.com> - 2.3-1
+* Fri Aug 27 2010 Gal Hammer <ghammer@redhat.com> - 2.3-1
 - Initial build.
