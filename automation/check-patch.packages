@@ -5,3 +5,4 @@ aclocal
 libtool
 python-pep8
 python-nose
+git
