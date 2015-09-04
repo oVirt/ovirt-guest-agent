@@ -337,7 +337,7 @@ class LinuxDataRetriver(DataRetriverBase):
             for mount in mounts:
                 try:
                     (device, path, fs) = mount.split()[:3]
-                    if fs not in self.ignored_fs:
+                    if fs not in self.ignored_fs and not os.path.isfile(path):
                         # path might include spaces.
                         path = path.decode("string-escape")
                         statvfs = os.statvfs(path)
