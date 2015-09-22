@@ -23,6 +23,7 @@ import sys
 import getopt
 import ConfigParser
 import cStringIO
+from GuestAgentLinux2 import LinuxVdsAgent
 
 io = None
 try:
@@ -32,7 +33,6 @@ except ImportError:
     import bytesio as modio
     io = modio
 
-from GuestAgentLinux2 import LinuxVdsAgent
 
 AGENT_CONFIG = '/etc/ovirt-guest-agent.conf'
 AGENT_DEFAULT_CONFIG = '/usr/share/ovirt-guest-agent/default.conf'

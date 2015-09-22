@@ -32,11 +32,11 @@ import struct
 from ctypes import Structure, POINTER, CDLL, c_ubyte, c_uint, c_void_p, \
     c_size_t, c_int, sizeof, cast, pointer, c_short, byref, get_errno
 from ctypes.util import find_library
+from dbus.mainloop.glib import DBusGMainLoop
 
 # Initializes the use of Python threading in the gobject module.
 gobject.threads_init()
 
-from dbus.mainloop.glib import DBusGMainLoop
 DBusGMainLoop(set_as_default=True)
 
 libc = CDLL(find_library('c'), use_errno=True)
