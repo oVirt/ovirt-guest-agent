@@ -21,6 +21,9 @@ import time
 import logging
 import struct
 import socket
+from threading import Event
+from VirtIoChannel import VirtIoChannel
+import timezone
 
 multiproc = None
 try:
@@ -32,9 +35,6 @@ except ImportError:
             return -1
     multiproc = MultiProcessingFake()
 
-from threading import Event
-from VirtIoChannel import VirtIoChannel
-import timezone
 
 _MAX_SUPPORTED_API_VERSION = 2
 _DISABLED_API_VALUE = 0
