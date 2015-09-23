@@ -17,22 +17,23 @@
 #
 
 import array
-import dbus
-import dbus.service
-import errno
-import gobject
-import pwd
-import logging
-import socket
-import time
-import threading
-import random
-import struct
-
 from ctypes import Structure, POINTER, CDLL, c_ubyte, c_uint, c_void_p, \
     c_size_t, c_int, sizeof, cast, pointer, c_short, byref, get_errno
 from ctypes.util import find_library
+import errno
+import logging
+import pwd
+import random
+import socket
+import struct
+import threading
+import time
+
+import dbus
+import dbus.service
+import gobject
 from dbus.mainloop.glib import DBusGMainLoop
+
 
 # Initializes the use of Python threading in the gobject module.
 gobject.threads_init()

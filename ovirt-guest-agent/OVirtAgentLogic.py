@@ -16,14 +16,16 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import thread
-import time
 import logging
-import struct
 import socket
+import struct
+import thread
 from threading import Event
-from VirtIoChannel import VirtIoChannel
+import time
+
 import timezone
+from VirtIoChannel import VirtIoChannel
+
 
 multiproc = None
 try:

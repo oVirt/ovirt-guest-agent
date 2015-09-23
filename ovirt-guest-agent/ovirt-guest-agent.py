@@ -15,15 +15,17 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
+import ConfigParser
+import cStringIO
+import getopt
 import logging
 import logging.config
 import os
 import signal
 import sys
-import getopt
-import ConfigParser
-import cStringIO
+
 from GuestAgentLinux2 import LinuxVdsAgent
+
 
 io = None
 try:

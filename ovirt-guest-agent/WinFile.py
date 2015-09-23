@@ -17,11 +17,11 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import win32security
-import win32file
-import win32event
-import win32con
 import pywintypes
+import win32con
+import win32event
+import win32file
+import win32security
 
 
 # Using Python's os.read() to do a blocking-read doesn't allow

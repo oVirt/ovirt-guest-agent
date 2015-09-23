@@ -1,10 +1,11 @@
 
 from distutils.core import setup
 from glob import glob
-import py2exe
-import sys
 import os
+import sys
 import version
+
+import py2exe
 
 dsa_path = os.path.join(
     os.path.dirname(

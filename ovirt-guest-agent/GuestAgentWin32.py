@@ -1,29 +1,32 @@
 #!/usr/bin/python
 
-import time
-import os
-import logging
-import win32netcon
-import win32net
-import win32ts
-import win32api
-import win32file
-import win32pipe
-import win32security
-import win32process
-import win32con
-import win32com.client
-import pythoncom
-import subprocess
-import socket
-from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
+import _winreg
 import ctypes
 from ctypes import c_ulong, byref, windll, create_unicode_buffer,\
     Structure, sizeof, c_void_p
 from ctypes.util import find_library
 from ctypes.wintypes import DWORD
-import _winreg
 import ctypes.wintypes
+import logging
+import os
+import socket
+import subprocess
+import time
+
+import pythoncom
+import win32api
+import win32com.client
+import win32con
+import win32file
+import win32net
+import win32netcon
+import win32pipe
+import win32process
+import win32security
+import win32ts
+
+from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
+
 
 # Constants according to
 # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724878.aspx

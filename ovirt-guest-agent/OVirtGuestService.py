@@ -1,19 +1,22 @@
 # qagentservice: Windows service wrapper for Qumranet monitoring agent
 # The service is converted into an exe-file with py2exe
 
-import win32serviceutil
-import win32service
-import win32evtlogutil
-from GuestAgentWin32 import WinVdsAgent
+import ConfigParser
+import _winreg
+import cStringIO
+import io
 import logging
 import logging.config
-import servicemanager
 import os
 import os.path
-import _winreg
-import ConfigParser
-import io
-import cStringIO
+
+import servicemanager
+import win32evtlogutil
+import win32service
+import win32serviceutil
+
+from GuestAgentWin32 import WinVdsAgent
+
 
 AGENT_CONFIG = 'ovirt-guest-agent.ini'
 AGENT_DEFAULT_CONFIG = 'default.ini'

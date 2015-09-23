@@ -23,7 +23,9 @@ import socket
 import subprocess
 import threading
 import time
+
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
+
 
 CredServer = None
 try:

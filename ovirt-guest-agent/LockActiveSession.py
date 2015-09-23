@@ -15,11 +15,12 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-import dbus
 import logging
 import os
 import os.path
 import subprocess
+
+import dbus
 
 
 class SessionWrapper(object):

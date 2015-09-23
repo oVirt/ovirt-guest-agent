@@ -16,12 +16,12 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
+import locale
+import logging
 import os
 import platform
 import time
-import locale
 import unicodedata
-import logging
 
 
 # avoid pep8 warnings
