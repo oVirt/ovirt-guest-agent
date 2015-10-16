@@ -78,7 +78,7 @@ def assert_integral_param(o, n):
     assert(n in o)
     integral = isinstance(o[n], (int, long))
     if not integral and isinstance(o[n], basestring):
-        var = long(o[n])
+        long(o[n])
         integral = True
     assert(integral)
 
@@ -167,10 +167,32 @@ def validate_timezone(msg):
     assert_integral_param(msg, 'offset')
 
 
+def validate_container(msg):
+    assertIn('names', msg)
+    assertIn('id', msg)
+    assertIn('command', msg)
+    assertIn('status', msg)
+    assertIn('image', msg)
+    assert_string_param(msg, 'id')
+    assert_string_param(msg, 'status')
+    assert_string_param(msg, 'image')
+    assert_string_param(msg, 'command')
+    assert_is_string_list(msg['names'])
+
+
+def validate_containers(msg):
+    assertIn('list', msg)
+    print msg
+    assert(isinstance(msg['list'], (list, tuple)))
+    for c in msg['list']:
+        validate_container(c)
+
+
 _MSG_VALIDATORS = {
     'active-user': _name_and_one_str_param('active-user', 'name'),
     'applications': _name_and_one_string_list_param('applications',
                                                     'applications'),
+    'containers': validate_containers,
     'disks-usage': validate_disks_usage,
     'fqdn': _name_and_one_str_param('fqdn', 'fqdn'),
     'host-name': _name_and_one_str_param('host-name', 'name'),
@@ -326,3 +348,20 @@ class MessageValidator(object):
         assert(agent.dr.getAPIVersion() == 2)
         agent.parseCommand('refresh', {'apiVersion': 2})
         assert(agent.dr.getAPIVersion() == 2)
+
+    @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
+                      'network-interfaces', 'disks-usage', 'fqdn')
+    def verifyRefreshReply5(self, agent):
+        agent.dr.setAPIVersion(3)
+        assert(agent.dr.getAPIVersion() == 3)
+        agent.parseCommand('refresh', {})
+        assert(agent.dr.getAPIVersion() == 0)
+
+    @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
+                      'network-interfaces', 'disks-usage', 'fqdn',
+                      'os-info', 'timezone', 'containers')
+    def verifyRefreshReply6(self, agent):
+        agent.dr.setAPIVersion(3)
+        assert(agent.dr.getAPIVersion() == 3)
+        agent.parseCommand('refresh', {'apiVersion': 3})
+        assert(agent.dr.getAPIVersion() == 3)

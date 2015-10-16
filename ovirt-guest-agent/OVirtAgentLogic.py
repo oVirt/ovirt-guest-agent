@@ -62,7 +62,8 @@ _MESSAGE_MIN_API_VERSION = {
     'session-shutdown': 0,
     'session-startup': 0,
     'session-unlock': 0,
-    'timezone': 2}
+    'timezone': 2,
+    'containers': 3}
 
 
 # Return a safe (password masked) repr of the credentials block.
@@ -123,6 +124,9 @@ class DataRetriverBase:
         pass
 
     def getOsVersion(self):
+        pass
+
+    def getContainerList(self):
         pass
 
     def getAllNetworkInterfaces(self):
@@ -218,6 +222,7 @@ class AgentLogicBase:
         self.sendInfo()
         self.sendUserInfo()
         self.sendAppList()
+        self.sendContainerList()
         self.sendFQDN()
         self.sendTimezone()
         self.sendOsInfo()
@@ -247,6 +252,7 @@ class AgentLogicBase:
                 appsecs -= 1
                 if appsecs <= 0:
                     self.sendAppList()
+                    self.sendContainerList()
                     self.sendInfo()
                     self.sendFQDN()
                     appsecs = self.appRefreshRate
@@ -290,6 +296,7 @@ class AgentLogicBase:
     def _refresh(self):
         self.sendUserInfo(True)
         self.sendAppList()
+        self.sendContainerList()
         self.sendInfo()
         self.sendDisksUsages()
         self.sendFQDN()
@@ -388,6 +395,9 @@ class AgentLogicBase:
         self._send('os-version', {'version': self.dr.getOsVersion()})
         self._send('network-interfaces',
                    {'interfaces': self.dr.getAllNetworkInterfaces()})
+
+    def sendContainerList(self):
+        self._send('containers', {'list': self.dr.getContainerList()})
 
     def sendAppList(self):
         self._send('applications', {'applications': self.dr.getApplications()})

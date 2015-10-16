@@ -1,5 +1,5 @@
 
-%global release_version 1
+%global release_version 2
 
 %global _moduledir /%{_lib}/security
 %global _kdmrc /etc/kde/kdm/kdmrc
@@ -194,12 +194,14 @@ fi
 # this actually might break it.
 %config %{_sysconfdir}/pam.d/ovirt-logout
 %config %{_sysconfdir}/pam.d/ovirt-locksession
+%config %{_sysconfdir}/pam.d/ovirt-container-list
 %config %{_sysconfdir}/pam.d/ovirt-shutdown
 %config %{_sysconfdir}/pam.d/ovirt-hibernate
 %config %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
 %config %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
 %config %{_sysconfdir}/security/console.apps/ovirt-logout
 %config %{_sysconfdir}/security/console.apps/ovirt-locksession
+%config %{_sysconfdir}/security/console.apps/ovirt-container-list
 %config %{_sysconfdir}/security/console.apps/ovirt-shutdown
 %config %{_sysconfdir}/security/console.apps/ovirt-hibernate
 
@@ -218,6 +220,7 @@ fi
 %{_datadir}/ovirt-guest-agent/ovirt-locksession
 %{_datadir}/ovirt-guest-agent/ovirt-shutdown
 %{_datadir}/ovirt-guest-agent/ovirt-hibernate
+%{_datadir}/ovirt-guest-agent/ovirt-container-list
 
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LogoutActiveUser.py*
@@ -226,6 +229,7 @@ fi
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default.conf
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default-logger.conf
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/diskmapper
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/container-list
 
 %{_unitdir}/ovirt-guest-agent.service
 
@@ -253,6 +257,9 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Fri Oct 16 2015 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.11-2
+- Adding ovirt container list feature (currently only docker)
+
 * Mon Jul 20 2015 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.11-1
 - New upstream version 1.0.11
 

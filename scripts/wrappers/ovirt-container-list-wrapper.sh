@@ -1,5 +1,6 @@
+#!/bin/sh
 #
-# Copyright 2014 Red Hat, Inc. and/or its affiliates.
+#       Copyright (C) 2014 Vinzenz Feenstra, Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,25 +17,6 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-SUBDIRS =        \
-    diskmapper   \
-    wrappers     \
-    $(NULL)
+/usr/share/ovirt-guest-agent/container-list
 
-osinfoscriptdir = $(pkgdatadir)
-osinfoscript_SCRIPTS= \
-    ovirt-osinfo   \
-    container-list \
-    $(NULL)
 
-EXTRA_DIST=                    \
-    ovirt-osinfo               \
-    container-list             \
-    sudoers.ovirt-guest-agent  \
-    $(NULL)
-
-if INSTALL_SUDO_SCRIPTS
-install-data-hook:
-	$(MKDIR_P) $(DESTDIR)/$(sysconfdir)/sudoers.d
-	$(INSTALL) -m 440 sudoers.ovirt-guest-agent $(DESTDIR)/$(sysconfdir)/sudoers.d/50_ovirt-guest-agent
-endif

@@ -432,6 +432,9 @@ class WinDataRetriver(DataRetriverBase):
             'type': 'windows',
             'kernel': ''}
 
+    def getContainerList(self):
+        return []
+
     def getAllNetworkInterfaces(self):
         return GetNetworkInterfaces()
 

@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+import json
+import os.path
+import socket
+
+
+def transform(container):
+    TRANSFORM = (('Id', 'id'), ('Names', 'names'), ('Image', 'image'),
+                 ('Command', 'command'), ('Status', 'status'))
+    result = {}
+    for mapping in TRANSFORM:
+        if mapping[0] in container:
+            result[mapping[1]] = container[mapping[0]]
+    return result
+
+
+def print_transformed(data):
+    print json.dumps([transform(container) for container in json.loads(data)]),
+
+
+if os.path.exists('/var/run/docker.sock'):
+    try:
+        s = socket.socket(socket.SOCK_STREAM, socket.AF_UNIX)
+        s.connect('/var/run/docker.sock')
+        s.send('GET /containers/json?all=true HTTP/1.0\r\n\r\n')
+        sockfile = s.makefile()
+        data = sockfile.read()
+        idx = data.find('\r\n\r\n')
+        if idx != -1:
+            print_transformed(data[idx + 4:])
+        else:
+            print '[]',
+    except:
+        print '[]',
+else:
+    print '[]',

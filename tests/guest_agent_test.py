@@ -67,9 +67,21 @@ class FunctionalTest(GuestAgentTestCase):
 
     def testRefresh(self):
         self._validator.verifyRefreshReply(self.vdsAgent)
+
+    def testRefresh2(self):
         self._validator.verifyRefreshReply2(self.vdsAgent)
+
+    def testRefresh3(self):
         self._validator.verifyRefreshReply3(self.vdsAgent)
+
+    def testRefresh4(self):
         self._validator.verifyRefreshReply4(self.vdsAgent)
+
+    def testRefresh5(self):
+        self._validator.verifyRefreshReply5(self.vdsAgent)
+
+    def testRefresh6(self):
+        self._validator.verifyRefreshReply6(self.vdsAgent)
 
     def testSendInfo(self):
         self._validator.verifySendInfo(self.vdsAgent)

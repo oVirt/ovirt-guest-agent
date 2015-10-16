@@ -28,6 +28,17 @@ from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
 from hooks import Hooks
 
 
+# avoid pep8 warnings
+def import_json():
+    try:
+        import json
+        return json
+    except ImportError:
+        import simplejson
+        return simplejson
+json = import_json()
+
+
 CredServer = None
 try:
     from CredServer import CredServer as CredServerImported
@@ -276,6 +287,20 @@ class LinuxDataRetriver(DataRetriverBase):
 
     def getOsVersion(self):
         return os.uname()[2]
+
+    def getContainerList(self):
+        cmd = [_get_script_path('ovirt-container-list')]
+        # skip if not available
+        if not os.path.exists(cmd[0]):
+            return []
+        logging.debug('Executing ovirt-container-list command')
+        result = []
+        try:
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            result = json.loads(p.stdout.read())
+        except Exception:
+            logging.exception('ovirt-container-list invocation failed')
+        return result
 
     def getOsInfo(self):
         cmd = [_get_script_path('ovirt-osinfo')]
