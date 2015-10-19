@@ -1,6 +1,6 @@
 Name:		ovirt-guest-agent-windows
 Version:	1.0.11
-Release:	1%{?release_suffix}
+Release:	2%{?release_suffix}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
 Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.11/ovirt-guest-agent-%{version}.tar.bz2
@@ -26,10 +26,10 @@ oVirt Guest Agent Service executable for Microsoft Windows platform.
 # Use this instead of ~/.wine. See wine(1).
 export WINEPREFIX=$PWD/wineprefix
 
-wine msiexec /i %{_datadir}/artifacts/python-windows/python-2.7.8.msi /qn ADDLOCAL=ALL
+wine msiexec /i %{_datadir}/python-windows/python-2.7.8.msi /qn ADDLOCAL=ALL
 export Path="%PATH%;C:\Python27"
 
-7za x %{_datadir}/artifacts/pywin32-py2.7/pywin32-219.win32-py2.7.exe
+7za x %{_datadir}/pywin32-py2.7/pywin32-219.win32-py2.7.exe
 mv PLATLIB/* $WINEPREFIX/drive_c/Python27/Lib/site-packages/
 rmdir PLATLIB
 mv SCRIPTS/* $WINEPREFIX/drive_c/Python27/Lib/site-packages/
@@ -39,7 +39,7 @@ wine python pywin32_postinstall.py -install -silent -quiet
 rm -f ./pywin32_postinstall.py
 popd
 
-7za x %{_datadir}/artifacts/py2exe-py2.7/py2exe-0.6.9.win32-py2.7.exe
+7za x %{_datadir}/py2exe-py2.7/py2exe-0.6.9.win32-py2.7.exe
 mv PLATLIB/* $WINEPREFIX/drive_c/Python27/Lib/site-packages/
 rmdir PLATLIB
 mv SCRIPTS/* $WINEPREFIX/drive_c/Python27/Lib/site-packages/
@@ -56,7 +56,7 @@ wine cmd.exe /C win-guest-agent-build-exe.bat
 popd
 
 %install
-DST=%{buildroot}%{_datadir}/artifacts/%{name}/
+DST=%{buildroot}%{_datadir}/%{name}/
 mkdir -p $DST
 cp -v %{_builddir}/ovirt-guest-agent-%{version}/ovirt-guest-agent/dist/*.exe $DST
 cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/default.ini $DST
@@ -64,9 +64,12 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/default-logger.in
 cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/ovirt-guest-agent.ini $DST
 
 %files
-%{_datadir}/artifacts/%{name}
+%{_datadir}/%{name}
 
 %changelog
+* Tue Oct 20 2015 Yedidyah Bar David <didi@redhat.com> - 1.0.11-2
+- dropped "artifacts" from all paths
+
 * Wed Aug 12 2015 Sandro Bonazzola <sbonazzo@redhat.com> - 1.0.11-1
 - New upstream version 1.0.11
 
