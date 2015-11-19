@@ -164,61 +164,69 @@ class IncomingMessageTypes:
         Credentials = 11
 
 
+class OSVERSIONINFOEXW(ctypes.Structure):
+    _fields_ = [('dwOSVersionInfoSize', ctypes.c_ulong),
+                ('dwMajorVersion', ctypes.c_ulong),
+                ('dwMinorVersion', ctypes.c_ulong),
+                ('dwBuildNumber', ctypes.c_ulong),
+                ('dwPlatformId', ctypes.c_ulong),
+                ('szCSDVersion', ctypes.c_wchar*128),
+                ('wServicePackMajor', ctypes.c_ushort),
+                ('wServicePackMinor', ctypes.c_ushort),
+                ('wSuiteMask', ctypes.c_ushort),
+                ('wProductType', ctypes.c_byte),
+                ('wReserved', ctypes.c_byte)]
+
+
 class WinOsTypeHandler:
-    WINNT3_51 = 'Win NT 3.51'
-    WINNT4 = 'Win NT 4'
-    WIN2K = 'Win 2000'
-    WINXP = 'Win XP'
     WIN2003 = 'Win 2003'
     WIN2008 = 'Win 2008'
     WIN2008R2 = 'Win 2008 R2'
     WIN2012 = 'Win 2012'
+    WIN2012R2 = 'Win 2012 R2'
+    WIN2016 = 'Win 2016'
+    WIN2K = 'Win 2000'
+    WINXP = 'Win XP'
+    WINVISTA = 'Win Vista'
     WIN7 = 'Win 7'
     WIN8 = 'Win 8'
-    WINCE3_1_0 = 'Win CE 1.0'
-    WINCE3_2_0 = 'Win CE 2.0'
-    WINCE3_2_1 = 'Win CE 2.1'
-    WINCE3_3_0 = 'Win CE 3.0'
+    WIN81 = 'Win 8.1'
+    WIN10 = 'Win 10'
     UNKNOWN = 'Unknown'
-    # winVersionMatrix is constructed from 3 fields
-    # <platformId>.<MajorVersion>.<MinorVersion>
-    winVersionMatrix = {
-        '2.3.51': WINNT3_51,
-        '2.4.0': WINNT4,
-        '2.5.0': WIN2K,
-        '2.5.1': WINXP,
-        '2.5.2': WIN2003,
-        '2.6.0': WIN2008,
-        '2.6.1': WIN2008R2,  # Window Server 2008 R2
-        '2.6.2': WIN2012,
-        '3.1.0': WINCE3_1_0,
-        '3.2.0': WINCE3_2_0,
-        '3.2.1': WINCE3_2_1,
-        '3.3.0': WINCE3_3_0}
+
+    desktopVersionMatrix = {
+        '5.0': WIN2K,
+        '5.1': WINXP,
+        '6.0': WINVISTA,
+        '6.1': WIN7,
+        '6.2': WIN8,
+        '6.3': WIN81,
+        '10.0': WIN10,
+    }
+    serverVersionMatrix = {
+        '5.2': WIN2003,
+        '6.0': WIN2008,
+        '6.1': WIN2008R2,
+        '6.2': WIN2012,
+        '6.3': WIN2012R2,
+        '10.0': WIN2016,
+    }
 
     def getWinOsType(self):
         name = self.UNKNOWN
         version = ''
-        try:
-            versionTupple = win32api.GetVersionEx(1)
-            key = "%d.%d.%d" % (
-                versionTupple[3], versionTupple[0], versionTupple[1])
-            version = '%d.%d' % versionTupple[:2]
-            if key in self.winVersionMatrix:
-                name = self.winVersionMatrix[key]
-            # Window 7 and Window Server 2008 R2 share the same version.
-            # Need to fix it using the wProductType field.
-                VER_NT_WORKSTATION = 1
-            if (name == WinOsTypeHandler.WIN2008R2 and
-                    versionTupple[8] == VER_NT_WORKSTATION):
-                name = WinOsTypeHandler.WIN7
-            elif (name == WinOsTypeHandler.WIN2012 and
-                    versionTupple[8] == VER_NT_WORKSTATION):
-                name = WinOsTypeHandler.WIN8
-            logging.debug("WinOsTypeHandler::getWinOsType osType = '%s' "
-                          "version = '%s'", name, version)
-        except:
-            logging.exception("getWinOsType - failed")
+        os_version = OSVERSIONINFOEXW()
+        os_version.dwOSVersionInfoSize = ctypes.sizeof(os_version)
+        retcode = ctypes.windll.Ntdll.RtlGetVersion(ctypes.byref(os_version))
+        VER_NT_WORKSTATION = 1
+        if retcode == 0:
+            major = os_version.dwMajorVersion
+            minor = os_version.dwMinorVersion
+            matrix = self.serverVersionMatrix
+            if os_version.wProductType == VER_NT_WORKSTATION:
+                matrix = self.desktopVersionMatrix
+            version = '%d.%d' % (major, minor)
+            name = matrix.get(version, '')
         return {'name': name, 'version': version}
 
 
