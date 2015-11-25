@@ -12,9 +12,9 @@ SUFFIX=".$(date -u +%Y%m%d%H%M%S).git$(git rev-parse --short HEAD)"
     --with-dist
 make dist
 
-#Build windows agent on fc22 only, the rpm will be distro-agnostic
-if rpm --eval "%dist" | grep -qFi 'fc22'; then
-    yum-builddep -y ovirt-guest-agent-windows.spec
+# We build the depdendencies for windows only on latest fedora.
+# Do not check %dist but just try to get them. Exit cleanly if missing.
+if yum-builddep -y ovirt-guest-agent-windows.spec; then
     rpmbuild \
         -D "_topdir $PWD/tmp.repos" \
         -D "_sourcedir $PWD" \
