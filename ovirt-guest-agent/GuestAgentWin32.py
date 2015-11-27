@@ -65,7 +65,7 @@ class StorageDeviceDescriptor(ctypes.Structure):
 def QueryStringValue(hkey, name):
     # if type(hkey) != type(PyHKEY):
     #     raise TypeError("1nd arg must be a PyHKEY.")
-    if not isinstance(name, unicode()):
+    if not isinstance(name, unicode):
         raise TypeError("2nd arg must be a unicode.")
     key_type = c_ulong(0)
     key_len = c_ulong(0)
