@@ -508,7 +508,8 @@ class WinDataRetriver(DataRetriverBase):
             elif domain.lower() != self.getMachineName().lower():
                 # Use FQDN as user name if computer is part of a domain.
                 try:
-                    user = u"%s\\%s" % (domain, user)
+                    user_orig = user
+                    user = u"%s\\%s" % (domain, user_orig)
                     user = win32security.TranslateName(
                         user,
                         win32api.NameSamCompatible,
@@ -519,7 +520,9 @@ class WinDataRetriver(DataRetriverBase):
                     if err != 0:
                         raise RuntimeError(err, 'TranslateName')
                 except:
-                    logging.exception("Error on user name translation.")
+                    logging.debug("Error on user name translation. Requested "
+                                  "translation '%s' '%s'", user_orig, domain)
+                    user = u"%s@%s" % (user_orig, domain)
             else:
                 user = u"%s@%s" % (user, domain)
         except:
