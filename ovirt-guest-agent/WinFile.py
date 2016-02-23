@@ -16,6 +16,8 @@
 #
 # Refer to the README and COPYING files for full details of the license.
 #
+import logging
+import time
 
 import win32security
 import win32file
@@ -56,7 +58,9 @@ class WinFile(object):
                                                self._read_ovrlpd,
                                                True)
         except:
-            pass
+            logging.debug("Exception on reading from VirtIO", exc_info=True)
+            # We do sleep here to avoid constant reads spike the CPU
+            time.sleep(1)
         return buf[:nr]
 
     def write(self, s):
@@ -66,4 +70,7 @@ class WinFile(object):
                                                  self._write_ovrlpd,
                                                  True)
         except:
+            logging.debug("Exception writing to VirtIO", exc_info=True)
+            # We do sleep here to avoid constant writes to spike the CPU
+            time.sleep(1)
             return 0
