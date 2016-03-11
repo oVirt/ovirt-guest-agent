@@ -225,6 +225,7 @@ class AgentLogicBase:
         disksecs = self.disksRefreshRate
         usersecs = self.userCheckRate
         numcpusecs = self.numCPUsCheckRate
+        reportedVersion = _DISABLED_API_VALUE
 
         try:
             while not self.wait_stop.isSet():
@@ -234,7 +235,8 @@ class AgentLogicBase:
                     self._send('heartbeat',
                                {'free-ram': self.dr.getAvailableRAM(),
                                 'memory-stat': self.dr.getMemoryStats(),
-                                'apiVersion': _MAX_SUPPORTED_API_VERSION})
+                                'apiVersion': reportedVersion})
+                    reportedVersion = _MAX_SUPPORTED_API_VERSION
                     hbsecs = self.heartBitRate
                 usersecs -= 1
                 if usersecs <= 0:
