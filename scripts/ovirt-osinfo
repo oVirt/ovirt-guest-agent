@@ -2,6 +2,18 @@
 
 import platform
 
+arch_replace = {
+    'i686': 'x86',
+    'i586': 'x86',
+    'i386': 'x86'}
+
+
+def get_arch():
+    arch = platform.uname()[-2].lower().strip()
+    if arch in arch_replace:
+        return arch_replace[arch]
+    return arch
+
 
 try:
     info = platform.linux_distributions()
@@ -19,6 +31,6 @@ except AttributeError:
 print 'distribution=%s' % info[0]
 print 'version=%s' % info[1]
 print 'codename=%s' % info[2]
-print 'arch=%s' % platform.uname()[-1]
+print 'arch=%s' % get_arch()
 print 'kernel=%s' % platform.release()
 print 'type=linux'
