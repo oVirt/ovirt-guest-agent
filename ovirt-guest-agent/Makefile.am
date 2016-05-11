@@ -11,6 +11,7 @@ agent_PYTHON= \
     VirtIoChannel.py \
     ovirt-guest-agent.py \
     timezone.py \
+    hooks.py \
     $(NULL)
 
 noinst_PYTHON=\

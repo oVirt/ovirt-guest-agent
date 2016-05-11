@@ -25,6 +25,7 @@ import threading
 import time
 
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
+from hooks import Hooks
 
 
 CredServer = None
@@ -41,6 +42,7 @@ except ImportError:
 
 
 _GUEST_SCRIPTS_INSTALL_PATH = '/usr/share/ovirt-guest-agent'
+_GUEST_HOOKS_CONFIG_PATH = '/etc/ovirt-guest-agent/hooks.d'
 
 
 def _get_script_path(name):
@@ -444,6 +446,8 @@ class LinuxVdsAgent(AgentLogicBase):
                                                  "ignore_zero_size_fs")
         self.commandHandler = CommandHandlerLinux(self)
         self.cred_server = CredServer()
+        self.hooks = Hooks(logging.getLogger('Hooks'),
+                           _GUEST_HOOKS_CONFIG_PATH)
 
     def run(self):
         self.cred_server.start()

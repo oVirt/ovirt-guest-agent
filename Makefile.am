@@ -7,6 +7,7 @@ SUBDIRS =                \
     tests                \
     windows-credprov     \
     scripts              \
+    hooks                \
     $(NULL)
 
 if BUILD_SSO_MODULES
@@ -56,6 +57,7 @@ PEP8_WHITELIST = \
     ovirt-guest-agent/WinFile.py \
     ovirt-guest-agent/ovirt-guest-agent.py \
     ovirt-guest-agent/version.py \
+    ovirt-guest-agent/hooks.py \
     tests/*.py
 
 PEP8_BLACKLIST = ovirt-guest-agent/setup.py
@@ -76,5 +78,4 @@ check-local:
 endif
 
 install-exec-hook:
-	$(MKDIR_P) $(DESTDIR)/$(pkgdatadir)
 	$(INSTALL) -d $(DESTDIR)/$(localstatedir)/log/ovirt-guest-agent

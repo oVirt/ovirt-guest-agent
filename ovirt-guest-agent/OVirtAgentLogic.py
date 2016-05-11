@@ -23,6 +23,7 @@ import thread
 from threading import Event
 import time
 
+import hooks
 import timezone
 from VirtIoChannel import VirtIoChannel
 
@@ -38,12 +39,13 @@ except ImportError:
     multiproc = MultiProcessingFake()
 
 
-_MAX_SUPPORTED_API_VERSION = 2
+_MAX_SUPPORTED_API_VERSION = 3
 _DISABLED_API_VALUE = 0
 
 _MESSAGE_MIN_API_VERSION = {
     'active-user': 0,
     'applications': 0,
+    'completion': 3,
     'disks-usage': 0,
     'echo': 0,
     'fqdn': 0,
@@ -348,9 +350,23 @@ class AgentLogicBase:
             if count > 0:
                 self.commandHandler.set_number_of_cpus(count)
                 self.sendNumberOfCPUs()
+        elif command == 'lifecycle-event':
+            name = args.pop('type', None)
+            if name:
+                try:
+                    self.hooks.dispatch(name)
+                except hooks.UnknownHookError as e:
+                    logging.debug('Unknown hook error: %s', e.args[0])
+            if 'reply_id' in args:
+                self.reply(args['reply_id'], done=True)
         else:
             logging.error("Unknown external command: %s (%s)"
                           % (command, args))
+
+    def reply(self, id, **kwargs):
+        args = {'reply_id': id}
+        args.update(kwargs)
+        self._send('completion', args)
 
     def sendFQDN(self):
         self._send('fqdn', {'fqdn': self.dr.getFQDN()})

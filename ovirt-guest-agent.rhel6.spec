@@ -98,6 +98,22 @@ fi
 %dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/ovirt-guest-agent
 %dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent
 
+# Hook configuration directories
+%dir %attr (755,root,root) %{_sysconfdir}/ovirt-guest-agent
+%dir %attr (755,root,root) %{_sysconfdir}/ovirt-guest-agent/hooks.d
+%dir %attr (755,root,root) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_migration
+%dir %attr (755,root,root) %{_sysconfdir}/ovirt-guest-agent/hooks.d/after_migration
+%dir %attr (755,root,root) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_hibernation
+%dir %attr (755,root,root) %{_sysconfdir}/ovirt-guest-agent/hooks.d/after_hibernation
+
+# Hook installation directories
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/defaults
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_migration
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/after_migration
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_hibernation
+%dir %attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/after_hibernation
 %config(noreplace) %{_sysconfdir}/ovirt-guest-agent.conf
 
 %doc AUTHORS COPYING NEWS README
@@ -121,6 +137,7 @@ fi
 %{_datadir}/ovirt-guest-agent/VirtIoChannel.py*
 %{_datadir}/ovirt-guest-agent/CredServer.py*
 %{_datadir}/ovirt-guest-agent/GuestAgentLinux2.py*
+%{_datadir}/ovirt-guest-agent/hooks.py*
 %{_datadir}/ovirt-guest-agent/timezone.py*
 %{_datadir}/ovirt-guest-agent/ovirt-osinfo
 %{_datadir}/ovirt-guest-agent/ovirt-logout

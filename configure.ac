@@ -230,6 +230,7 @@ AC_CONFIG_FILES([
     Makefile
     configurations/Makefile
     GinaSSO/Makefile
+    hooks/Makefile
     ovirt-guest-agent/Makefile
     ovirt-guest-agent/ovirt-guest-agent
     ovirt-guest-agent/consoleapps/Makefile

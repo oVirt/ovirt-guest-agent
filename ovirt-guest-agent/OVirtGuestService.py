@@ -51,6 +51,7 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
             filePath = _winreg.QueryValueEx(hkey, "")[0].replace('"', '')
             hkey.Close()
         filePath = os.path.dirname(filePath)
+        self._install_dir = filePath
         AGENT_CONFIG = os.path.join(filePath, AGENT_CONFIG)
         AGENT_DEFAULT_CONFIG = os.path.join(filePath, AGENT_DEFAULT_CONFIG)
         AGENT_DEFAULT_LOG_CONFIG = os.path.join(filePath,
@@ -86,7 +87,7 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
             config.read(AGENT_DEFAULT_CONFIG)
         config.read(AGENT_CONFIG)
 
-        self.vdsAgent = WinVdsAgent(config)
+        self.vdsAgent = WinVdsAgent(config, install_dir=self._install_dir)
         self.vdsAgent.run()
 
         # and write a 'stopped' event to the event log (skip this step if the

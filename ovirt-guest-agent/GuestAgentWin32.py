@@ -26,6 +26,7 @@ import win32security
 import win32ts
 
 from OVirtAgentLogic import AgentLogicBase, DataRetriverBase
+from hooks import Hooks
 
 
 # Constants according to
@@ -662,10 +663,12 @@ class WinDataRetriver(DataRetriverBase):
 
 class WinVdsAgent(AgentLogicBase):
 
-    def __init__(self, config):
+    def __init__(self, config, install_dir):
         AgentLogicBase.__init__(self, config)
         self.dr = WinDataRetriver()
         self.commandHandler = CommandHandlerWin()
+        hooks_dir = os.path.join(install_dir, 'hooks')
+        self.hooks = Hooks(logging.getLogger('Hooks'), hooks_dir)
 
     def run(self):
         logging.debug("WinVdsAgent:: run() entered")
