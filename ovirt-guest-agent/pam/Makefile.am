@@ -2,6 +2,7 @@ if INSTALL_USERMODE_SCRIPTS
 pamdir = $(PAM_PREFIX)/pam.d
 pam_DATA =               \
     ovirt-container-list \
+    ovirt-flush-caches   \
     ovirt-shutdown       \
     ovirt-logout         \
     ovirt-locksession    \
@@ -11,6 +12,7 @@ endif
 
 EXTRA_DIST =             \
     ovirt-container-list \
+    ovirt-flush-caches   \
     ovirt-shutdown       \
     ovirt-logout         \
     ovirt-locksession    \

@@ -5,6 +5,7 @@ EXTRA_DIST =                         \
     ovirt-logout-wrapper.sh          \
     ovirt-locksession-wrapper.sh     \
     ovirt-shutdown-wrapper.sh        \
+    ovirt-flush-caches-wrapper.sh    \
     ovirt-sudo-wrapper.sh            \
     $(NULL)
 
@@ -20,6 +21,7 @@ sudoscripts_SCRIPTS=                \
     ovirt-logout-wrapper.sh         \
     ovirt-shutdown-wrapper.sh       \
     ovirt-locksession-wrapper.sh    \
+    ovirt-flush-caches-wrapper.sh   \
     $(NULL)
 
 install-exec-hook:
@@ -28,6 +30,7 @@ install-exec-hook:
 	$(LN_S) -f $(pkgdatadir)/ovirt-sudo-wrapper.sh $(DESTDIR)/$(pkgdatadir)/ovirt-locksession
 	$(LN_S) -f $(pkgdatadir)/ovirt-sudo-wrapper.sh $(DESTDIR)/$(pkgdatadir)/ovirt-shutdown
 	$(LN_S) -f $(pkgdatadir)/ovirt-sudo-wrapper.sh $(DESTDIR)/$(pkgdatadir)/ovirt-logout
+	$(LN_S) -f $(pkgdatadir)/ovirt-sudo-wrapper.sh $(DESTDIR)/$(pkgdatadir)/ovirt-flush-caches
 endif
 
 if INSTALL_USERMODE_SCRIPTS
@@ -37,4 +40,5 @@ install-exec-hook:
 	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-shutdown
 	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-hibernate
 	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-logout
+	$(LN_S) -f $(bindir)/consolehelper $(DESTDIR)/$(pkgdatadir)/ovirt-flush-caches
 endif

@@ -7,6 +7,7 @@ consoleapps_DATA =       \
     ovirt-logout         \
     ovirt-locksession    \
     ovirt-hibernate      \
+    ovirt-flush-caches   \
     $(NULL)
 endif
 
@@ -16,6 +17,7 @@ EXTRA_DIST =             \
     ovirt-logout         \
     ovirt-locksession    \
     ovirt-hibernate      \
+    ovirt-flush-caches   \
     $(NULL)
 
 CLEANFILES = \

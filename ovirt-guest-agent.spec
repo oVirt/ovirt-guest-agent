@@ -197,6 +197,7 @@ fi
 %config %{_sysconfdir}/pam.d/ovirt-container-list
 %config %{_sysconfdir}/pam.d/ovirt-shutdown
 %config %{_sysconfdir}/pam.d/ovirt-hibernate
+%config %{_sysconfdir}/pam.d/ovirt-flush-caches
 %config %attr (644,root,root) %{_sysconfdir}/udev/rules.d/55-ovirt-guest-agent.rules
 %config %{_sysconfdir}/dbus-1/system.d/org.ovirt.vdsm.Credentials.conf
 %config %{_sysconfdir}/security/console.apps/ovirt-logout
@@ -204,8 +205,13 @@ fi
 %config %{_sysconfdir}/security/console.apps/ovirt-container-list
 %config %{_sysconfdir}/security/console.apps/ovirt-shutdown
 %config %{_sysconfdir}/security/console.apps/ovirt-hibernate
+%config %{_sysconfdir}/security/console.apps/ovirt-flush-caches
 
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/ovirt-guest-agent.py*
+
+%{_datadir}/ovirt-guest-agent/scripts/hooks/defaults/55-flush-caches
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/defaults/55-flush-caches.consolehelper
+%attr (755,root,root) %{_datadir}/ovirt-guest-agent/scripts/hooks/defaults/flush-caches
 
 %{_datadir}/ovirt-guest-agent/OVirtAgentLogic.py*
 %{_datadir}/ovirt-guest-agent/VirtIoChannel.py*
@@ -215,12 +221,19 @@ fi
 %{_datadir}/ovirt-guest-agent/timezone.py*
 %{_datadir}/ovirt-guest-agent/ovirt-osinfo
 %{_datadir}/ovirt-guest-agent/ovirt-logout
+%{_datadir}/ovirt-guest-agent/ovirt-flush-caches
 
 # consolehelper symlinks
 %{_datadir}/ovirt-guest-agent/ovirt-locksession
 %{_datadir}/ovirt-guest-agent/ovirt-shutdown
 %{_datadir}/ovirt-guest-agent/ovirt-hibernate
 %{_datadir}/ovirt-guest-agent/ovirt-container-list
+
+# Symlinks for the default hooks
+%config(noreplace) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_hibernation/55_flush-caches
+%config(noreplace) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_migration/55_flush-caches
+%config(noreplace) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_hibernation/55_flush-caches
+%config(noreplace) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_migration/55_flush-caches
 
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LogoutActiveUser.py*

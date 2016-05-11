@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# This line will drop all caches on Linux systems
+# See https://www.kernel.org/doc/Documentation/sysctl/vm.txt for more
+# information
+echo 3 > /proc/sys/vm/drop_caches

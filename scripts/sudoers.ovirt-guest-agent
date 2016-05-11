@@ -2,7 +2,8 @@ Cmnd_Alias OVIRTAGENT_SCRIPTS =\
     /usr/share/ovirt-guest-agent/ovirt-hibernate-wrapper.sh *,\
     /usr/share/ovirt-guest-agent/ovirt-shutdown-wrapper.sh *,\
     /usr/share/ovirt-guest-agent/ovirt-container-list.sh,\
-    /usr/share/ovirt-guest-agent/ovirt-locksession-wrapper.sh
+    /usr/share/ovirt-guest-agent/ovirt-locksession-wrapper.sh,\
+    /usr/share/ovirt-guest-agent/scripts/hooks/defaults/ovirt-flush-caches-wrapper.sh
 
 ovirtagent ALL= NOPASSWD: OVIRTAGENT_SCRIPTS
 Defaults:ovirtagent !requiretty
