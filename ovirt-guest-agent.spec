@@ -1,11 +1,11 @@
 
-%global release_version 2
+%global release_version 1
 
 %global _moduledir /%{_lib}/security
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.11
+Version: 1.0.12
 Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -270,6 +270,9 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Thu May 19 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.12-1
+- New upstream version 1.0.12
+
 * Fri Oct 16 2015 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.11-2
 - Adding ovirt container list feature (currently only docker)
 

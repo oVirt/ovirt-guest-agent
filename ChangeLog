@@ -1,3 +1,301 @@
+commit a781a1ca19f3ff945747049556ed637f5e299237
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed May 11 14:49:03 2016 +0200
+
+    linux: Default flush caches hook for the guest agent
+
+    This patch adds a script to flush cache buffers of linux systems.
+    This script will now be installed as a default hook before migrations
+    and hibernations to allow faster migrations / hibernations.
+
+    Since this script needs root permissions to function, the necessary
+    elevation scripts have been added.
+
+    Change-Id: Iccf6708cd40843884571d2ed9ccf1e420b13cc0f
+    Bug-Url: https://bugzilla.redhat.com/1298120
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 6580f866717810ebaac1cd6ab60be2fcc91fe967
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 19 09:28:12 2016 +0200
+
+    linux: Add atomic host awareness to container-list
+
+    For the container list script it is necessary that it becomes
+    aware of being in a container and correspondingly tries to use
+    the /host prefix for the docker socket path if it inside a container
+
+    Change-Id: I63b95320674ee52fd8a4c8bb2328c39e24b5e2d1
+    Bug-Url: https://bugzilla.redhat.com/1273399
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 55cf8f65b54e6123df273c760751ebd77ae66f0e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Oct 16 14:39:53 2015 +0200
+
+    Support for reporting active docker containers
+
+    With this patch we'll be able to report active docker containers
+    running on a VM.
+    If there are no containers, the reported list would be empty.
+
+    The reported data is a list of objects with the following fields:
+    - id: Docker Container ID
+    - names: List of aliases for the running container
+    - image: Name of the running image
+    - cmd: The command the container was started with
+    - status: The status message of the container
+
+    Change-Id: Iaeab78cdab55ba9a525479a1785c2c1e4730a862
+    Guest-Agent-API-Version: 3
+    Bug-Url: https://bugzilla.redhat.com/1273399
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit d06975721dcae7d060dc9af88cfcffbd42963c0e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed May 11 14:48:11 2016 +0200
+
+    Implementation for guest agent hook points
+
+    This patch introduces the ability of the guest agent to handle lifecycle
+    events and executes hooks which are configured for the given event.
+
+    Change-Id: I77dc3278c28e3f156c54a1db653744c127bd1c3f
+    Bug-Url: https://bugzilla.redhat.com/1298120
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 520201d811eed4cec58211737471c8926e883edc
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Mon Mar 21 12:44:31 2016 +0100
+
+    automation: don't require repos on el6
+
+    Change-Id: I8f5bfca573106aa31f30d8959d5fb61666697b38
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 17f66d0e084f96c5bb5314d4974662e76cd26b80
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Feb 23 14:23:10 2016 +0100
+
+    windows: More defensive code for windows VirtIO handling
+
+    To avoid continous exceptions to eat 100% of the CPU we're
+    now sleeping at least for 1 second after an exception and
+    we're logging the exception in debug mode, so we can investigate
+    potential problems.
+    To avoid spamming the logs this is on debug log for now.
+
+    Change-Id: I0cb7c1108a579bf55f9340cb1c211b65d6cd8f5b
+    Bug-Url: https://bugzilla.redhat.com/1257835
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 55b63a2961d207a10f4ff0826bcdeb499169d8f8
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Mar 11 11:55:57 2016 +0100
+
+    Force negotiation of the API Version
+
+    This patch introduces a forced switch of the api version value to disabled
+    first and then max on the second heart-beat. Which effectively triggers
+    VDSM to renegotiate the API version.
+
+    Change-Id: I1ba2013e17e13cecec4eae53c7a4d11cee4b47b9
+    Bug-Url: https://bugzilla.redhat.com/1285851
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit d2bcc66fc4bab58b0599f6039372d3e3cb3990de
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jan 14 14:35:54 2016 +0100
+
+    win: Try to revert to previous value on TranslateName failure
+
+    In case TranslateName fails, we're now reverting back to the previous value
+    of the username only - Most of the time the translation fails on the hostname
+    which cannot be resolved.
+    Which would cause random data to be returned. This has been resolved with this
+    patch.
+
+    Change-Id: I4c5cf6db6d906625cdd01415e2c1153ae3fa0c08
+    Bug-Url: https://bugzilla.redhat.com/1117504
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 4e686cdc15b2b91ab28f73df9a6fb17e7fdcce72
+Author: Yedidyah Bar David <didi@redhat.com>
+Date:   Wed Nov 25 11:26:39 2015 +0200
+
+    automation: Build for windows only if deps available
+
+    We build the depdendencies for windows only on latest fedora.
+    Do not check %dist but just try to get them. Exit cleanly if missing.
+
+    Change-Id: I93275a2714ae012db1725b47d6646f7e43bd8bdc
+    Signed-off-by: Yedidyah Bar David <didi@redhat.com>
+
+commit e439e4a9ae3af12837bf9ee5f81129a70951f63b
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Nov 30 12:46:49 2015 +0100
+
+    Fix osinfo for el5
+
+    Python 2.4 does not come with linux_distributions, so we are
+    putting in an explicit workaround for EL5
+
+    Change-Id: I8dc2efa00eac25c6854fb8f47b86e5da746502e1
+    Bug-Url: https://bugzilla.redhat.com/1286937
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 6d7c24d774a9f71a7c54f243c95fe8c6c96eaddc
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Nov 27 08:12:26 2015 +0100
+
+    PEP8 fix introduced regression
+
+    Bug-Url: https://bugzilla.redhat.com/1285834
+    Change-Id: I9af99bce9b5c2558a1e87859edc08cce37704cd2
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 3e191fa79517fe8bcf32f0832aab2e96e37d1865
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Nov 19 12:08:16 2015 +0100
+
+    win32: Update version information reporting for Win8+ and simplify
+
+    With Windows 8.1 the API for retrieving the OS version on Windows has
+    changed that it won't report a higher version than 6.2 even though it
+    might be Windows 8.1 or Windows 10 etc
+
+    This code change introduces a new way to retrieve the current version by
+    using RtlGetVersion which still does behave the old way.
+    Additionally this patch already introduces the Windows 2016 Server detection
+    as the version for this is known.
+
+    Also this patch now removes obsolete and unsupported versions.
+
+    Change-Id: I8047842b080140e072b04c2af46ec0e6b8287c51
+    Bug-Url: https://bugzilla.redhat.com/1279980
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 77e52cc5b8165c8f65557ae8ed6cfb5756587183
+Author: Yedidyah Bar David <didi@redhat.com>
+Date:   Mon Oct 19 14:58:03 2015 +0300
+
+    packaging: windows spec: Remove 'artifacts' from paths
+
+    Change all /usr/share/artifacts to /usr/share.
+
+    See:
+
+    https://gerrit.ovirt.org/47771 - spice-nsis aka ovirt-wgt
+    https://gerrit.ovirt.org/47460 - ovirt-wgt-toolchain
+    https://gerrit.ovirt.org/47461 - ovirt-guest-agent
+
+    Change-Id: Ia95c93d7399758fe4ae6bbf22219065b7a58c4ae
+    Signed-off-by: Yedidyah Bar David <didi@redhat.com>
+
+commit feb0b120457e67396aa47f076a625f9af7b1f03d
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Sep 23 14:14:20 2015 +0200
+
+    Providing afxres.h for cases where no MFC is available for VC
+
+    Change-Id: Ia9bb7a0ec6aae9c1a5ba0a8710f42b3487857e21
+    Bug-Url: https://bugzilla.redhat.com/1177242
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 48fb7db4207efd991c9d33e1524bb9ec714aa33b
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Sep 23 11:24:22 2015 +0200
+
+    Imports reorder
+
+    Change-Id: Iab4245af990f35ab2fd3eb34531c59089f33b957
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit c7d34e391a3ca8b78e7e024e6f6919fa03f46898
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Sep 22 11:31:32 2015 +0200
+
+    PEP8 1.62 compliance fixes
+
+    Change-Id: I50b6fedea4a9691b44fd527f1c9bb9cf0ddbde77
+    Bug-Url: https://bugzilla.redhat.com/1265164
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit a683d840bb795942df164de11516532f7f83d294
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Sep 4 11:14:13 2015 +0200
+
+    Exclude mount targets which are files
+
+    Bug-Url: https://bugzilla.redhat.com/1252467
+    Change-Id: I819bd8d86bbab8657aeaea745319145e39133ce3
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit b05e64cd45150c3980fccce7a75e71224c30444c
+Author: Yedidyah Bar David <didi@redhat.com>
+Date:   Tue Aug 4 23:57:57 2015 +0300
+
+    automation: add automated rpm build
+
+    Also fixed spec file causing build failures.
+    Skipping rpmbuild for el7
+
+    Change-Id: I79a23c5add645dfccc386406d9ee0126596f5b63
+    Signed-off-by: Yedidyah Bar David <didi@redhat.com>
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+    Signed-off-by: David Caro <dcaroest@redhat.com>
+
+commit 0177a91e4fe1e4733208a1ca5c110985bea74d7f
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Wed Aug 12 17:32:11 2015 +0200
+
+    packaging: remove autogenerated INSTALL
+
+    Change-Id: Ib499cdcf7d0ad5bdc77fe1992307c2477f9fc649
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit cfc3a6ff13463ac0ca23829686d02174b8c5599d
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Wed Aug 12 17:31:14 2015 +0200
+
+    packaging: added windows agent spec file
+
+    Change-Id: Ic1ecb0c9009c70bdafb5a22f78a85de1a32bb09a
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit b757ad835b3134835e660b1c57f964b7c5ea8d1c
+Author: David Caro <dcaroest@redhat.com>
+Date:   Fri Aug 7 11:42:38 2015 +0200
+
+    Added git dependency
+
+    It turns out that the inner make commands don't work without it, but
+    don't fail either
+
+    Change-Id: Iff44a3270c8e2c18f852d9c282fc24f39a7453cb
+    Signed-off-by: David Caro <dcaroest@redhat.com>
+
+commit dcff97c22fbbc9e2125c6e4edb2a707d83cccce3
+Author: David Caro <dcaroest@redhat.com>
+Date:   Wed Jul 29 12:59:27 2015 +0200
+
+    Added standard ci scripts
+
+    Only the check-patch, as that's the only job it has now on the ovirt
+    ci
+
+    Change-Id: I928b2a5c2ceff982475f9052acf96d610c0c04f7
+    Signed-off-by: David Caro <dcaroest@redhat.com>
+
+commit 9d75015dc6119800198f8321198faf75c633261d
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Mon Jul 20 08:59:48 2015 +0200
+
+    1.0.11 version bump
+
+    Change-Id: I971363830f76f1022562ca6ed2801e515e62da2c
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
 commit deeaf0ffa9dd087bbdf89ef20bc12b1b934ef308
 Author: Vinzenz Feenstra <vfeenstr@redhat.com>
 Date:   Fri Jun 12 09:17:17 2015 +0200
