@@ -5,6 +5,12 @@ import os.path
 import socket
 
 
+if 'container' in os.environ and os.environ['container'] == 'docker':
+    _DOCKER_PATH = '/host/var/run/docker.sock'
+else:
+    _DOCKER_PATH = '/var/run/docker.sock'
+
+
 def transform(container):
     TRANSFORM = (('Id', 'id'), ('Names', 'names'), ('Image', 'image'),
                  ('Command', 'command'), ('Status', 'status'))
@@ -19,10 +25,10 @@ def print_transformed(data):
     print json.dumps([transform(container) for container in json.loads(data)]),
 
 
-if os.path.exists('/var/run/docker.sock'):
+if os.path.exists(_DOCKER_PATH):
     try:
         s = socket.socket(socket.SOCK_STREAM, socket.AF_UNIX)
-        s.connect('/var/run/docker.sock')
+        s.connect(_DOCKER_PATH)
         s.send('GET /containers/json?all=true HTTP/1.0\r\n\r\n')
         sockfile = s.makefile()
         data = sockfile.read()
