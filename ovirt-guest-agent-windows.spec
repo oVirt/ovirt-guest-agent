@@ -1,9 +1,11 @@
+%define _ovirt_version 1.0.12
+
 Name:		ovirt-guest-agent-windows
-Version:	1.0.11
-Release:	2%{?release_suffix}
+Version:	1.0.12
+Release:	1%{?release_suffix}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
-Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.11/ovirt-guest-agent-%{version}.tar.bz2
+Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/%{version}/ovirt-guest-agent-%{_ovirt_version}.tar.bz2
 
 URL:		http://www.ovirt.org/
 BuildArch:	noarch
@@ -20,7 +22,7 @@ BuildRequires:	wget
 oVirt Guest Agent Service executable for Microsoft Windows platform.
 
 %prep
-%setup -q -n ovirt-guest-agent-%{version}
+%setup -q -n ovirt-guest-agent-%{_ovirt_version}
 
 %build
 # Use this instead of ~/.wine. See wine(1).
@@ -67,6 +69,9 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/ovirt-guest-agent
 %{_datadir}/%{name}
 
 %changelog
+* Thu May 19 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.12-1
+- Updated version 1.0.12
+
 * Tue Oct 20 2015 Yedidyah Bar David <didi@redhat.com> - 1.0.11-2
 - dropped "artifacts" from all paths
 
