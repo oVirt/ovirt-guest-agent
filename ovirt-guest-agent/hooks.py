@@ -40,9 +40,13 @@ class Hooks(object):
 
     def _execute(self, path):
         """ Executes the given path and returns return code and output """
-        proc = subprocess.Popen(path, stderr=subprocess.PIPE,
-                                stdout=subprocess.PIPE)
-        out, err = proc.communicate()
+        try:
+            proc = subprocess.Popen(path, stderr=subprocess.PIPE,
+                                    stdout=subprocess.PIPE)
+            out, err = proc.communicate()
+        except OSError:
+            self._log.warning('Executing %s failed', path, exc_info=True)
+            return -1, '', ''
         return proc.returncode, out, err
 
     def _run(self, name):
