@@ -234,6 +234,18 @@ class WinOsTypeHandler:
         return {'name': name, 'version': version}
 
 
+def set_bcd_useplatformclock():
+    osinfo = WinOsTypeHandler().getWinOsType()
+    if osinfo.get('version', '5.0').split('.')[0] > '5':
+        try:
+            subprocess.call(['%SystemRoot%\\sysnative\\bcdedit.exe', '/set',
+                             '{current}', 'USEPLATFORMCLOCK', 'on'],
+                            shell=True)
+        except OSError:
+            logging.info('Failed to set the USEPLATFORMCLOCK flag via '
+                         'bcdedit.exe', exc_info=True)
+
+
 class CommandHandlerWin:
 
     def lock_screen(self):
@@ -672,6 +684,7 @@ class WinVdsAgent(AgentLogicBase):
         self.commandHandler = CommandHandlerWin()
         hooks_dir = os.path.join(install_dir, 'hooks')
         self.hooks = Hooks(logging.getLogger('Hooks'), hooks_dir)
+        set_bcd_useplatformclock()
 
     def run(self):
         logging.debug("WinVdsAgent:: run() entered")
