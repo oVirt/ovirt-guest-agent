@@ -157,10 +157,10 @@ fi
 %{_datadir}/ovirt-guest-agent/ovirt-container-list
 
 # Symlinks for the default hooks
-%config(noreplace) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_hibernation/55-flush-caches
-%config(noreplace) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_migration/55-flush-caches
-%config(noreplace) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_hibernation/55-flush-caches
-%config(noreplace) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_migration/55-flush-caches
+%config(noreplace) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_hibernation/55_flush-caches
+%config(noreplace) %{_datadir}/ovirt-guest-agent/scripts/hooks/before_migration/55_flush-caches
+%config(noreplace) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_hibernation/55_flush-caches
+%config(noreplace) %{_sysconfdir}/ovirt-guest-agent/hooks.d/before_migration/55_flush-caches
 
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default.conf
 %attr (644,root,root) %{_datadir}/ovirt-guest-agent/default-logger.conf
@@ -170,6 +170,8 @@ fi
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LogoutActiveUser.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/LockActiveSession.py*
 %attr (755,root,root) %{_datadir}/ovirt-guest-agent/hibernate
+
+%{_datadir}/ovirt-guest-agent/ovirt-flush-caches
 
 %attr (755,root,root) %{_initrddir}/ovirt-guest-agent
 
