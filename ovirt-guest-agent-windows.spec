@@ -17,6 +17,8 @@ BuildRequires:	python-windows = 2.7.8
 BuildRequires:	pywin32-py2.7 = 219
 BuildRequires:	wine
 BuildRequires:	wget
+BuildRequires:  mingw32-gcc-c++
+BuildRequires:  mingw64-gcc-c++
 
 %description
 oVirt Guest Agent Service executable for Microsoft Windows platform.
@@ -25,6 +27,16 @@ oVirt Guest Agent Service executable for Microsoft Windows platform.
 %setup -q -n ovirt-guest-agent-%{_ovirt_version}
 
 %build
+
+pushd windows-credprov
+x86_64-w64-mingw32-g++ *.cpp -I . -o oVirtCredentialsProvider64.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid
+i686-w64-mingw32-g++ *.cpp -I . -o oVirtCredentialsProvider32.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid
+popd
+
+pushd GinaSSO
+i686-w64-mingw32-g++ *.cpp -I . -o oVirtGinaSSO.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid -lwsock32 -DUNICODE
+popd
+
 # Use this instead of ~/.wine. See wine(1).
 export WINEPREFIX=$PWD/wineprefix
 
@@ -64,6 +76,11 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/ovirt-guest-agent/dist/*.exe $DS
 cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/default.ini $DST
 cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/default-logger.ini $DST
 cp -v %{_builddir}/ovirt-guest-agent-%{version}/configurations/ovirt-guest-agent.ini $DST
+
+# SSO Plugins
+cp -v %{_builddir}/ovirt-guest-agent-%{version}/GinaSSO/oVirtGinaSSO.dll $DST
+cp -v %{_builddir}/ovirt-guest-agent-%{version}/windows-credprov/oVirtCredentialsProvider32.dll $DST
+cp -v %{_builddir}/ovirt-guest-agent-%{version}/windows-credprov/oVirtCredentialsProvider64.dll $DST
 
 %files
 %{_datadir}/%{name}
