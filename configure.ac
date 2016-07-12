@@ -101,8 +101,11 @@ dnl ---------------------------------------------------------------------------
 HAVE_PEP8="yes"
 AC_PATH_PROG([PEP8], [pep8])
 if test "x$PEP8" = "x"; then
-  AC_MSG_WARN([python-pep8 not found])
-  HAVE_PEP8="no"
+  AC_PATH_PROG([PEP8], [pycodestyle])
+  if test "x$PEP8" = "x"; then
+      AC_MSG_WARN([Neither python-pep8 nor python-pycodestyle could be found])
+      HAVE_PEP8="no"
+  fi
 fi
 AM_CONDITIONAL(HAVE_PEP8, [ test -n "$HAVE_PEP8" -a "x$HAVE_PEP8" != xno ])
 
