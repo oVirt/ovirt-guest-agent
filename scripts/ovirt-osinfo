@@ -16,7 +16,7 @@ def get_arch():
 
 
 try:
-    info = platform.linux_distributions()
+    info = platform.linux_distribution()
 except AttributeError:
     info = platform.dist()
     if info[0] == 'redhat':
