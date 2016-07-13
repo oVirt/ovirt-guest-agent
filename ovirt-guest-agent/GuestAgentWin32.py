@@ -234,16 +234,25 @@ class WinOsTypeHandler:
         return {'name': name, 'version': version}
 
 
-def set_bcd_useplatformclock():
+def remove_bcd_useplatformclock():
+    try:
+        subprocess.call(['%SystemRoot%\\sysnative\\bcdedit.exe',
+                         '/deletevalue', '{current}', 'USEPLATFORMCLOCK'],
+                        shell=True)
+    except OSError:
+        logging.info('Failed to set the USEPLATFORMCLOCK flag via '
+                     'bcdedit.exe', exc_info=True)
+
+
+def apply_clock_tuning():
     osinfo = WinOsTypeHandler().getWinOsType()
-    if osinfo.get('version', '5.0').split('.')[0] > '5':
-        try:
-            subprocess.call(['%SystemRoot%\\sysnative\\bcdedit.exe', '/set',
-                             '{current}', 'USEPLATFORMCLOCK', 'on'],
-                            shell=True)
-        except OSError:
-            logging.info('Failed to set the USEPLATFORMCLOCK flag via '
-                         'bcdedit.exe', exc_info=True)
+    parts = osinfo.get('version', '6.0').split('.')
+    if parts[0] >= '6':
+        if parts[0] == '6' and parts[1] == '0':
+            # Skip 6.0 and lower
+            pass
+        else:
+            remove_bcd_useplatformclock()
 
 
 class CommandHandlerWin:
@@ -687,7 +696,9 @@ class WinVdsAgent(AgentLogicBase):
         self.commandHandler = CommandHandlerWin()
         hooks_dir = os.path.join(install_dir, 'hooks')
         self.hooks = Hooks(logging.getLogger('Hooks'), hooks_dir)
-        set_bcd_useplatformclock()
+
+        if config.getboolean('general', 'apply_timer_configuration'):
+            apply_clock_tuning()
 
     def run(self):
         logging.debug("WinVdsAgent:: run() entered")
