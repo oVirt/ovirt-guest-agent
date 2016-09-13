@@ -13,8 +13,8 @@ Packager:	Lev Veyde <lveyde@redhat.com>
 
 BuildRequires:	p7zip
 BuildRequires:	py2exe-py2.7 = 0.6.9
-BuildRequires:	python-windows = 2.7.8
-BuildRequires:	pywin32-py2.7 = 219
+BuildRequires:	python-windows = 2.7.12
+BuildRequires:	pywin32-py2.7 = 220
 BuildRequires:	wine
 BuildRequires:	wget
 BuildRequires:  mingw32-gcc-c++
@@ -40,10 +40,10 @@ popd
 # Use this instead of ~/.wine. See wine(1).
 export WINEPREFIX=$PWD/wineprefix
 
-wine msiexec /i %{_datadir}/python-windows/python-2.7.8.msi /qn ADDLOCAL=ALL
+wine msiexec /i %{_datadir}/python-windows/python-2.7.12.msi /qn ADDLOCAL=ALL
 export Path="%PATH%;C:\Python27"
 
-7za x %{_datadir}/pywin32-py2.7/pywin32-219.win32-py2.7.exe
+7za x %{_datadir}/pywin32-py2.7/pywin32-220.win32-py2.7.exe
 mv PLATLIB/* $WINEPREFIX/drive_c/Python27/Lib/site-packages/
 rmdir PLATLIB
 mv SCRIPTS/* $WINEPREFIX/drive_c/Python27/Lib/site-packages/
