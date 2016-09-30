@@ -200,24 +200,36 @@ class AgentLogicBase:
             logging.debug("Message %s not supported by api version %d.",
                           name, self.dr.getAPIVersion())
 
-    def run(self):
-        logging.debug("AgentLogicBase:: run() entered")
-        thread.start_new_thread(self.doListen, ())
-        thread.start_new_thread(self.doWork, ())
+    def _start_thread_joinable(self, fun):
+        def f(evt):
+            try:
+                fun()
+            finally:
+                evt.set()
+        evt = Event()
+        thread.start_new_thread(f, (evt,))
+        return evt
 
+    def _join(self, evt):
         # Yuck! It's seem that Python block all signals when executing
         # a "real" code. So there is no way just to sit and wait (with
         # no timeout).
         # Try breaking out from this code snippet:
         # $ python -c "import threading; threading.Event().wait()"
-        while not self.wait_stop.isSet():
-            self.wait_stop.wait(1)
+        while not evt.isSet():
+            evt.wait(1)
+
+    def run(self):
+        logging.debug("AgentLogicBase:: run() entered")
+        thread.start_new_thread(self.doListen, ())
+        self._join(self._start_thread_joinable(self.doWork))
 
     def stop(self):
         logging.debug("AgentLogicBase:: baseStop() entered")
         self.wait_stop.set()
 
     def doWork(self):
+        self.sessionStartup()
         logging.debug("AgentLogicBase:: doWork() entered")
         self.sendInfo()
         self.sendUserInfo()
@@ -268,6 +280,7 @@ class AgentLogicBase:
             logging.debug("AgentLogicBase:: doWork() exiting")
         except:
             logging.exception("AgentLogicBase::doWork")
+        self.sessionShutdown()
 
     def doListen(self):
         logging.debug("AgentLogicBase::doListen() - entered")

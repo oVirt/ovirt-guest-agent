@@ -98,7 +98,6 @@ class OVirtGuestService(win32serviceutil.ServiceFramework):
         logging.info("Stopping OVirt Guest Agent service")
 
     def SvcShutdown(self):
-        self.vdsAgent.sessionShutdown()
         self._shutting_down = True
         self.vdsAgent.stop()
 
