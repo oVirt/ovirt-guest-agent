@@ -185,7 +185,7 @@ class AgentLogicBase:
         self.disksRefreshRate = config.getint("general", "report_disk_usage")
         self.numCPUsCheckRate = config.getint("general", "report_num_cpu_rate")
         self.activeUser = ""
-        self.vio = VirtIoChannel(config.get("virtio", "device"))
+        self.vio = VirtIoChannel(config.get("virtio", "device_prefix"))
         self.dr = None
         self.commandHandler = None
 

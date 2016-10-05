@@ -64,6 +64,9 @@ exit 0
 
 %posttrans
 /sbin/udevadm trigger --subsystem-match="virtio-ports" \
+    --attr-match="name=ovirt-guest-agent.0"
+
+/sbin/udevadm trigger --subsystem-match="virtio-ports" \
     --attr-match="name=com.redhat.rhevm.vdsm"
 
 %preun
@@ -73,11 +76,18 @@ then
     /sbin/chkconfig --del ovirt-guest-agent
 
     # Send an "uninstalled" notification to vdsm.
-    VIRTIO=`grep "^device" %{_sysconfdir}/ovirt-guest-agent.conf | awk '{ print $3; }'`
-    if [ -w $VIRTIO ]
+    if [ -w /dev/virtio-ports/com.redhat.rhevm.vdsm ]
     then
         # Non blocking uninstalled notification
-        echo -e '{"__name__": "uninstalled"}\n' | dd of=$VIRTIO \
+        echo -e '{"__name__": "uninstalled"}\n' | dd \
+            of=/dev/virtio-ports/com.redhat.rhevm.vdsm \
+            oflag=nonblock status=noxfer conv=nocreat 1>& /dev/null || :
+    fi
+    if [ -w /dev/virtio-ports/ovirt-guest-agent.0 ]
+    then
+        # Non blocking uninstalled notification
+        echo -e '{"__name__": "uninstalled"}\n' | dd \
+            of=/dev/virtio-ports/ovirt-guest-agent.0 \
             oflag=nonblock status=noxfer conv=nocreat 1>& /dev/null || :
     fi
 fi
@@ -88,6 +98,9 @@ then
     # Let udev clear access rights
     /sbin/udevadm trigger --subsystem-match="virtio-ports" \
         --attr-match="name=com.redhat.rhevm.vdsm"
+    /sbin/udevadm trigger --subsystem-match="virtio-ports" \
+        --attr-match="name=ovirt-guest-agent.0"
+
 fi
 
 if [ "$1" -ge 1 ]; then

@@ -61,7 +61,7 @@ class FunctionalTest(GuestAgentTestCase):
         self._config.set('general', 'report_num_cpu_rate', '60')
         self._config.set('general', 'report_application_rate', '120')
         self._config.set('general', 'report_disk_usage', '300')
-        self._config.set('virtio', 'device', self._vport_name)
+        self._config.set('virtio', 'device_prefix', self._vport_name)
 
         self.vdsAgent = agent_class(self._config)
 

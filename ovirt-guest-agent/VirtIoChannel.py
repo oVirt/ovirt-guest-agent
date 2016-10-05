@@ -111,24 +111,33 @@ def _filter_object(obj):
     return filt(obj)
 
 
+def get_vports(prefix):
+    return (os.path.join(prefix, 'ovirt-guest-agent.0'),
+            os.path.join(prefix, 'com.redhat.rhevm.vdsm'))
+
+
 class VirtIoStream(object):
     # Python on Windows 7 returns 'Microsoft' rather than 'Windows' as
     # documented.
     is_windows = platform.system() in ['Windows', 'Microsoft']
     is_test = False
 
-    def __init__(self, vport_name):
+    def __init__(self, vport_prefix):
         if self.is_test:
             from test_port import get_test_port
-            self._vport = get_test_port(vport_name)
+            self._vport = get_test_port(vport_prefix)
             self._read = self._vport.read
             self._write = self._vport.write
         elif self.is_windows:
             from WinFile import WinFile
-            self._vport = WinFile(vport_name)
+            self._vport = WinFile(get_vports(vport_prefix))
             self._read = self._vport.read
             self._write = self._vport.write
         else:
+            current_port, legacy_port = get_vports(vport_prefix)
+            vport_name = current_port
+            if os.path.exists(legacy_port):
+                vport_name = legacy_port
             self._vport = os.open(vport_name, os.O_RDWR)
             self._read = self._os_read
             self._write = self._os_write

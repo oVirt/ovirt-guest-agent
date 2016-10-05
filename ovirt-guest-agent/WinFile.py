@@ -30,16 +30,26 @@ import win32security
 # to use os.write() on a different thread. This class overrides
 # this problem by using Windows's API.
 class WinFile(object):
-
-    def __init__(self, filename):
+    def _open_port(self, name):
         self._hfile = win32file.CreateFile(
-            filename,
+            name,
             win32con.GENERIC_READ | win32con.GENERIC_WRITE,
             win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE,
             win32security.SECURITY_ATTRIBUTES(),
             win32con.OPEN_EXISTING,
             win32con.FILE_FLAG_OVERLAPPED,
             0)
+
+    def __init__(self, ports):
+        current_port, legacy_port = ports
+        try:
+            try:
+                self._open_port(current_port)
+            except win32file.error:
+                self._open_port(legacy_port)
+        except win32file.error:
+            logging.exception('Failed to connect to virtio channel')
+
         self._read_ovrlpd = pywintypes.OVERLAPPED()
         self._read_ovrlpd.hEvent = win32event.CreateEvent(None, True, False,
                                                           None)

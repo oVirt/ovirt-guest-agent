@@ -17,4 +17,5 @@
 #
 
 SYMLINK=="virtio-ports/com.redhat.rhevm.vdsm", OWNER="ovirtagent", GROUP="ovirtagent"
+SYMLINK=="virtio-ports/ovirt-guest-agent.0", OWNER="ovirtagent", GROUP="ovirtagent"
 

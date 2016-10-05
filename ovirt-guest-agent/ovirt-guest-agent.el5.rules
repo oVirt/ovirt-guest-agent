@@ -17,3 +17,4 @@
 #
 
 KERNEL=="vport*", SYSFS{name}=="com.redhat.rhevm.vdsm", OWNER="ovirtagent", GROUP="ovirtagent"
+KERNEL=="vport*", SYSFS{name}=="ovirt-guest-agent.0", OWNER="ovirtagent", GROUP="ovirtagent"
