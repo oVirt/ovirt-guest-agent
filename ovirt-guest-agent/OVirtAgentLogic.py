@@ -307,6 +307,7 @@ class AgentLogicBase:
             self._refresh()
 
     def _refresh(self):
+        self.sessionStartup()
         self.sendUserInfo(True)
         self.sendAppList()
         self.sendContainerList()
