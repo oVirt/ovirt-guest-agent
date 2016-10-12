@@ -314,7 +314,8 @@ class MessageValidator(object):
         agent.dr.setAPIVersion(0)
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
-                      'network-interfaces', 'disks-usage', 'fqdn')
+                      'network-interfaces', 'disks-usage', 'fqdn',
+                      'session-startup')
     def verifyRefreshReply(self, agent):
         # If not yet activated, monkey patch to support the versioning
         if OVirtAgentLogic._MAX_SUPPORTED_API_VERSION == 0:
@@ -325,7 +326,8 @@ class MessageValidator(object):
         assert(agent.dr.getAPIVersion() == 1)
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
-                      'network-interfaces', 'disks-usage', 'fqdn')
+                      'network-interfaces', 'disks-usage', 'fqdn',
+                      'session-startup')
     def verifyRefreshReply2(self, agent):
         agent.dr.setAPIVersion(1)
         assert(agent.dr.getAPIVersion() == 1)
@@ -333,7 +335,8 @@ class MessageValidator(object):
         assert(agent.dr.getAPIVersion() == 0)
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
-                      'network-interfaces', 'disks-usage', 'fqdn')
+                      'network-interfaces', 'disks-usage', 'fqdn',
+                      'session-startup')
     def verifyRefreshReply3(self, agent):
         agent.dr.setAPIVersion(2)
         assert(agent.dr.getAPIVersion() == 2)
@@ -342,7 +345,7 @@ class MessageValidator(object):
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
                       'network-interfaces', 'disks-usage', 'fqdn', 'timezone',
-                      'os-info')
+                      'os-info', 'session-startup')
     def verifyRefreshReply4(self, agent):
         agent.dr.setAPIVersion(2)
         assert(agent.dr.getAPIVersion() == 2)
@@ -350,7 +353,8 @@ class MessageValidator(object):
         assert(agent.dr.getAPIVersion() == 2)
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
-                      'network-interfaces', 'disks-usage', 'fqdn')
+                      'network-interfaces', 'disks-usage', 'fqdn',
+                      'session-startup')
     def verifyRefreshReply5(self, agent):
         agent.dr.setAPIVersion(3)
         assert(agent.dr.getAPIVersion() == 3)
@@ -359,7 +363,7 @@ class MessageValidator(object):
 
     @_ensure_messages('applications', 'host-name', 'os-version', 'active-user',
                       'network-interfaces', 'disks-usage', 'fqdn',
-                      'os-info', 'timezone', 'containers')
+                      'os-info', 'timezone', 'containers', 'session-startup')
     def verifyRefreshReply6(self, agent):
         agent.dr.setAPIVersion(3)
         assert(agent.dr.getAPIVersion() == 3)
