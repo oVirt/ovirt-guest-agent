@@ -208,34 +208,3 @@ class VirtIoChannel:
             written = self._stream.write(message)
             logging.debug("Written %s" % message[:written])
             message = message[written:]
-
-
-def _create_vio():
-    if (platform.system() == 'Windows') or (platform.system() == 'Microsoft'):
-        vport_name = '\\\\.\\Global\\com.redhat.rhevm.vdsm'
-    else:
-        vport_name = '/dev/virtio-ports/com.redhat.rhevm.vdsm'
-    return VirtIoChannel(vport_name)
-
-
-def _test_write():
-    vio = _create_vio()
-    vio.write('network-interfaces',
-              {'interfaces': [{
-                  'name': 'eth0',
-                  'inet': ['10.0.0.2'],
-                  'inet6': ['fe80::213:20ff:fef5:f9d6'],
-                  'hw': '00:1a:4a:23:10:00'}]})
-    vio.write('applications', {'applications': ['kernel-2.6.32-131.4.1.el6',
-                                                'rhev-agent-2.3.11-1.el6']})
-
-
-def _test_read():
-    vio = _create_vio()
-    line = vio.read()
-    while line:
-        print line
-        line = vio.read()
-
-if __name__ == "__main__":
-    _test_read()
