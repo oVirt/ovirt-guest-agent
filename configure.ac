@@ -2,7 +2,7 @@
 AC_PREREQ([2.63])
 
 AC_INIT([ovirt-guest-agent],
-	[1.0.12],
+	[1.0.13],
 	[http://bugzilla.redhat.com])
 
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2 -Wall])

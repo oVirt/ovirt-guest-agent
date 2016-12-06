@@ -1,7 +1,7 @@
-%define _ovirt_version 1.0.12
+%define _ovirt_version 1.0.13
 
 Name:		ovirt-guest-agent-windows
-Version:	1.0.12
+Version:	1.0.13
 Release:	1%{?release_suffix}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
@@ -86,6 +86,9 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/windows-credprov/oVirtCredential
 %{_datadir}/%{name}
 
 %changelog
+* Tue Dec 06 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.13-1
+- New upstream version 1.0.13
+
 * Thu May 19 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.12-1
 - Updated version 1.0.12
 

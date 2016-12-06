@@ -1,3 +1,231 @@
+commit f51546c15f723590118e094bb95a9ee89b89f160
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Sat Nov 12 18:55:24 2016 +0100
+
+    vio: Remove unused obsolete code
+
+    Change-Id: Ie6aeb0b73bd7d7f7b838003602d19f67ea24b4c1
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 9f4d8d50ce2ca058075b6cf4b4c3862bfb411d7a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Oct 5 12:39:15 2016 +0200
+
+    Add support for new VirtIO channel name
+
+    Bug-Url: https://bugzilla.redhat.com/1350334
+    Change-Id: Ibb5a6120317bf24ca750dde3c9913db24709774e
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit baa1be15dde19743ee0b7a7a412952fec5ea387e
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Oct 12 12:09:20 2016 +0200
+
+    Report session-startup on refresh
+
+    To show that we support session-startup and session-shutdown
+    we need to send upon receiving a refresh message also the
+    session-startup message. Otherwise VDSM will assume that
+    we do not support session-{startup,shutdown} reporting.
+
+    Change-Id: Ia19348cd66552fcf029d6725ba78e22619ce77e9
+    Backport-To: 4.0
+    Bug-Url: https://bugzilla.redhat.com/1341106
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit d89d9619f537fa446ae5b5e0f1cc794b0f2ba243
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Sep 30 12:28:00 2016 +0200
+
+    Report session start and stop on all Guest OSes
+
+    Previously the session shutdown was reported on Windows only and
+    the session startup wasn't reported at all. This patch fixes this
+    missing feature.
+
+    Change-Id: Iddf478c6d961dad60c2095762654d1bf4c33c25e
+    Backport-To: 4.0
+    Bug-Url: https://bugzilla.redhat.com/1341106
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1602123e67b88f86a2f67e4ac8f53a43cfe4551b
+Author: Gal Hammer <ghammer@redhat.com>
+Date:   Mon Jan 14 10:46:05 2013 +0100
+
+    agent: apply virtual-guest tuning profile on installation
+
+    Change-Id: I51691439193ec6da881459a5e7c9f798aa9f618c
+    Signed-off-by: Gal Hammer <ghammer@redhat.com>
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 21cba0c0b211ecf13730233695768bfb2bd31889
+Author: Yedidyah Bar David <didi@redhat.com>
+Date:   Tue Sep 13 14:25:16 2016 +0300
+
+    build: Use newer python-windows and pywin32
+
+    Change-Id: Id286c81e671fc6a5ad6c34e14f3516a7cff1b7f8
+    Signed-off-by: Yedidyah Bar David <didi@redhat.com>
+
+commit 218d9145fb7b7bf87a3a307c40e2d8a789352523
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jul 13 13:34:58 2016 +0200
+
+    windows: Apply timer usage parameters for best performance
+
+    The configuration should be now done like this:
+
+    - For versions above Windows 2003/Vista we're going to delete the
+      USEPLATFORMCLOCK value to let the windows kernel decide the best
+      option by itself
+
+    This functionality can be disabled by setting the value
+    general.apply_timer_configuration in the configuration to false
+
+    Change-Id: I8a344002ac4206a6125755a4b0195777cdfadcf9
+    Bug-Url: https://bugzilla.redhat.com/1335309
+    Bug-Url: https://bugzilla.redhat.com/1354532
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit fe036948268ec61b1c485e3b1c30002018d468f3
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 12 09:57:40 2016 +0200
+
+    linux: Fix osinfo script typo as reported in BZ
+
+    Previously overlooked typo in the bug report. This fixes this typo.
+
+    Change-Id: Iebcad103a751537f35a2532bb6c2bc891971ef9d
+    Bug-Url: https://bugzilla.redhat.com/1337942
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit b22ccc74bf32d28e044e2e347ae1b13233db3611
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jul 12 09:45:17 2016 +0200
+
+    build: pep8 tool is now called pycodestyle
+
+    The codestyle checking tool pep8 has been renamed to pycodestyle with
+    version 2.0
+    This patch adds a check for pycodestyle if pep8 wasn't found to handle
+    this change but keep the previous name still relevant.
+
+    Change-Id: I03f486e13d0365f9e8bf114bbe41164b1b85e9c3
+    Bug-Url: https://bugzilla.redhat.com/1352773
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit efab8383eba953a06bfa39d77df084324e2ee2db
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jun 23 09:46:26 2016 +0200
+
+    build: Including Windows SSO plugins in build now
+
+    Change-Id: Id2e0c4e41d3dd0b128df4dd1617684a9b64cd491
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 836c7dca83f0a18d9a8baab13b5cea663cdadb15
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Apr 2 14:13:35 2014 +0200
+
+    Adding Windows cross compilation compatibility
+
+    This patch introduces changes to the guest agent plugins to have the
+    ability to cross compile the plugins
+
+    Change-Id: I40f0c5d85a2ed2d322250271d2f8d75f96b74598
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 50093664153a73419aad11056bd38863d38736c3
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Fri Jul 4 20:39:54 2014 +0200
+
+    Additional filtering data point for updates
+
+    Updates by Microsoft usually contain a 'HelpLink' field which points
+    to somewhere at http://support.microsoft.com
+
+    This patch utilizes this fact to additionally detect otherwise
+    undetected items to filter.
+
+    Change-Id: Iee20995c2b832e5cda42838c8a2965633785f69c
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 4c8adf37b9c234598bb6b8ae199ab74bb4128eb3
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed Jun 22 12:41:05 2016 +0200
+
+    packaging: Fix for rhel6 spec file
+
+    The jenkins nightly builds were broken due to this mistake.
+
+    Change-Id: Ifc44bfca0a08d45fab6dca17eba041d82de00b52
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 22d972a1c4b5ea0c17992f6ce4e7cae87b8e24e4
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jun 7 09:28:11 2016 +0200
+
+    hooks: Make execution more robust
+
+    Previously, exceptions raised due to executing potentially not
+    executable or inaccessible hooks caused exceptions to be passed
+    through to the VirtIO read loop. Which caused that any other hook
+    configured after that not being executed.
+
+    This patch handles the OSErrors potentially raised by the subprocess
+    usage
+
+    Change-Id: I951f6e6ecabdebb9abeba7449329a363296411f7
+    Bug-Url: https://bugzilla.redhat.com/1343017
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit c5f1e25ea31d7df09e344e19e426f2e8247bf9b8
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Jun 7 11:18:21 2016 +0200
+
+    Win: Apply USEPLATFORMCLOCK on Windows 6.x+ on startup
+
+    This patch will apply the boot setting for the current OS configuration
+    to use the platform clock. This will improve the time keeping for the
+    windows guest operating systems version 6.x+
+
+    Change-Id: Id76464df66f577a1d78db716beb04ee8311b9bb5
+    Bug-Url: https://bugzilla.redhat.com/1328920
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit d2c5dde976dae509acbb302a4f9a330918ce852a
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 19 17:09:31 2016 +0200
+
+    automation: Windows spec update to 1.0.12
+
+    This was missing from the version bump
+
+    Change-Id: Ie325e7acb1d95237ef97f2181ae0fb69cfec24a2
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 1796632c776558dcee88a14f5c057da705d9870b
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu May 19 13:03:08 2016 +0200
+
+    Version Bump 1.0.12 - For ovirt 4.0
+
+    Change-Id: Ie52dde8f113d69942072c027b9d627f18e216a72
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 519e9b3b1da2ce096176cab22eac391ac5840980
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Wed May 4 09:41:31 2016 +0200
+
+    Map architectures i[356]86 to x86
+
+    Because architectures i386,i586 and i686 aren't understood by the engine
+    we have to map them to x86
+
+    Change-Id: Idca38acbe9a62d50016d3f177eaf3d028487a0b9
+    Bug-Url: https://bugzilla.redhat.com/1332723
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
 commit a781a1ca19f3ff945747049556ed637f5e299237
 Author: Vinzenz Feenstra <vfeenstr@redhat.com>
 Date:   Wed May 11 14:49:03 2016 +0200

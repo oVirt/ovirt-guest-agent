@@ -5,13 +5,13 @@
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.12
+Version: 1.0.13
 Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
 License: ASL 2.0
 URL: http://wiki.ovirt.org/wiki/Category:Ovirt_guest_agent
-Source0: https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/1.0.11/%{name}-%{version}.tar.bz2
+Source0: https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires: libtool
 BuildRequires: pam-devel
 BuildRequires: python2-devel
@@ -302,6 +302,9 @@ fi
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
 
 %changelog
+* Tue Dec 06 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.13-1
+- New upstream version 1.0.13
+
 * Thu May 19 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.12-1
 - New upstream version 1.0.12
 

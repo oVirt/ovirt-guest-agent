@@ -1,3 +1,11 @@
+ovirt-guest-agent (1.0.13-1) quantal; urgency=low
+
+  * Bump to ovirt-guest-agent 1.0.13
+
+ovirt-guest-agent (1.0.12-1) quantal; urgency=low
+
+  * Bump to ovirt-guest-agent 1.0.12
+
 ovirt-guest-agent (1.0.11-1) quantal; urgency=low
 
   * Bump to ovirt-guest-agent 1.0.11

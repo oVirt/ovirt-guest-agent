@@ -2,7 +2,7 @@
 %global release_version 1
 
 Name: ovirt-guest-agent
-Version: 1.0.12
+Version: 1.0.13
 Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -190,6 +190,9 @@ fi
 
 
 %changelog
+* Tue Dec 06 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.13-1
+- New upstream version 1.0.13
+
 * Thu May 19 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.12-1
 - New upstream version 1.0.12
 
