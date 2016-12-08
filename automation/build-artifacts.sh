@@ -29,8 +29,6 @@ if rpm --eval "%dist" | grep -qFi 'el6'; then
         -D "_sourcedir $PWD" \
         -D "release_suffix ${SUFFIX}" \
         -ba ovirt-guest-agent.rhel6.spec
-elif rpm --eval "%dist" | grep -qFi 'el7'; then
-    echo "TODO"
 else
     yum-builddep -y ovirt-guest-agent.spec
     rpmbuild \

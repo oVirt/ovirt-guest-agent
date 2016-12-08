@@ -25,7 +25,9 @@ Requires: %{name}-common = %{version}-%{release}
 %package common
 Summary: Commonly used files of the oVirt Guest Agent
 BuildArch: noarch
+%if !0%{?rhel}
 BuildRequires: python-pep8
+%endif
 Requires: dbus-python
 Requires: rpm-python
 Requires: qemu-guest-agent
@@ -48,18 +50,7 @@ Summary: PAM module for the oVirt Guest Agent
 Requires: %{name} = %{version}-%{release}
 Requires: pam
 
-%if 0%{?fedora} < 19
-%package gdm-plugin
-Summary: GDM plug-in for the oVirt Guest Agent
-BuildRequires: dbus-glib-devel
-BuildRequires: gdm-devel
-BuildRequires: gobject-introspection-devel
-BuildRequires: gtk2-devel
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-pam-module = %{version}-%{release}
-Requires: gdm
-%endif
-
+%if !0%{?rhel}
 %package kdm-plugin
 Summary: KDM plug-in for the oVirt Guest Agent
 BuildRequires: kdebase-workspace-devel
@@ -67,6 +58,7 @@ BuildRequires: gcc-c++
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-pam-module = %{version}-%{release}
 Requires: kdm
+%endif
 
 %description
 This is the oVirt management agent running inside the guest. The agent
@@ -86,15 +78,11 @@ restart).
 The oVirt PAM module provides the functionality necessary to use the
 oVirt automatic log-in system.
 
-%if 0%{?fedora} < 19
-%description gdm-plugin
-The GDM plug-in provides the functionality necessary to use the
-oVirt automatic log-in system.
-%endif
-
+%if !0%{?rhel}
 %description kdm-plugin
 The KDM plug-in provides the functionality necessary to use the
 oVirt automatic log-in system.
+%endif
 
 %prep
 %setup -q -n ovirt-guest-agent-%{version}
@@ -103,8 +91,9 @@ oVirt automatic log-in system.
 %configure \
     --enable-securedir=%{_moduledir} \
     --includedir=%{_includedir}/security \
-%if 0%{?fedora} >= 19
     --without-gdm \
+%if 0%{?rhel}
+    --without-kdm \
 %endif
     --with-pam-prefix=%{_sysconfdir}
 
@@ -147,11 +136,14 @@ if (! $TUNED_ADM active > /dev/null 2>&1 || $TUNED_ADM active | grep -q "balance
 fi
 %endif
 
+
+%if !0%{?rhel}
 %post kdm-plugin
 if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
 then
     sed -i "s~^#PluginsLogin=winbind~PluginsLogin=ovirtcred,classic~" "%{_kdmrc}"
 fi
+%endif
 
 %preun common
 if [ "$1" -eq 0 ]
@@ -191,11 +183,14 @@ if [ "$1" -ge 1 ]; then
     /bin/systemctl try-restart ovirt-guest-agent.service >/dev/null 2>&1 || :
 fi
 
+
+%if !0%{?rhel}
 %postun kdm-plugin
 if [ "$1" -eq 0 ]
 then
     sed -i "s~PluginsLogin=ovirtcred,classic~#PluginsLogin=winbind~" "%{_kdmrc}"
 fi
+%endif
 
 %files common
 %dir %attr (755,ovirtagent,ovirtagent) %{_localstatedir}/log/ovirt-guest-agent
@@ -283,23 +278,11 @@ fi
 %exclude %{_moduledir}/pam_ovirt_cred.a
 %exclude %{_moduledir}/pam_ovirt_cred.la
 
-%if 0%{?fedora} < 19
-%files gdm-plugin
-# This is intentionally NOT 'noreplace' If this is modified by an user,
-# this actually might break it.
-%config %{_sysconfdir}/pam.d/gdm-ovirtcred
-%{_datadir}/icons/hicolor/*/*/*.png
-%dir %{_datadir}/gdm/simple-greeter/extensions/ovirtcred
-%{_datadir}/gdm/simple-greeter/extensions/ovirtcred/page.ui
-%{_libdir}/gdm/simple-greeter/extensions/libovirtcred.so
-# Unwanted files
-%exclude %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.a
-%exclude %{_libdir}/gdm/simple-greeter/extensions/libovirtcred.la
-%endif
-
+%if !0%{?rhel}
 %files kdm-plugin
 %config %{_sysconfdir}/pam.d/kdm-ovirtcred
 %attr (755,root,root) %{_libdir}/kde4/kgreet_ovirtcred.so
+%endif
 
 %changelog
 * Tue Dec 06 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.13-1
@@ -326,7 +309,7 @@ fi
 - Python 2.4 compatability fix
 - Some build fixes applied
 
-* Thu Aug 28 2013 Amador Pahim <apahim@redhat.com> - 1.0.8-2
+* Wed Aug 28 2013 Amador Pahim <apahim@redhat.com> - 1.0.8-2
 - Solved: Configure tuned only if current profile is off or default.
   performance
 Resolves: BZ#991538
