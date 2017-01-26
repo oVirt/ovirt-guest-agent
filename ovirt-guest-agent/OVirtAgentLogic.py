@@ -77,6 +77,7 @@ def safe_creds_repr(creds):
 
 class DataRetriverBase:
     def __init__(self):
+        self.desktopLocked = True
         self.apiVersion = _DISABLED_API_VALUE
         self.memStats = {
             'mem_total': 0,
@@ -432,6 +433,7 @@ class AgentLogicBase:
     def sessionLogon(self):
         logging.debug("AgentLogicBase::sessionLogon: user logs on the system.")
         cur_user = self.dr.getActiveUser()
+        self.dr.desktopLocked = False
         retries = 0
         while (cur_user == 'None') and (retries < 5):
             time.sleep(1)
@@ -441,6 +443,7 @@ class AgentLogicBase:
         self._send('session-logon')
 
     def sessionLogoff(self):
+        self.dr.desktopLocked = True
         logging.debug("AgentLogicBase::sessionLogoff: "
                       "user logs off from the system.")
         self.activeUser = 'None'
@@ -448,11 +451,13 @@ class AgentLogicBase:
         self._send('active-user', {'name': self.activeUser})
 
     def sessionLock(self):
+        self.dr.desktopLocked = True
         logging.debug("AgentLogicBase::sessionLock: "
                       "user locks the workstation.")
         self._send('session-lock')
 
     def sessionUnlock(self):
+        self.dr.desktopLocked = False
         logging.debug("AgentLogicBase::sessionUnlock: "
                       "user unlocks the workstation.")
         self._send('session-unlock')
