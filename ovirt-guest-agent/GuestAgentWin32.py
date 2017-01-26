@@ -256,6 +256,8 @@ def apply_clock_tuning():
 
 
 class CommandHandlerWin:
+    def __init__(self, dr):
+        self._dr = dr
 
     def lock_screen(self):
         self.LockWorkStation()
@@ -289,6 +291,9 @@ class CommandHandlerWin:
             self._setSoftwareSASPolicy(oldValue)
 
     def login(self, credentials):
+        if not self._dr.desktopLocked:
+            logging.debug("Not unlocking screen because it is not locked")
+            return
         PIPE_NAME = "\\\\.\\pipe\\VDSMDPipe"
         BUFSIZE = 1024
         RETIRES = 3
@@ -693,7 +698,7 @@ class WinVdsAgent(AgentLogicBase):
     def __init__(self, config, install_dir):
         AgentLogicBase.__init__(self, config)
         self.dr = WinDataRetriver()
-        self.commandHandler = CommandHandlerWin()
+        self.commandHandler = CommandHandlerWin(self.dr)
         hooks_dir = os.path.join(install_dir, 'hooks')
         self.hooks = Hooks(logging.getLogger('Hooks'), hooks_dir)
 
