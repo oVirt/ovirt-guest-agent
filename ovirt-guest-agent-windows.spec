@@ -2,7 +2,7 @@
 
 Name:		ovirt-guest-agent-windows
 Version:	1.0.13
-Release:	1%{?release_suffix}
+Release:	1%{?release_suffix}%{?dist}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
 Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/%{version}/ovirt-guest-agent-%{_ovirt_version}.tar.bz2
