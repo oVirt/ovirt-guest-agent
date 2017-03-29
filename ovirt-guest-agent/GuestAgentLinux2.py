@@ -200,19 +200,20 @@ class NicMgr(object):
             ipv6_addrs.append(ip.address)
         return ipv6_addrs
 
-    def ethtool_list_nics(self):
+    def ethtool_list_nics(self, blacklist=()):
         interfaces = list()
         try:
             for dev in self.ethtool.get_devices():
-                flags = self.ethtool.get_flags(dev)
-                if flags & self.ethtool.IFF_UP and \
-                        not(flags & self.ethtool.IFF_LOOPBACK):
-                    devinfo = self.ethtool.get_interfaces_info(dev)[0]
-                    interfaces.append(
-                        {'name': dev,
-                         'inet': self._get_ipv4_addresses(devinfo),
-                         'inet6': self._get_ipv6_addresses(devinfo),
-                         'hw': self.ethtool.get_hwaddr(dev)})
+                if (dev not in blacklist):
+                    flags = self.ethtool.get_flags(dev)
+                    if flags & self.ethtool.IFF_UP and \
+                            not(flags & self.ethtool.IFF_LOOPBACK):
+                        devinfo = self.ethtool.get_interfaces_info(dev)[0]
+                        interfaces.append(
+                            {'name': dev,
+                             'inet': self._get_ipv4_addresses(devinfo),
+                             'inet6': self._get_ipv6_addresses(devinfo),
+                             'hw': self.ethtool.get_hwaddr(dev)})
         except:
             logging.exception("Error retrieving network interfaces.")
         return interfaces
@@ -278,6 +279,7 @@ class LinuxDataRetriver(DataRetriverBase):
             self.list_nics = nicmgr.list_nics
         self.app_list = ""
         self.ignored_fs = ""
+        self.ignored_nics = ""
         self.ignore_zero_size_fs = True
         self._init_vmstat()
         DataRetriverBase.__init__(self)
@@ -325,7 +327,7 @@ class LinuxDataRetriver(DataRetriverBase):
         return result
 
     def getAllNetworkInterfaces(self):
-        return self.list_nics()
+        return self.list_nics(self.ignored_nics.split())
 
     def getApplications(self):
         return self.list_pkgs(self.app_list)
@@ -466,6 +468,7 @@ class LinuxVdsAgent(AgentLogicBase):
         AgentLogicBase.__init__(self, config)
         self.dr = LinuxDataRetriver()
         self.dr.app_list = config.get("general", "applications_list")
+        self.dr.ignored_nics = config.get("general", "ignored_nics")
         self.dr.ignored_fs = set(config.get("general", "ignored_fs").split())
         self.dr.ignore_zero_size_fs = config.get("general",
                                                  "ignore_zero_size_fs")
@@ -487,6 +490,7 @@ def test():
     from pprint import pprint
     dr = LinuxDataRetriver()
     dr.app_list = "kernel kernel-headers aspell"
+    dr.ignored_nics = "docker0"
     dr.ignored_fs = set("rootfs tmpfs autofs cgroup selinuxfs udev mqueue "
                         "nfsd proc sysfs devtmpfs hugetlbfs rpc_pipefs devpts "
                         "securityfs debugfs binfmt_misc fuse.gvfsd-fuse "

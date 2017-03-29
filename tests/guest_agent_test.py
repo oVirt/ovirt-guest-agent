@@ -29,6 +29,7 @@ def _linux_setup_test(conf):
              'securityfs debugfs binfmt_misc fuse.gvfsd-fuse '
              'fuse.gvfs-fuse-daemon fusectl usbfs')
     conf.set('general', 'ignore_zero_size_fs', 'true')
+    conf.set('general', 'ignored_nics', 'docker0')
     import GuestAgentLinux2
     GuestAgentLinux2._GUEST_SCRIPTS_INSTALL_PATH = _get_scripts_path()
     return port_name, GuestAgentLinux2.LinuxVdsAgent
