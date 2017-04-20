@@ -1,5 +1,7 @@
 [Unit]
 Description=oVirt Guest Agent
+Wants=qemu-guest-agent.service
+After=qemu-guest-agent.service
 
 [Service]
 Type=simple
