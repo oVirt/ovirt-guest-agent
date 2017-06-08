@@ -6,15 +6,6 @@ import sys
 
 import py2exe
 
-dsa_path = os.path.join(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.dirname(
-                os.path.abspath(
-                    sys.argv[0])))),
-    "re")
-sys.path.append(dsa_path)
-
 if len(sys.argv) == 1:
     sys.argv.append("py2exe")
     sys.argv.append("-b 1")
