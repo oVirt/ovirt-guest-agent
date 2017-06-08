@@ -1,4 +1,4 @@
-# qagentservice: Windows service wrapper for Qumranet monitoring agent
+# Windows service wrapper for oVirt Guest Agent
 # The service is converted into an exe-file with py2exe
 
 import ConfigParser
