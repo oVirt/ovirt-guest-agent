@@ -18,7 +18,6 @@ noinst_PYTHON=\
     bytesio.py \
     GuestAgentWin32.py \
     setup.py \
-    version.py \
     WinFile.py \
     OVirtGuestService.py \
     $(NULL)

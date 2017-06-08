@@ -3,7 +3,6 @@ from distutils.core import setup
 from glob import glob
 import os
 import sys
-import version
 
 import py2exe
 
@@ -24,8 +23,7 @@ if len(sys.argv) == 1:
 class Target:
     def __init__(self, **kw):
         self.__dict__.update(kw)
-        self.version = "%s.%s" % (version.version_info['software_version'],
-                                  version.version_info['software_revision'])
+        self.version = "1.0.13"
         self.company_name = "Red Hat"
         self.copyright = "Copyright(C) Red Hat Inc."
         self.name = "Guest VDS Agent "
