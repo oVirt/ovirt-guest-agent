@@ -274,7 +274,7 @@ class LinuxDataRetriver(DataRetriverBase):
         try:
             nicmgr = NicMgr()
         except NotImplementedError:
-            self.list_nics = lambda: []
+            self.list_nics = lambda _: []
         else:
             self.list_nics = nicmgr.list_nics
         self.app_list = ""
