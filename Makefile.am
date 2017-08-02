@@ -41,7 +41,6 @@ EXTRA_DIST=                     \
     ovirt-guest-agent.spec      \
     ovirt-guest-agent.rhel6.spec\
     m4/fhs.m4                   \
-    debian                      \
     $(NULL)
 
 # When fixing a file to conform with pep8 add it to the WL here so it will be

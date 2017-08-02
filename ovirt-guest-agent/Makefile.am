@@ -37,7 +37,6 @@ rules_DATA = 55-$(AGENT_NAME).rules
 
 55-$(AGENT_NAME).rules: $(AGENT_NAME).rules
 	cp $(AGENT_NAME).rules 55-$(AGENT_NAME).rules
-	cp $(AGENT_NAME).rules ../debian/$(AGENT_NAME).udev
 
 # Conditionally install the systemd service
 if HAVE_SYSTEMD
@@ -62,7 +61,6 @@ EXTRA_DIST= \
 CLEANFILES = \
     *~ \
     55-$(AGENT_NAME).rules \
-	../debian/ovirt-guest-agent.udev \
 	$(NULL)
 
 MAINTAINERCLEANFILES = \
