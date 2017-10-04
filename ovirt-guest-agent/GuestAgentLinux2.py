@@ -379,7 +379,8 @@ class LinuxDataRetriver(DataRetriverBase):
                         usages.append({'path': path, 'fs': fs, 'total': total,
                                        'used': used})
                 except:
-                    logging.exception("Error retrieving disks usages.")
+                    logging.exception("Error retrieving disk usage; "
+                                      "mount description: %s", mount)
             mounts.close()
         except Exception:
             logging.exception("Error during reading mounted devices")
