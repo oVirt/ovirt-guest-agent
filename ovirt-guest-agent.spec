@@ -35,7 +35,6 @@ Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
-Requires: tuned >= 0.2.19-10
 Provides: %{name} = %{version}-%{release}
 
 %if 0%{?fc16}
@@ -117,25 +116,6 @@ exit 0
     --attr-match="name=ovirt-guest-agent.0"
 
 /bin/systemctl daemon-reload
-
-TUNED_ADM=/usr/sbin/tuned-adm
-TUNED_PROFILE=virtual-guest
-
-%if 0%{?rhel} == 6
-if $TUNED_ADM active | grep -q -e "default$" -e "off$" && $TUNED_ADM list | grep -q $TUNED_PROFILE; then
-    $TUNED_ADM profile $TUNED_PROFILE
-fi
-%endif
-
-%if 0%{?rhel} == 7
-if ! /bin/systemctl status tuned.service > /dev/null 2>&1; then
-    /bin/systemctl start tuned.service
-fi
-if (! $TUNED_ADM active > /dev/null 2>&1 || $TUNED_ADM active | grep -q "balanced$") && $TUNED_ADM list | grep -q $TUNED_PROFILE; then
-    $TUNED_ADM profile $TUNED_PROFILE
-fi
-%endif
-
 
 %if !0%{?rhel}
 %post kdm-plugin
