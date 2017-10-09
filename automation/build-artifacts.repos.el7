@@ -1,0 +1,4 @@
+ovirt-4.1-snapshot,http://resources.ovirt.org/pub/ovirt-4.1-snapshot/rpm/$distro
+ovirt-4.1-snapshot-static,http://resources.ovirt.org/pub/ovirt-4.1-snapshot-static/rpm/$distro
+sbonazzo-wine-epel-x86_64,https://copr-be.cloud.fedoraproject.org/results/sbonazzo/wine-epel/epel-7-x86_64/
+sbonazzo-wine-epel-i386,https://copr-be.cloud.fedoraproject.org/results/sbonazzo/wine-epel/custom-1-i386/
