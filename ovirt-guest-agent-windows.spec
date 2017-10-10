@@ -1,8 +1,9 @@
 %define _ovirt_version 1.0.13
+%global python_windows_version 2.7.14
 
 Name:		ovirt-guest-agent-windows
 Version:	1.0.13
-Release:	1%{?release_suffix}%{?dist}
+Release:	2%{?release_suffix}%{?dist}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
 Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/%{version}/ovirt-guest-agent-%{_ovirt_version}.tar.bz2
@@ -13,7 +14,7 @@ Packager:	Lev Veyde <lveyde@redhat.com>
 
 BuildRequires:	p7zip
 BuildRequires:	py2exe-py2.7 = 0.6.9
-BuildRequires:	python-windows = 2.7.12
+BuildRequires:	python-windows = %{python_windows_version}
 BuildRequires:	pywin32-py2.7 = 220
 BuildRequires:	wine
 BuildRequires:	wget
@@ -40,7 +41,7 @@ popd
 # Use this instead of ~/.wine. See wine(1).
 export WINEPREFIX=$PWD/wineprefix
 
-wine msiexec /i %{_datadir}/python-windows/python-2.7.12.msi /qn ADDLOCAL=ALL
+wine msiexec /i %{_datadir}/python-windows/python-%{python_windows_version}.msi /qn ADDLOCAL=ALL
 export Path="%PATH%;C:\Python27"
 
 7za x %{_datadir}/pywin32-py2.7/pywin32-220.win32-py2.7.exe
@@ -86,6 +87,9 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/windows-credprov/oVirtCredential
 %{_datadir}/%{name}
 
 %changelog
+* Tue Oct 10 2017 Sandro Bonazzola <sbonazzo@redhat.com> - 1.0.13-2
+- Requires python 2.7.14 instead of 2.7.12
+
 * Tue Dec 06 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.13-1
 - New upstream version 1.0.13
 
