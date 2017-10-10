@@ -12,9 +12,8 @@ SUFFIX=".$(date -u +%Y%m%d%H%M%S).git$(git rev-parse --short HEAD)"
     --with-dist
 make dist
 
-# We build the depdendencies for windows only on latest fedora.
-# Do not check %dist but just try to get them. Exit cleanly if missing.
-if yum-builddep -y ovirt-guest-agent-windows.spec; then
+if ! rpm --eval "%dist" | grep -qFi 'el6'; then
+    yum-builddep -y ovirt-guest-agent-windows.spec
     rpmbuild \
         -D "_topdir $PWD/tmp.repos" \
         -D "_sourcedir $PWD" \
