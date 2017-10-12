@@ -1,2 +1,3 @@
-ovirt-master-snapshot,http://resources.ovirt.org/pub/ovirt-master-snapshot/rpm/$distro
-ovirt-master-snapshot-static,http://resources.ovirt.org/pub/ovirt-master-snapshot-static/rpm/$distro
+ovirt-4.1-snapshot,http://resources.ovirt.org/pub/ovirt-4.1-snapshot/rpm/$distro
+ovirt-4.1-snapshot-static,http://resources.ovirt.org/pub/ovirt-4.1-snapshot-static/rpm/$distro
+
