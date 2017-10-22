@@ -9,9 +9,11 @@
 .deps
 .idea
 .libs
+INSTALL
 Makefile
 Makefile.in
 aclocal.m4
+ar-lib
 autom4te.cache/
 compile
 config.cache
@@ -27,7 +29,11 @@ depcomp
 install-sh
 libtool
 ltmain.sh
+m4/
 missing
+py-compile
 stamp-h1
+test-driver
 ovirt-guest-agent/ovirt-guest-agent
 ovirt-guest-agent/ovirt-guest-agent.upstart.conf
+ovirt-guest-agent-*.tar.bz2
