@@ -16,8 +16,8 @@ Requirements:
 Install Python 2.7.3 for Windows.
 (http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi)
 
-Install Python for Windows extension (pywin32) version 216 for Python 2.7
-(http://sourceforge.net/projects/pywin32/files/pywin32/Build216/pywin32-216.win32-py2.7.exe/download)
+Install Python for Windows extension (pywin32) version 221 for Python 2.7
+(https://sourceforge.net/projects/pywin32/files/pywin32/Build%20221/pywin32-221.win32-py2.7.exe/download)
 
 Optionally install py2exe if you want to build an executable file which
 doesn't require Python installation for running
