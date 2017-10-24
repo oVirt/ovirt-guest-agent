@@ -1,13 +1,12 @@
-%define _ovirt_version 1.0.13
 %global python_windows_version 2.7.14
 %global pywin32_py27_version 221
 
 Name:		ovirt-guest-agent-windows
-Version:	1.0.13
-Release:	3%{?release_suffix}%{?dist}
+Version:	1.0.14
+Release:	1%{?release_suffix}%{?dist}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
-Source0:	https://evilissimo.fedorapeople.org/releases/ovirt-guest-agent/%{version}/ovirt-guest-agent-%{_ovirt_version}.tar.bz2
+Source0:	http:///resources.ovirt.org/pub/src/ovirt-guest-agent/ovirt-guest-agent-%{version}.tar.bz2
 
 URL:		http://www.ovirt.org/
 BuildArch:	noarch
@@ -26,7 +25,7 @@ BuildRequires:  mingw64-gcc-c++
 oVirt Guest Agent Service executable for Microsoft Windows platform.
 
 %prep
-%setup -q -n ovirt-guest-agent-%{_ovirt_version}
+%setup -q -n ovirt-guest-agent-%{version}
 
 %build
 
@@ -88,6 +87,9 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/windows-credprov/oVirtCredential
 %{_datadir}/%{name}
 
 %changelog
+* Mon Oct 23 2017 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.14-1
+- New upstream version 1.0.14
+
 * Mon Oct 23 2017 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.13-3
 - Requrires pywin32 version 221 instead of 220
 

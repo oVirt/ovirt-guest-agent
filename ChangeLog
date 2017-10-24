@@ -1,3 +1,264 @@
+commit e72ea907a5c6d12e5ff031de20e7b8027ecdfebc
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Sun Oct 22 23:48:26 2017 +0200
+
+    bump pywin32-py2.7 to version 221
+
+    In [1] the pywin32-py2.7 has been rebased to version 221. Bump our
+    dependency accordingly.
+
+    [1] https://gerrit.ovirt.org/#/c/82667/
+
+    Change-Id: I9a4ec3be1fe1e6b4aeb1004aa5d18a74db4a346e
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 6018f8f551f4ede2d6407cc062cf1138623305fa
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Sun Oct 22 21:16:38 2017 +0200
+
+    gitignore: ignore automake files and dist package
+
+    Ignore files created by automake during build.
+    Ignore package created by 'make dist'.
+
+    Change-Id: I44196f85054a18c725028cef1e1c6756984d18a6
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit bbb7cf26dd92212157ad84bed45472540f0eb984
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Thu Jun 8 19:28:08 2017 +0200
+
+    win: fix comment in GA service
+
+    It's not Qumranet Monitoring Agent for long long time.
+
+    Change-Id: I0b87ed3f5f7ee35c172b80614dfa9c8116442ce8
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 27ca2539743e5cb681235bf4289df44bf55be7af
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Tue Oct 10 13:10:35 2017 +0200
+
+    automation: drop bad comment
+
+    The comment in build-artifacts.sh is no longer true. We are able to
+    build the ovirt-gutest-agent-windows on EL7 and Fedora.
+
+    Change-Id: I5d347b4615d4e2735e18f954b145819536266188
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit bb821a5228cefbcd13a79e08dd473c0b751d0003
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Tue Oct 10 09:59:31 2017 +0200
+
+    packaging: spec: windows: requires python 2.7.14
+
+    python 2.7.14 is now provided in the build system.
+
+    Change-Id: Id2aefdfa06c9067c42e121a1cc0221d0950ff65e
+    Requires: https://gerrit.ovirt.org/82638
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 684b6d0b3086fe938cd84b85b28e78ba43dd62e0
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Mon Oct 9 23:01:09 2017 +0200
+
+    automation: fix el7 build for windows agent
+
+    fix el7 build for windows agent by providing a recent
+    wine with both 64bit and 32bit support.
+
+    Change-Id: I745a362591f2aad14f32e03a498575565301a876
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit f648cf099e82d7523c5c9020ab3864bfa6bc319b
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Oct 4 14:31:32 2017 +0200
+
+    configuration: ignore some filesystems
+
+    Adding following to list of ignored filesystems:
+    * cgroup2 -- v2 of the cgroup
+    * configfs -- userspace-driven kernel object configuration [1]
+    * pstore -- persistent storage for a kernel crash log [2]
+
+    [1] https://www.mjmwired.net/kernel/Documentation/filesystems/configfs/configfs.txt
+    [2] https://lwn.net/Articles/434821/
+
+    Change-Id: I76bd011e02384ab4f12d395f01131bd2141be1c2
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit d8c007b03f3a4299ccfebc8d19186de87e54d9e4
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Oct 4 14:29:59 2017 +0200
+
+    configuration: sort list of ignored filesystems
+
+    Change-Id: I6044b6ff57de43f412c94b8ce7625b3e60287cd8
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit f51c1215c766c2229214c0785bc65a1a66da5edc
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Oct 4 14:12:48 2017 +0200
+
+    linux: disks-usage: log details about mountpoint on failure
+
+    Change-Id: I751e344e7ac36dbbc268338bc85dc9a48e9553a5
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 0f383b060aebfd9d5a324185c55b9df23dd6884f
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Thu Oct 5 14:09:06 2017 +0200
+
+    Remove dependency on tuned
+
+    The dependency is no longer needed, tuned sets the correct profile
+    automatically.
+
+    Change-Id: Ia43bf716b0bb8e8241a161a4cc16d94676244737
+    Bug-Url: https://bugzilla.redhat.com/1443143
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit cda44e485ea99f3aa3ab826783c85079df1a154d
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Tue Sep 19 12:50:58 2017 +0200
+
+    sudoers: fix path to container listing script
+
+    Change-Id: Ib1f33e9d83177ea5df4b45f6997e415e11ea8710
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 1d2181b0c2b2ab2c1d26684b54f2e19aefc35f23
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Thu Jun 8 19:33:41 2017 +0200
+
+    build: remove reference to non-existing directory
+
+    A directory "re" is added to search paths for modules. But this
+    directory is actually located outside of the repository root.
+    Whatever that was, it is not relevant anymore.
+
+    Change-Id: Ic5c1d1d97a15703effe8d1b13935bfb50f082bea
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 1090707087adb69fc4b89f29b980f5cbcc3f82de
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Thu Jun 8 18:21:49 2017 +0200
+
+    build: drop useless version.py
+
+    The module version.py is hardly used and most of the content is not
+    outdated anyway. There is no real reason to keep it.
+
+    Change-Id: I98fd82a6d5f2f8832793b28cc12b247e36326628
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 0bd04757b6c2087186eee64a9b12049b8ea77c20
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Aug 2 11:21:12 2017 +0200
+
+    remove debian directory
+
+    Remove the directory with debian packaging. We don't use it anymore and
+    it causes only confusion.
+
+    Change-Id: I5a3f344ca33d130b4708a156ae1b1672602c732d
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 30ba9ea673c5db66e437948689d9b203f29ec6f7
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Aug 2 13:47:43 2017 +0200
+
+    linux: fix missing argument for lambda of list_nics
+
+    Commit a76da96 added posibility to ignore certain interfaces from list
+    of available NICs. This change added a new argument to the function
+    ethtool_list_nics() that handles listing when python-ethtool is
+    available. It however did not add the argument to the lambda used when
+    there is no python-ethtool available.
+
+    Change-Id: I3235e9a95ad7accde1e7d88973dc3fe03c8c0d2b
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 1d284c59092ce32261b3bd054e670f899a579ac7
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Apr 20 09:28:29 2017 +0200
+
+    systemd: Add dependency on qemu-guest-agent service
+
+    Change-Id: I0d288e8265b440df9f4b091c240d853eefabb895
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit a76da96c5a9ca3a4294a154bd76aecaf658b8aa9
+Author: Marcus Young <myoung34@my.apsu.edu>
+Date:   Tue Mar 28 20:20:24 2017 -0500
+
+    Allow ability to ignore specific NICs in linux guest agent
+
+    Change-Id: Ifc7cd4e72a72b5133bae7405753046f56036c37f
+    Signed-off-by: Marcus Young <myoung34@my.apsu.edu>
+
+commit c3cfd269d66def2a3b1bf5cfcfd878493aa99473
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Jan 26 08:09:56 2017 +0100
+
+    win32: Do not attempt to login when the desktop is unlocked
+
+    When the desktop is unlocked we should not try to login because we're
+    calling the 'Secure Attention Sequence' which will open the fullscreen
+    window with the options to lock the screen, change password etc. This is
+    a disturbing side effect that should be avoided.
+
+    After searching for the best possible solution I came to the conclusion
+    that the solution introduced in this patch is good enough, even though
+    it won't work right after starting the agent. It will start working after
+    the first login or unlock of the screen. That means also that this
+    functionality won't be working after a restart of the service, since the
+    agent won't be aware of the fact that it has been only restarted.
+    I also can't say by default that the screen is unlocked, because that
+    would break the SSO on startup and other cases. Therefore I assumed
+    this as the currently 'good enough solution' as this is also a niche
+    problem because for this feature to be useful the option to take no
+    action on console disconnect has to be active in the ovirt-engine. The
+    default is the lock screen behavior which will intiate the locking of
+    the screen in case of a disconnect of the console.
+
+    Bug-Url: https://bugzilla.redhat.com/1365925
+    Backport-To: 4.1
+    Change-Id: I52e92dc00eb34f9f6afc98dc4743a7d793de858b
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit fb12983b0396b5628b222e8df427fde2ed1a41a9
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Thu Feb 2 17:40:29 2017 +0100
+
+    ovirt-guest-agent-windows: add dist tag
+
+    adding dist tag to the NVR of the package to ensure
+    it's correctly handled by repoman and jenkins automation
+    queue
+
+    Change-Id: I1914257d26e71e8cdbca5ecf9b4757f75294f5d5
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 165fff1854b70f8dfff19bbc0c43462e6c930e8b
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Thu Dec 8 12:37:25 2016 +0100
+
+    rpm: Build artifacts having EL7 buildable
+
+    Change-Id: If6d7fe77edc72db5b5442351b5fcb39cf32fef25
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
+commit 272f8798ace2eacc179c3f3b8744b363b3e4512f
+Author: Vinzenz Feenstra <vfeenstr@redhat.com>
+Date:   Tue Dec 6 11:09:15 2016 +0100
+
+    Version bump to 1.0.13 for ovirt 4.1
+
+    Change-Id: I053ddf7653692b2d739e56802fa2985e74081277
+    Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+
 commit f51546c15f723590118e094bb95a9ee89b89f160
 Author: Vinzenz Feenstra <vfeenstr@redhat.com>
 Date:   Sat Nov 12 18:55:24 2016 +0100

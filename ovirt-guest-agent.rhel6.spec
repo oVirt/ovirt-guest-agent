@@ -2,13 +2,13 @@
 %global release_version 1
 
 Name: ovirt-guest-agent
-Version: 1.0.13
+Version: 1.0.14
 Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
 License: ASL 2.0
 URL: http://wiki.ovirt.org/wiki/Category:Ovirt_guest_agent
-Source0: http://ovirt.org/releases/stable/src/%{name}-%{version}.tar.bz2
+Source0: http:///resources.ovirt.org/pub/src/ovirt-guest-agent/%{name}-%{version}.tar.bz2
 BuildArch: noarch
 BuildRequires: python2-devel
 BuildRequires: python-pep8
@@ -190,6 +190,9 @@ fi
 
 
 %changelog
+* Mon Oct 23 2017 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.14-1
+- New upstream version 1.0.14
+
 * Tue Dec 06 2016 Vinzenz Feenstra <vfeenstr@redhat.com> - 1.0.13-1
 - New upstream version 1.0.13
 
