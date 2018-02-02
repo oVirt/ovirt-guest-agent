@@ -3,5 +3,5 @@ automake
 gettext-devel
 git
 python2-devel
-dnf-utils
+yum-utils
 libtool
