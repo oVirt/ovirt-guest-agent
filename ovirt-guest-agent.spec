@@ -109,9 +109,9 @@ getent passwd ovirtagent > /dev/null || \
 exit 0
 
 %post common
+%udev_rules_update
 /sbin/udevadm trigger --subsystem-match="virtio-ports" \
     --attr-match="name=com.redhat.rhevm.vdsm"
-
 /sbin/udevadm trigger --subsystem-match="virtio-ports" \
     --attr-match="name=ovirt-guest-agent.0"
 
@@ -152,6 +152,7 @@ if [ "$1" -eq 0 ]
 then
     /bin/systemctl daemon-reload
     # Let udev clear access rights
+    %udev_rules_update
     /sbin/udevadm trigger --subsystem-match="virtio-ports" \
         --attr-match="name=com.redhat.rhevm.vdsm"
     /sbin/udevadm trigger --subsystem-match="virtio-ports" \
