@@ -11,7 +11,7 @@ Summary: The oVirt Guest Agent
 Group: Applications/System
 License: ASL 2.0
 URL: http://wiki.ovirt.org/wiki/Category:Ovirt_guest_agent
-Source0: http:///resources.ovirt.org/pub/src/ovirt-guest-agent/%{name}-%{version}.tar.bz2
+Source0: http://resources.ovirt.org/pub/src/%{name}/%{name}-%{version}.tar.bz2
 BuildRequires: libtool
 BuildRequires: pam-devel
 BuildRequires: python2-devel
