@@ -1,7 +1,7 @@
 
 %global release_version 1
 
-%global _moduledir /%{_lib}/security
+%global _moduledir /%{_libdir}/security
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
