@@ -15,11 +15,7 @@ Source0: http:///resources.ovirt.org/pub/src/ovirt-guest-agent/%{name}-%{version
 BuildRequires: libtool
 BuildRequires: pam-devel
 BuildRequires: python2-devel
-%if 0%{?fedora} >= 18
 BuildRequires: systemd
-%else
-BuildRequires: systemd-units
-%endif
 Requires: %{name}-common = %{version}-%{release}
 
 %package common
@@ -37,12 +33,9 @@ Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
 Provides: %{name} = %{version}-%{release}
 
-%if 0%{?fc16}
-Conflicts: selinux-policy < 3.10.0-77
-%endif
-%if 0%{?fedora} >= 17
+# If selinux is installed and has a version lower than tested, our package
+# would not work as expected.
 Conflicts: selinux-policy < 3.10.0-89
-%endif
 
 %package pam-module
 Summary: PAM module for the oVirt Guest Agent
