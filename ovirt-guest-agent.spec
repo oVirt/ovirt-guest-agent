@@ -31,6 +31,9 @@ Requires: python-ethtool >= 0.4-1
 Requires: udev >= 095-14.23
 Requires: kernel > 2.6.18-238.5.0
 Requires: usermode
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
 Provides: %{name} = %{version}-%{release}
 
 # If selinux is installed and has a version lower than tested, our package
@@ -108,8 +111,6 @@ exit 0
 /sbin/udevadm trigger --subsystem-match="virtio-ports" \
     --attr-match="name=ovirt-guest-agent.0"
 
-/bin/systemctl daemon-reload
-
 %if !0%{?rhel}
 %post kdm-plugin
 if ! grep -q "^PluginsLogin=" "%{_kdmrc}";
@@ -121,7 +122,7 @@ fi
 %preun common
 if [ "$1" -eq 0 ]
 then
-    /bin/systemctl stop ovirt-guest-agent.service > /dev/null 2>&1
+    %systemd_preun ovirt-guest-agent.service
 
     # Send an "uninstalled" notification to vdsm.
     if [ -w /dev/virtio-ports/com.redhat.rhevm.vdsm ]
@@ -143,19 +144,15 @@ fi
 %postun common
 if [ "$1" -eq 0 ]
 then
-    /bin/systemctl daemon-reload
     # Let udev clear access rights
     %udev_rules_update
     /sbin/udevadm trigger --subsystem-match="virtio-ports" \
         --attr-match="name=com.redhat.rhevm.vdsm"
     /sbin/udevadm trigger --subsystem-match="virtio-ports" \
         --attr-match="name=ovirt-guest-agent.0"
-
 fi
 
-if [ "$1" -ge 1 ]; then
-    /bin/systemctl try-restart ovirt-guest-agent.service >/dev/null 2>&1 || :
-fi
+%systemd_postun_with_restart ovirt-guest-agent.service
 
 
 %if !0%{?rhel}
