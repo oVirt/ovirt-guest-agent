@@ -1,5 +1,5 @@
 %global python_windows_version 2.7.14
-%global pywin32_py27_version 221
+%global pywin32_py27_version 222
 
 Name:		ovirt-guest-agent-windows
 Version:	1.0.14
