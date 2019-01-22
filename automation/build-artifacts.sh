@@ -5,7 +5,11 @@
 [[ -d tmp.repos ]] \
 || mkdir -p tmp.repos
 
-SUFFIX=".$(date -u +%Y%m%d%H%M%S).git$(git rev-parse --short HEAD)"
+if git describe --exact-match --tags --match "[0-9]*" > /dev/null 2>&1 ; then
+    SUFFIX=""
+else
+    SUFFIX=".$(date -u +%Y%m%d%H%M%S).git$(git rev-parse --short HEAD)"
+fi
 
 ./autogen.sh
 ./configure \

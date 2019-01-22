@@ -1,3 +1,118 @@
+commit 30a9b911fa6551571d06769f66e0e1e190f7aeb9
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Thu Aug 30 08:47:18 2018 +0200
+
+    packaging: spec: update windows requirements
+
+    Change-Id: Ia929b8dfd5a67c5ffcaf09573780da836e35ee13
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit dcb03c3005900b2731b12958513c4d0a13996592
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Mar 30 10:51:08 2018 +0200
+
+    packaging: spec: fix moduledir
+
+    moduledir should be /%{_libdir}/security
+    instead of /%{_lib}/security being /lib and lib64 deprecated
+    and kept as symlink only for backward compatibility
+
+    Change-Id: I5c7b08c0efe539eac0ebd4717b55b0e026932793
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 98a332ff493c2c97cbdcc625901e8da697f25791
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Mar 30 10:39:38 2018 +0200
+
+    packaging: spec: fix Source0 URL
+
+    fixing a typo in the Source0 URL, reusing package name.
+
+    Change-Id: Ic7c7c389bdcd83251c32da27cc7d72220901703e
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 853617b008bab7cf36aed364407f519dc83bb210
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Mar 30 10:30:10 2018 +0200
+
+    packaging: spec: use systemd macros
+
+    Use systemd macros which are available since Fedora 18
+    and are available in EL7 as well.
+    Dropped calls to systemctl reload where not needed.
+
+    Change-Id: If5bc3cbdc9845f2638649eb88ed53d88351f08b5
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit fef4e3cb7a853ebc69fb040dae475d7443a5bc99
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Mar 30 10:25:22 2018 +0200
+
+    packaging: spec: drop legacy code
+
+    Fedora 16, 17 and 18 are gone EOL long time ago and
+    EL7 has newer version than the one shipped in Fedora 17.
+
+    Change-Id: I5cb3382efc6e2e3e5e60d4a80e26aaafb07b7e41
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 5b50011afeb50d0e7e5d54649e343a0657e37a34
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Mar 30 10:18:29 2018 +0200
+
+    packaging: spec: reload udev rules
+
+    Reload udev rules before triggering them.
+    The fix is available in the EPEL and Fedora packaging
+    but it never got backported to upstream.
+
+    Change-Id: I9329db73ed427bae1a488bf06999607eec26c93e
+    Related-To: http://bugzilla.redhat.com/1278163
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit d68c7a7cb2d83b5ea17a104bf266718fb5bba064
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Mar 30 11:41:16 2018 +0200
+
+    automation: drop aclocal from check-patch.packages
+
+    aclocal is provided by automake and doesn't exist
+    as its own package.
+
+    Change-Id: Iacc3ba80d54a84ec36d702e1d146048759530ba0
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit 4ecb7e3dbcd2f55f4398c4c76d1d3f962aceb842
+Author: Sandro Bonazzola <sbonazzo@redhat.com>
+Date:   Fri Feb 2 16:44:15 2018 +0100
+
+    automation: fix fedora builds
+
+    using dnf-utils instead of yum-utils on Fedora.
+    Latest Fedoras uses boolean conditionals, so yum-builddep would fail
+    with something like:
+      Error: Package: cmake-rpm-macros-3.10.1-11.fc27.noarch (fedora-updates-fc27)
+                Requires: (cmake-data = 3.10.1-11.fc27 if cmake-data < 3.10.1-11.fc27)
+      Error: Package: cmake-rpm-macros-3.10.1-11.fc27.noarch (fedora-updates-fc27)
+                Requires: (cmake = 3.10.1-11.fc27 if cmake < 3.10.1-11.fc27)
+
+    dnf-util provides symlinks allowing to keep using yum-builddep command
+    also with dnf.
+
+    Change-Id: I08102b8bdf056b1662ab530d1c1d291be84e6ee6
+    Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+
+commit bb1a5750559aad0249752b0aaa01f36e34e24e12
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Nov 8 22:34:26 2017 +0100
+
+    configuration: ignore tracefs
+
+    tracefs is file system that hold the control files as
+    well as the output of the kernel function tracer.
+
+    Change-Id: I6f8ac455e3fd47e6ea15f057082b2f954ee3de27
+
 commit e72ea907a5c6d12e5ff031de20e7b8027ecdfebc
 Author: Tomáš Golembiovský <tgolembi@redhat.com>
 Date:   Sun Oct 22 23:48:26 2017 +0200
