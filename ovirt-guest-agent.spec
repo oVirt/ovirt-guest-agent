@@ -5,7 +5,7 @@
 %global _kdmrc /etc/kde/kdm/kdmrc
 
 Name: ovirt-guest-agent
-Version: 1.0.14
+Version: 1.0.15
 Release: %{release_version}%{?release_suffix}%{?dist}
 Summary: The oVirt Guest Agent
 Group: Applications/System
@@ -256,6 +256,9 @@ fi
 %endif
 
 %changelog
+* Tue Jan 22 2019 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.15-1
+- New upstream version 1.0.15
+
 * Mon Oct 23 2017 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.14-1
 - New upstream version 1.0.14
 
