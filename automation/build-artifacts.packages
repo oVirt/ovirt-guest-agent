@@ -1,7 +1,7 @@
 autoconf
 automake
+dnf-utils
 gettext-devel
 git
-python2-devel
-dnf-utils
 libtool
+python2-devel

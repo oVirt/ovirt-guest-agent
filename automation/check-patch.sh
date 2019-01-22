@@ -8,3 +8,5 @@
     --localstatedir=/var \
     --without-sso
 make check
+
+./automation/build-artifacts.sh

@@ -1,6 +1,5 @@
 autoconf
 automake
-dnf-utils
 gettext-devel
 git
 libtool
@@ -8,3 +7,4 @@ make
 python2-devel
 python-nose
 python-pep8
+yum-utils

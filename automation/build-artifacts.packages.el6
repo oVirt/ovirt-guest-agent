@@ -2,6 +2,6 @@ autoconf
 automake
 gettext-devel
 git
+libtool
 python2-devel
 yum-utils
-libtool

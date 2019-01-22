@@ -1,9 +1,11 @@
 #!/bin/bash -xe
-[[ -d exported-artifacts ]] \
-|| mkdir -p exported-artifacts
 
-[[ -d tmp.repos ]] \
-|| mkdir -p tmp.repos
+# cleanup leftovers from previous builds
+rm -rf exported-artifacts
+rm -rf tmp.repos
+
+mkdir -p exported-artifacts
+mkdir -p tmp.repos
 
 if git describe --exact-match --tags --match "[0-9]*" > /dev/null 2>&1 ; then
     SUFFIX=""
@@ -21,7 +23,7 @@ if ! rpm --eval "%dist" | grep -qFi 'el6'; then
     rpmbuild \
         -D "_topdir $PWD/tmp.repos" \
         -D "_sourcedir $PWD" \
-        -D "release_suffix ${SUFFIX}" \
+        ${SUFFIX:+-D "release_suffix ${SUFFIX}"} \
         -ba ovirt-guest-agent-windows.spec
 fi
 
@@ -30,14 +32,14 @@ if rpm --eval "%dist" | grep -qFi 'el6'; then
     rpmbuild \
         -D "_topdir $PWD/tmp.repos" \
         -D "_sourcedir $PWD" \
-        -D "release_suffix ${SUFFIX}" \
+        ${SUFFIX:+-D "release_suffix ${SUFFIX}"} \
         -ba ovirt-guest-agent.rhel6.spec
 else
     yum-builddep -y ovirt-guest-agent.spec
     rpmbuild \
         -D "_topdir $PWD/tmp.repos" \
         -D "_sourcedir $PWD" \
-        -D "release_suffix ${SUFFIX}" \
+        ${SUFFIX:+-D "release_suffix ${SUFFIX}"} \
         -ba ovirt-guest-agent.spec
 fi
 
