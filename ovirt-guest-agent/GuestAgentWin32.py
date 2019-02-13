@@ -189,6 +189,7 @@ class WinOsTypeHandler:
     WIN2012 = 'Win 2012'
     WIN2012R2 = 'Win 2012 R2'
     WIN2016 = 'Win 2016'
+    WIN2019 = 'Win 2019'
     WIN2K = 'Win 2000'
     WINXP = 'Win XP'
     WINVISTA = 'Win Vista'
@@ -213,7 +214,10 @@ class WinOsTypeHandler:
         '6.1': WIN2008R2,
         '6.2': WIN2012,
         '6.3': WIN2012R2,
-        '10.0': WIN2016,
+        '10.0': [
+            (17763, WIN2019),
+            (14393, WIN2016),
+        ],
     }
 
     def getWinOsType(self):
@@ -231,6 +235,12 @@ class WinOsTypeHandler:
                 matrix = self.desktopVersionMatrix
             version = '%d.%d' % (major, minor)
             name = matrix.get(version, '')
+            if isinstance(name, list):
+                build_list = name
+                name = ''
+                for final_build, build_name in build_list:
+                    if os_version.dwBuildNumber <= final_build:
+                        name = build_name
         return {'name': name, 'version': version}
 
 
