@@ -32,6 +32,8 @@ def import_json():
     except ImportError:
         import simplejson
         return simplejson
+
+
 json = import_json()
 
 __REPLACEMENT_CHAR = u'\ufffd'

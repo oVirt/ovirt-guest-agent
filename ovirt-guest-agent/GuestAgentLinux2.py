@@ -36,8 +36,9 @@ def import_json():
     except ImportError:
         import simplejson
         return simplejson
-json = import_json()
 
+
+json = import_json()
 
 CredServer = None
 try:
@@ -511,6 +512,7 @@ def test():
     print "Disk Mapping:",
     pprint(dr.getDiskMapping())
     print "Memory Stats:", dr.getMemoryStats()
+
 
 if __name__ == '__main__':
     test()

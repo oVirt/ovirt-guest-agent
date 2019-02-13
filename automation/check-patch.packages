@@ -7,4 +7,4 @@ libtool
 make
 python2-devel
 python-nose
-python-pep8
+python-pycodestyle

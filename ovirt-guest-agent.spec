@@ -22,7 +22,7 @@ Requires: %{name}-common = %{version}-%{release}
 Summary: Commonly used files of the oVirt Guest Agent
 BuildArch: noarch
 %if !0%{?rhel}
-BuildRequires: python-pep8
+BuildRequires: python-pycodestyle
 %endif
 Requires: dbus-python
 Requires: rpm-python

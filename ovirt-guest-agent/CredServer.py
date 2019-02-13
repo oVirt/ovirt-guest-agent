@@ -50,7 +50,7 @@ SCM_CREDENTIALS = 2
 class iovec(Structure):
     _fields_ = [
         ('iov_base', POINTER(c_ubyte)),
-        ('iov_len',  c_uint)
+        ('iov_len', c_uint)
     ]
 
 
@@ -292,6 +292,7 @@ def main():
             time.sleep(1)
     except (KeyboardInterrupt, SystemExit):
         server.join()
+
 
 if __name__ == "__main__":
     logging.root.level = logging.DEBUG

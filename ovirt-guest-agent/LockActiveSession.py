@@ -152,5 +152,6 @@ def main():
         else:
             logging.error("Error locking session (no active session).")
 
+
 if __name__ == '__main__':
     main()

@@ -174,7 +174,7 @@ class OSVERSIONINFOEXW(ctypes.Structure):
                 ('dwMinorVersion', ctypes.c_ulong),
                 ('dwBuildNumber', ctypes.c_ulong),
                 ('dwPlatformId', ctypes.c_ulong),
-                ('szCSDVersion', ctypes.c_wchar*128),
+                ('szCSDVersion', ctypes.c_wchar * 128),
                 ('wServicePackMajor', ctypes.c_ushort),
                 ('wServicePackMinor', ctypes.c_ushort),
                 ('wSuiteMask', ctypes.c_ushort),
@@ -749,6 +749,7 @@ def test():
     print "Disks Usage:", dr.getDisksUsage()
     print "Memory Stats:", dr.getMemoryStats()
     print "DiskMapping:", dr.getDiskMapping()
+
 
 if __name__ == '__main__':
     test()
