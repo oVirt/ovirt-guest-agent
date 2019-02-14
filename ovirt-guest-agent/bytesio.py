@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2
 
 class BytesIO:
     def __init__(self, buffer):

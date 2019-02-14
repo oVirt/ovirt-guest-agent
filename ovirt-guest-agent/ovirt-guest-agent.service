@@ -12,7 +12,7 @@ PermissionsStartOnly=true
 ExecStartPre=/sbin/modprobe virtio_console
 ExecStartPre=/bin/touch /run/ovirt-guest-agent.pid
 ExecStartPre=/bin/chown ovirtagent:ovirtagent /run/ovirt-guest-agent.pid
-ExecStart=/usr/bin/python /usr/share/ovirt-guest-agent/ovirt-guest-agent.py
+ExecStart=/usr/bin/python2 /usr/share/ovirt-guest-agent/ovirt-guest-agent.py
 
 [Install]
 WantedBy=multi-user.target

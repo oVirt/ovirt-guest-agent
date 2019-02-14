@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python2
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 # Copyright 2014 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
