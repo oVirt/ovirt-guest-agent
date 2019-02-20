@@ -1,3 +1,49 @@
+commit 3cdcd461fa4329d1f3ae7fa57ac005597e8082ad
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Feb 13 15:28:05 2019 +0100
+
+    guestagent: add support for Windows 2019
+
+    Server editions stopped bumping the major/minor versions and Windows
+    2019 is also 10.0 (just like Windows 2016). To distinguish the versions
+    we have to match build numbers.
+
+    Final build number of Windows Server 2016 is 14939 and everything from
+    0 to 14939 (including) is Windows Server 2016. Final build number of
+    Windows Server 2019 is 17764, so any version with build number above
+    14939 up to 17764 is Windows Server 2019.
+
+    Reference:
+    https://techcommunity.microsoft.com/t5/Windows-Server-Insiders/Windows-Server-2019-version-info/m-p/293112/highlight/true#M859
+
+    Change-Id: Iffacc52891afa37fe4f1a7ca1f31652cebc07cb7
+    Bug-Url: https://bugzilla.redhat.com/1656346
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
+commit 117b21d806dc8ffa5f4c669e120ef6d5ce0cd0e3
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Thu Feb 14 12:46:30 2019 +0100
+
+    Explicitly use python2 in shebang
+
+    Reference:
+    https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+
+    Change-Id: I5b2e2c1d0bc73d617aaa006f722df12a904fdf90
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+    Bug-Url: https://bugzilla.redhat.com/1675605
+
+commit cb061768427998e635b8a82d6ea41bede962eab3
+Author: Tomáš Golembiovský <tgolembi@redhat.com>
+Date:   Wed Feb 13 19:16:36 2019 +0100
+
+    Switch to pycodestyle
+
+    python-pep8 is deprecated
+
+    Change-Id: I9abcf2a2a3d30967018dd4ca9fdb91af2b68aa38
+    Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+
 commit 30a9b911fa6551571d06769f66e0e1e190f7aeb9
 Author: Sandro Bonazzola <sbonazzo@redhat.com>
 Date:   Thu Aug 30 08:47:18 2018 +0200

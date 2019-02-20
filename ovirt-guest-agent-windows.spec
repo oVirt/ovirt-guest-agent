@@ -2,7 +2,7 @@
 %global pywin32_py27_version 222
 
 Name:		ovirt-guest-agent-windows
-Version:	1.0.15
+Version:	1.0.16
 Release:	1%{?release_suffix}%{?dist}
 Summary:	oVirt Guest Agent Service for Windows
 License:	ASL 2.0
@@ -87,6 +87,9 @@ cp -v %{_builddir}/ovirt-guest-agent-%{version}/windows-credprov/oVirtCredential
 %{_datadir}/%{name}
 
 %changelog
+* Wed Feb 20 2019 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.16-1
+- New upstream version 1.0.16
+
 * Tue Jan 22 2019 Tomáš Golembiovský <tgolembi@redhat.com> - 1.0.15-1
 - New upstream version 1.0.15
 
