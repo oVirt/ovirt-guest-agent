@@ -15,6 +15,7 @@ class Target:
     def __init__(self, **kw):
         self.__dict__.update(kw)
         self.version = "1.0.16"
+        self.package_version = "1.0.16"
         self.company_name = "Red Hat"
         self.copyright = "Copyright(C) Red Hat Inc."
         self.name = "Guest VDS Agent "
