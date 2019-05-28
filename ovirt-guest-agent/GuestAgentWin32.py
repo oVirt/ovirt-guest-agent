@@ -113,7 +113,7 @@ def GetNetworkInterfaces():
     interfaces = list()
     try:
         objWMIService = win32com.client.Dispatch("WbemScripting.SWbemLocator")
-        objSWbemServices = objWMIService.ConnectServer(".", "root\cimv2")
+        objSWbemServices = objWMIService.ConnectServer(".", "root\\cimv2")
         adapters = objSWbemServices.ExecQuery(
             "SELECT * FROM Win32_NetworkAdapterConfiguration")
         for adapter in adapters:
@@ -638,7 +638,7 @@ class WinDataRetriver(DataRetriverBase):
             objWMIService = \
                 win32com.client.Dispatch("WbemScripting.SWbemLocator")
             objSWbemServices = \
-                objWMIService.ConnectServer(strComputer, "root\cimv2")
+                objWMIService.ConnectServer(strComputer, "root\\cimv2")
             colItems = \
                 objSWbemServices.ExecQuery(
                     "SELECT * FROM Win32_DiskDrive")
@@ -658,7 +658,7 @@ class WinDataRetriver(DataRetriverBase):
             objWMIService = \
                 win32com.client.Dispatch("WbemScripting.SWbemLocator")
             objSWbemServices = \
-                objWMIService.ConnectServer(strComputer, "root\cimv2")
+                objWMIService.ConnectServer(strComputer, "root\\cimv2")
             colItems = \
                 objSWbemServices.ExecQuery(
                     "SELECT * FROM Win32_PageFileUsage")
@@ -685,7 +685,7 @@ class WinDataRetriver(DataRetriverBase):
             objWMIService = \
                 win32com.client.Dispatch("WbemScripting.SWbemLocator")
             objSWbemServices = \
-                objWMIService.ConnectServer(strComputer, "root\cimv2")
+                objWMIService.ConnectServer(strComputer, "root\\cimv2")
             colItems = \
                 objSWbemServices.ExecQuery(
                     "SELECT * FROM Win32_PerfFormattedData_PerfOS_Memory")
@@ -738,7 +738,7 @@ class WinVdsAgent(AgentLogicBase):
     def disable_screen_saver(self):
         keyHandle = win32api.RegOpenKeyEx(
             win32con.HKEY_USERS,
-            ".DEFAULT\Control Panel\Desktop",
+            ".DEFAULT\\Control Panel\\Desktop",
             0,
             win32con.KEY_WRITE)
         win32api.RegSetValueEx(keyHandle, "ScreenSaveActive", 0,
