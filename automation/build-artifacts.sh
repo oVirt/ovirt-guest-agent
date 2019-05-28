@@ -34,7 +34,9 @@ if rpm --eval "%dist" | grep -qFi 'el6'; then
         -D "_sourcedir $PWD" \
         ${SUFFIX:+-D "release_suffix ${SUFFIX}"} \
         -ba ovirt-guest-agent.rhel6.spec
-else
+fi
+
+if rpm --eval "%dist" | grep -qFi 'el7'; then
     yum-builddep -y ovirt-guest-agent.spec
     rpmbuild \
         -D "_topdir $PWD/tmp.repos" \
