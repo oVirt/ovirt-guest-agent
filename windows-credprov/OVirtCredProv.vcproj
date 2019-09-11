@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="secur32.lib shlwapi.lib"
+				AdditionalDependencies="credui.lib secur32.lib shlwapi.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="OVirtCredProv.def"
 				GenerateDebugInformation="true"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="secur32.lib shlwapi.lib"
+				AdditionalDependencies="credui.lib secur32.lib shlwapi.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="OVirtCredProv.def"
 				GenerateDebugInformation="true"
@@ -217,7 +217,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="secur32.lib shlwapi.lib"
+				AdditionalDependencies="credui.lib secur32.lib shlwapi.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="OVirtCredProv.def"
 				GenerateDebugInformation="true"
@@ -294,7 +294,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="secur32.lib shlwapi.lib"
+				AdditionalDependencies="credui.lib secur32.lib shlwapi.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="OVirtCredProv.def"
 				GenerateDebugInformation="true"

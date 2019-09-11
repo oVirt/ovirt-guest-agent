@@ -30,8 +30,8 @@ oVirt Guest Agent Service executable for Microsoft Windows platform.
 %build
 
 pushd windows-credprov
-x86_64-w64-mingw32-g++ *.cpp -I . -o oVirtCredentialsProvider64.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid
-i686-w64-mingw32-g++ *.cpp -I . -o oVirtCredentialsProvider32.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid
+x86_64-w64-mingw32-g++ *.cpp -I . -o oVirtCredentialsProvider64.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid -lcredui
+i686-w64-mingw32-g++ *.cpp -I . -o oVirtCredentialsProvider32.dll -shared -static-libstdc++ -static-libgcc -lshlwapi -lsecur32 -lole32 -luuid -lcredui
 popd
 
 pushd GinaSSO
