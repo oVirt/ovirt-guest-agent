@@ -296,6 +296,12 @@ class LinuxDataRetriver(DataRetriverBase):
         # skip if not available
         if not os.path.exists(cmd[0]):
             return []
+        if not os.path.exists('/host/var/run/docker.sock') and \
+                not os.path.exists('/var/run/docker.sock'):
+            logging.debug(
+                'Skipping execution of ovirt-container-list command,'
+                ' docker not running')
+            return []
         logging.debug('Executing ovirt-container-list command')
         result = []
         try:
