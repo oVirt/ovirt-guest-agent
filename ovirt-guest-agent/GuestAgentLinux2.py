@@ -122,7 +122,7 @@ class PkgMgr(object):
         """ Implementes the package retrieval for apt based environments """
         INSTALLED_STATE = self.apt_pkg.CURSTATE_INSTALLED
         apps = set()
-        cache = self.apt_pkg.Cache()
+        cache = self.apt_pkg.Cache(None)
         for app in app_list.split():
             if app in cache:
                 pkg = cache[app]
